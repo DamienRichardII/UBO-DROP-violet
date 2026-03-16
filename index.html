@@ -2,7 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#3d0882">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>UBO DROP</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -430,6 +434,48 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
   color: var(--ink) !important;
 }
 
+
+/* ══ FULLSCREEN MOBILE ══ */
+@media (max-width: 480px) {
+  body {
+    background: var(--cr) !important;
+  }
+  .stage {
+    padding: 0 !important;
+    height: 100dvh !important;
+    display: block !important;
+  }
+  .phone {
+    width: 100vw !important;
+    height: 100dvh !important;
+    min-height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  /* Status bar space via safe area */
+  .sbar {
+    padding-top: env(safe-area-inset-top, 10px) !important;
+    height: calc(44px + env(safe-area-inset-top, 0px)) !important;
+  }
+  /* Bottom nav safe area */
+  .bnav {
+    padding-bottom: env(safe-area-inset-bottom, 8px) !important;
+    height: calc(60px + env(safe-area-inset-bottom, 8px)) !important;
+  }
+  /* Dynamic island hidden on real phones (they have their own) */
+  .di { display: none !important; }
+  /* Screens fill full height */
+  .sc { height: 100dvh !important; }
+  /* Theme button stays visible */
+  .theme-btn { top: calc(14px + env(safe-area-inset-top, 0px)) !important; }
+}
+
+/* Also handle very tall phones */
+@media (max-width: 480px) and (min-height: 850px) {
+  .phone { height: 100dvh !important; }
+}
+
 </style>
 <style id="theme-root-style"></style>
 </head>
@@ -648,13 +694,12 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
 
 <!-- Bottom nav -->
 <div class="bnav">
-  <button class="ntab a" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
-</div>
-</div>
+    <button class="ntab a" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
+</div></div>
 <!-- ══ BOOKING MODAL — 4 étapes ══ -->
 <div class="modal" id="s-booking">
 <div style="position:absolute;inset:0;background:var(--cr)"></div>
@@ -872,13 +917,12 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
   </div>
 </div>
 <div class="bnav">
-  <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
-  <button class="ntab a" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
-</div>
-</div>
+    <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
+    <button class="ntab a" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
+</div></div>
 <!-- ══ MESSAGES ══ -->
 <div class="sc" id="s-messages">
 <div style="position:absolute;inset:0;background:var(--cr)"></div>
@@ -948,8 +992,7 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
     <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
     <button class="ntab a" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
     <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
-  </div>
-</div>
+</div></div>
 
 <!-- Vue chat individuel (overlay dans messages) -->
 <div id="chat-view" style="position:absolute;inset:0;background:var(--cr);display:none;flex-direction:column">
@@ -1272,13 +1315,12 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
   </div>
 </div>
 <div class="bnav">
-  <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
-  <button class="ntab a" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
-</div>
-</div>
+    <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
+    <button class="ntab a" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
+</div></div>
 
 <!-- Profile (minimal) -->
 <div class="sc" id="s-profile">
@@ -1297,13 +1339,12 @@ body.theme-cream #s-splash span[style*="color:#fff"] {
   </div>
 </div>
 <div class="bnav">
-  <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
-  <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
-  <button class="ntab a" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
-</div>
-</div>
+    <button class="ntab" onclick="swNav('map')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span class="ntl">Carte</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('explore')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="ntl">Explorer</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('bookings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span class="ntl">RDV</span><div class="npip"></div></button>
+    <button class="ntab" onclick="swNav('messages')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span class="ntl">Messages</span><div class="npip"></div></button>
+    <button class="ntab a" onclick="swNav('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span class="ntl">Profil</span><div class="npip"></div></button>
+</div></div>
 <script>
 // ── Clock ──
 function tick(){const n=new Date();document.getElementById('clk').textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}

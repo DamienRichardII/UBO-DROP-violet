@@ -718,8 +718,8 @@ const GMAPS_KEY = 'VOTRE_CLE_API_GOOGLE_MAPS'; // Remplacer par votre clé
 </div>
 <!-- ══ MAP — BOBIGNY 93 ══ -->
 <div class="sc" id="s-map">
-<div id="gmap" aria-label="Carte des professionnels de Bobigny"></div>
-<div id="map-canvas" style="display:none">
+<div id="gmap" style="display:none"></div>
+<div id="map-canvas">
   <!-- Fond papier -->
   <div style="position:absolute;inset:0;background:linear-gradient(160deg,#ede5f8 0%,#dcd0f0 100%)"></div>
 
@@ -1437,7 +1437,7 @@ const GMAPS_KEY = 'VOTRE_CLE_API_GOOGLE_MAPS'; // Remplacer par votre clé
           <div id="dispo-label" style="font-size:22px;font-weight:700;letter-spacing:-.5px;font-family:var(--sr)">Disponible</div>
           <div id="dispo-sub" style="font-size:12px;color:var(--t2);margin-top:3px">Visible sur la carte · Bobigny</div>
         </div>
-        <button class="toggle ton" id="dispoTog" onclick="toggleDispo()"></button>
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(42,122,72,.15);border:1px solid rgba(42,122,72,.3);border-radius:20px"><div style="width:6px;height:6px;border-radius:50%;background:#7de8a8;animation:pulse 1.8s infinite"></div><span style="font-size:11px;font-weight:600;color:#7de8a8;font-family:var(--mo)">EN LIGNE</span></div>
       </div>
       <div id="dispo-status" style="display:flex;align-items:center;gap:7px;background:rgba(42,122,72,.07);border-radius:11px;padding:9px 13px">
         <div style="width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.8s infinite"></div>
@@ -1461,6 +1461,12 @@ const GMAPS_KEY = 'VOTRE_CLE_API_GOOGLE_MAPS'; // Remplacer par votre clé
   <div style="margin:18px 20px 0;background:rgba(154,114,40,.08);border:1px solid var(--aum);border-radius:20px;padding:16px 18px">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div style="display:flex;align-items:center;gap:9px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--au)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><div style="font-size:15px;font-weight:600">Promo auto</div></div><button class="toggle ton" onclick="showT('Toggle promo')"></button></div>
     <div style="font-size:12px;color:var(--t2)">–30% si créneau vide depuis 2h</div>
+  </div>
+  <!-- Badge certifié CTA -->
+  <div onclick="submitSiretFromDash()" style="margin:0 20px;background:rgba(201,144,10,.08);border:1px solid rgba(201,144,10,.22);border-radius:18px;padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--au)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+    <div style="flex:1"><div style="font-size:14px;font-weight:600;color:var(--au)">Obtenir le badge Certifié</div><div style="font-size:11px;color:rgba(245,240,232,.4);margin-top:2px">Soumettre ton SIRET · Validation en 24h</div></div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--au)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
   </div>
 </div>
 </div>
@@ -1707,26 +1713,7 @@ function addBubble(txt){const msgs=document.getElementById('chat-msgs');const t=
 
 // ── PRO DISPO ──
 let dispoOn=true;
-function toggleDispo(){dispoOn=!dispoOn;const tog=document.getElementById('dispoTog');const inner=document.getElementById('dispo-inner');const label=document.getElementById('dispo-label');const sub=document.getElementById('dispo-sub');const status=document.getElementById('dispo-status');if(dispoOn){tog.classList.replace('tof','ton');inner.style.background='rgba(42,122,72,.08)';inner.style.borderColor='rgba(42,122,72,.2)';label.textContent='Disponible';sub.textContent='Visible sur la carte · Bobigny';status.style.background='rgba(42,122,72,.07)';status.innerHTML='<div style="width:7px;height:7px;border-radius:50%;background:var(--ok);animation:pulse 1.8s infinite"></div><span style="font-size:12px;font-weight:500;color:var(--ok)">En ligne · Les clients te voient sur la carte</span>';}else{tog.classList.replace('ton','tof');inner.style.background='rgba(15,13,10,.04)';inner.style.borderColor='rgba(15,13,10,.1)';label.textContent='Indisponible';sub.textContent='Tu n\'apparais pas sur la carte';status.style.background='rgba(15,13,10,.04)';status.innerHTML='<div style="width:7px;height:7px;border-radius:50%;background:var(--t3)"></div><span style="font-size:12px;font-weight:500;color:var(--t3)">Hors ligne · Invisible pour les clients</span>';}showT(dispoOn?'Statut : Disponible ✓':'Statut : Indisponible');}
-
-
-
-// ══ THEME SWITCH ══
-let currentTheme = 'purple'; // 'purple' | 'cream'
-
-function updateThemeBtn(screenId) {
-  const btn   = document.getElementById('theme-btn');
-  const label = document.getElementById('theme-label');
-  if (!btn) return;
-  // Button is always opposite of current theme
-  if (currentTheme === 'purple') {
-    btn.className = 'theme-btn t-violet'; // crème button on violet bg
-    label.textContent = 'Crème';
-  } else {
-    btn.className = 'theme-btn t-cream';  // violet button on cream bg
-    label.textContent = 'Violet';
-  }
-}
+function toggleDispo(){ /* locked ON for MVP */ }
 
 function applyTheme(theme) {
   const root = document.documentElement;
@@ -1872,15 +1859,7 @@ function initGoogleMap() {
 }
 
 // Load Google Maps when entering map screen
-function loadMapIfNeeded() {
-  if(typeof google !== 'undefined' && !map) { initGoogleMap(); return; }
-  if(typeof google === 'undefined' && GMAPS_KEY !== 'VOTRE_CLE_API_GOOGLE_MAPS') {
-    const s = document.createElement('script');
-    s.src = `https://maps.googleapis.com/maps/api/js?key=${GMAPS_KEY}&callback=initGoogleMap`;
-    s.async = true; s.defer = true;
-    document.head.appendChild(s);
-  }
-}
+function loadMapIfNeeded() { /* Google Maps désactivé temporairement */ }
 
 // ══════════════════════════════════════════════════════
 // PUSH NOTIFICATIONS
@@ -2197,6 +2176,75 @@ function setRegType(type, el) {
   if(sf) { sf.style.display = type === 'pro' ? 'flex' : 'none'; if(type==='pro') sf.style.alignItems='center'; }
 }
 
+
+// ══ SIRET Validation ══
+function validateSiret(input) {
+  const val = input.value.replace(/\D/g, '');
+  input.value = val;
+  const check = document.getElementById('siret-check');
+  const feedback = document.getElementById('siret-feedback');
+  if(!val) {
+    check.style.display = 'none';
+    feedback.style.display = 'none';
+    return;
+  }
+  check.style.display = 'block';
+  feedback.style.display = 'block';
+  if(val.length === 14) {
+    // Luhn-style check: SIRET = SIREN (9) + NIC (5)
+    // Basic format check
+    check.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7de8a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+    feedback.style.color = '#7de8a8';
+    feedback.textContent = '✓ Format valide — vérification en cours après inscription';
+  } else {
+    check.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--er)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+    feedback.style.color = 'var(--er)';
+    feedback.textContent = val.length + '/14 chiffres';
+  }
+}
+
+// ══ Register submit ══
+let registeredSiret = '';
+function submitRegister() {
+  const siretInput = document.getElementById('siret-input');
+  const siret = siretInput ? siretInput.value.trim() : '';
+  registeredSiret = siret;
+
+  // Show success screen
+  goTo('register-success');
+
+  // Configure success screen based on SIRET
+  const sub = document.getElementById('reg-success-sub');
+  const pending = document.getElementById('siret-pending-block');
+  const later = document.getElementById('siret-later-block');
+  const display = document.getElementById('siret-display');
+
+  if(siret && siret.length === 14) {
+    if(sub) sub.textContent = "Bienvenue chez UBO Drop. Ton SIRET est en cours de vérification.";
+    if(pending) pending.style.display = 'block';
+    if(later)   later.style.display   = 'none';
+    if(display) display.textContent   = 'SIRET : ' + siret.replace(/(\d{3})(\d{3})(\d{3})(\d{5})/, '$1 $2 $3 $4');
+    // Notify admin (demo)
+    setTimeout(() => showInAppNotif && showInAppNotif('Nouveau Pro inscrit', 'SIRET en attente de vérification'), 1500);
+  } else {
+    if(sub) sub.textContent = "Bienvenue chez UBO Drop. Tu peux soumettre ton SIRET plus tard.";
+    if(pending) pending.style.display = 'none';
+    if(later)   later.style.display   = 'block';
+  }
+
+  // Notification
+  setTimeout(() => triggerBookingNotif && triggerBookingNotif('UBO Drop', 'Compte créé avec succès !'), 500);
+}
+
+// ══ Submit SIRET from Pro Dashboard ══
+function submitSiretFromDash() {
+  const val = prompt('Entre ton numéro SIRET (14 chiffres) :');
+  if(!val) return;
+  const clean = val.replace(/\D/g,'');
+  if(clean.length !== 14) { showT && showT('SIRET invalide — 14 chiffres requis'); return; }
+  showInAppNotif && showInAppNotif('SIRET soumis ✓', 'Vérification en cours · Badge dans les 24h');
+}
+
 </script>
 
 <!-- ══ ADMIN DASHBOARD ══ -->
@@ -2446,17 +2494,76 @@ function setRegType(type, el) {
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
       <input placeholder="Mot de passe" type="password" autocomplete="new-password" style="flex:1;background:none;border:none;color:#fff;font-family:var(--sf);font-size:15px;outline:none" aria-label="Mot de passe">
     </div>
-    <div id="siret-field" style="display:none;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:13px 16px;align-items:center;gap:10px">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-      <input placeholder="SIRET (14 chiffres)" type="text" inputmode="numeric" maxlength="14" style="flex:1;background:none;border:none;color:#fff;font-family:var(--mo);font-size:15px;outline:none" aria-label="Numéro SIRET">
+    <!-- SIRET PRO — optionnel → badge certifié -->
+    <div id="siret-field" style="display:none;flex-direction:column;gap:10px">
+      <!-- Explication badge -->
+      <div style="background:rgba(201,144,10,.1);border:1px solid rgba(201,144,10,.25);border-radius:14px;padding:13px 15px;display:flex;gap:10px;align-items:flex-start">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--au)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--au);margin-bottom:3px">Badge Pro Certifié</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.45);line-height:1.5">Optionnel · Renseigne ton SIRET pour obtenir le badge <strong style="color:var(--au)">✓ Certifié</strong> après validation par l'équipe UBO Drop (24h)</div>
+        </div>
+      </div>
+      <!-- Input SIRET -->
+      <div style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);border-radius:14px;padding:13px 16px;display:flex;align-items:center;gap:10px">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+        <input id="siret-input" placeholder="SIRET — 14 chiffres (optionnel)" type="text" inputmode="numeric" maxlength="14" oninput="validateSiret(this)" style="flex:1;background:none;border:none;color:#fff;font-family:var(--mo);font-size:14px;outline:none;letter-spacing:.04em" aria-label="Numéro SIRET">
+        <div id="siret-check" style="width:20px;height:20px;flex-shrink:0;display:none"></div>
+      </div>
+      <!-- SIRET feedback -->
+      <div id="siret-feedback" style="display:none;font-size:11px;padding:0 4px"></div>
     </div>
   </div>
   <div style="font-size:12px;color:rgba(255,255,255,.35);margin-bottom:20px;line-height:1.6">
     En créant un compte, tu acceptes nos <span style="color:var(--au);cursor:pointer" onclick="openLegal('cgu')">CGU</span> et notre <span style="color:var(--au);cursor:pointer" onclick="openLegal('rgpd')">Politique de confidentialité</span>.
   </div>
-  <button onclick="goTo('map');triggerBookingNotif('UBO Drop','Compte créé avec succès !')" style="width:100%;padding:15px;background:var(--pu2);border:none;border-radius:16px;font-family:var(--sf);font-size:16px;font-weight:600;color:#fff;cursor:pointer">Créer mon compte</button>
+  <button onclick="submitRegister()" style="width:100%;padding:15px;background:var(--pu2);border:none;border-radius:16px;font-family:var(--sf);font-size:16px;font-weight:600;color:#fff;cursor:pointer">Créer mon compte</button>
   <div style="flex:1"></div>
   <div style="text-align:center;font-size:13px;color:rgba(255,255,255,.4);margin-top:20px">Déjà un compte ? <span style="color:var(--au);font-weight:500;cursor:pointer" onclick="goTo('login')">Se connecter</span></div>
+</div>
+</div>
+
+
+<!-- ══ REGISTER SUCCESS ══ -->
+<div class="sc" id="s-register-success">
+<div style="position:absolute;inset:0;background:linear-gradient(160deg,#120228 0%,#3d0882 100%)"></div>
+<div style="position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px;text-align:center">
+
+  <!-- Success icon -->
+  <div style="width:80px;height:80px;border-radius:28px;background:rgba(42,122,72,.2);border:2px solid rgba(42,122,72,.4);display:flex;align-items:center;justify-content:center;margin-bottom:24px">
+    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#7de8a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+
+  <div style="font-size:34px;font-weight:700;letter-spacing:-1px;font-family:var(--sr);color:#fff;margin-bottom:8px">Compte créé !</div>
+  <div id="reg-success-sub" style="font-size:14px;color:rgba(255,255,255,.5);line-height:1.65;margin-bottom:32px">Bienvenue sur UBO Drop.</div>
+
+  <!-- SIRET pending badge (shown if SIRET submitted) -->
+  <div id="siret-pending-block" style="display:none;width:100%;margin-bottom:24px">
+    <div style="background:rgba(201,144,10,.1);border:1px solid rgba(201,144,10,.28);border-radius:18px;padding:18px 20px;display:flex;gap:14px;align-items:flex-start;text-align:left">
+      <div style="width:40px;height:40px;border-radius:13px;background:rgba(201,144,10,.18);border:1px solid rgba(201,144,10,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--au)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--au);margin-bottom:4px">Vérification SIRET en cours</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.45);line-height:1.55">Ton SIRET est en cours de vérification par l'équipe UBO Drop. Tu recevras ton badge <strong style="color:var(--au)">✓ Certifié</strong> dans les 24h.</div>
+        <div id="siret-display" style="font-family:var(--mo);font-size:12px;color:var(--au);margin-top:8px;letter-spacing:.06em"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- No SIRET info (shown if no SIRET) -->
+  <div id="siret-later-block" style="display:none;width:100%;margin-bottom:24px">
+    <div style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:16px 18px;display:flex;gap:12px;align-items:flex-start;text-align:left">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:rgba(255,255,255,.65);margin-bottom:3px">Badge Certifié disponible plus tard</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.38);line-height:1.55">Tu pourras soumettre ton SIRET depuis ton dashboard Pro pour obtenir le badge <strong style="color:var(--au)">✓ Certifié</strong>.</div>
+      </div>
+    </div>
+  </div>
+
+  <button onclick="goTo('pro-dash')" style="width:100%;padding:15px;background:var(--pu2);border:none;border-radius:16px;font-family:var(--sf);font-size:16px;font-weight:600;color:#fff;cursor:pointer;margin-bottom:10px">Accéder à mon dashboard</button>
+  <button onclick="goTo('map')" style="width:100%;padding:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:16px;font-family:var(--sf);font-size:15px;font-weight:500;color:rgba(255,255,255,.7);cursor:pointer">Voir la carte</button>
 </div>
 </div>
 

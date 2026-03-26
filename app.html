@@ -8,582 +8,408 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
+            --violet-deep: #6C3FA0;
+            --violet-neon: #A855F7;
             --violet-light: #D4B8E8;
             --violet-medium: #B48ED0;
             --violet-soft: #EDE4F3;
             --violet-pale: #F3ECF8;
-            --violet-dark: #7B5EA7;
             --noir: #111111;
             --noir-soft: #1A1A2E;
-            --noir-card: #1E1E32;
             --blanc-casse: #F5F0EB;
             --blanc: #FFFFFF;
+            --green: #22C55E;
+            --red: #EF4444;
+            --gold: #F59E0B;
             --glass-border: rgba(212,184,232,0.25);
             --shadow-sm: 0 2px 8px rgba(17,17,17,0.06);
             --shadow-md: 0 4px 20px rgba(17,17,17,0.1);
             --shadow-lg: 0 8px 40px rgba(17,17,17,0.15);
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --radius-xl: 32px;
         }
 
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
             font-family: 'DM Sans', -apple-system, sans-serif;
-            background: var(--noir);
-            color: var(--blanc-casse);
+            background: var(--violet-pale);
+            color: var(--noir);
             line-height: 1.6; overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
         }
         img { max-width: 100%; display: block; }
         a { text-decoration: none; color: inherit; }
+        input, select, button { font-family: 'DM Sans', sans-serif; }
 
-        /* ===== APP SHELL ===== */
-        .app-shell {
-            max-width: 430px;
-            margin: 0 auto;
-            min-height: 100vh;
-            position: relative;
-            background: var(--noir);
-        }
-
-        /* ===== SPLASH / HOME SCREEN ===== */
+        .app-shell { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--violet-pale); }
         .screen { display: none; min-height: 100vh; }
-        .screen.active { display: block; }
+        .screen.active { display: flex; flex-direction: column; }
 
-        /* — Splash — */
+        /* ==================== SPLASH ==================== */
         #splash {
-            display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             min-height: 100vh;
-            background: radial-gradient(ellipse at center, rgba(122,94,167,0.15) 0%, var(--noir) 70%);
-            position: relative;
-        }
-        .splash-logo {
-            width: 120px; height: 120px; border-radius: 30px;
-            object-fit: cover;
-            box-shadow: 0 0 60px rgba(180,142,208,0.3);
-            margin-bottom: 24px;
-            animation: splashPulse 2s ease infinite;
-        }
-        @keyframes splashPulse {
-            0%, 100% { box-shadow: 0 0 40px rgba(180,142,208,0.2); }
-            50% { box-shadow: 0 0 80px rgba(180,142,208,0.4); }
-        }
-        .splash-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.2rem; font-weight: 900;
-            letter-spacing: 4px; color: var(--blanc-casse);
-            margin-bottom: 8px;
-        }
-        .splash-sub {
-            font-size: 0.9rem; color: var(--violet-light);
-            opacity: 0.7; margin-bottom: 48px;
-        }
-        .splash-enter {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: var(--blanc-casse); color: var(--noir);
-            padding: 16px 40px; border-radius: 50px;
-            font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
-            border: none; cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 24px rgba(245,240,235,0.15);
-        }
-        .splash-enter:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(245,240,235,0.2); }
-        .splash-enter svg { width: 18px; height: 18px; }
-
-        .splash-back {
-            position: absolute; bottom: 40px;
-            font-size: 0.82rem; color: var(--violet-light);
-            opacity: 0.5; transition: opacity 0.2s;
-        }
-        .splash-back:hover { opacity: 1; }
-
-        /* — Home — */
-        #home {
-            background: var(--noir);
-            padding-bottom: 100px;
-        }
-
-        .home-header {
-            padding: 60px 20px 20px;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .home-greeting {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem; font-weight: 700;
-        }
-        .home-greeting span { color: var(--violet-light); }
-        .home-avatar {
-            width: 42px; height: 42px; border-radius: 50%;
-            background: var(--violet-light);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .home-avatar svg { width: 20px; height: 20px; stroke: var(--noir); }
-
-        /* Search bar */
-        .home-search {
-            margin: 16px 20px;
-            background: var(--noir-card);
-            border: 1px solid rgba(212,184,232,0.1);
-            border-radius: 16px; padding: 14px 18px;
-            display: flex; align-items: center; gap: 12px;
-            cursor: pointer; transition: border-color 0.2s;
-        }
-        .home-search:hover { border-color: var(--violet-light); }
-        .home-search svg { width: 18px; height: 18px; stroke: var(--violet-light); opacity: 0.6; }
-        .home-search span { font-size: 0.9rem; opacity: 0.4; }
-
-        /* Location filter */
-        .location-filter {
-            display: flex; gap: 10px; padding: 0 20px; margin-bottom: 24px;
-        }
-        .loc-btn {
-            flex: 1; padding: 12px 10px;
-            border-radius: 14px; border: 1px solid rgba(212,184,232,0.15);
-            background: var(--noir-card); color: var(--blanc-casse);
-            font-size: 0.78rem; font-weight: 600; text-align: center;
-            cursor: pointer; transition: all 0.25s ease;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .loc-btn.active, .loc-btn:hover {
-            background: var(--violet-light); color: var(--noir);
-            border-color: var(--violet-medium);
-        }
-
-        /* Categories horizontal */
-        .home-cats-label {
-            padding: 0 20px; margin-bottom: 14px;
-            font-size: 0.75rem; font-weight: 600;
-            letter-spacing: 1.5px; text-transform: uppercase;
-            color: var(--violet-light); opacity: 0.7;
-        }
-        .home-cats-scroll {
-            display: flex; gap: 12px; padding: 0 20px;
-            overflow-x: auto; -webkit-overflow-scrolling: touch;
-            scrollbar-width: none; margin-bottom: 28px;
-        }
-        .home-cats-scroll::-webkit-scrollbar { display: none; }
-
-        .home-cat-card {
-            flex-shrink: 0; width: 90px;
-            display: flex; flex-direction: column; align-items: center;
-            gap: 8px; padding: 16px 8px;
-            background: var(--noir-card);
-            border: 1px solid rgba(212,184,232,0.08);
-            border-radius: 18px; cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .home-cat-card:hover, .home-cat-card.active {
-            background: var(--violet-dark);
-            border-color: var(--violet-light);
-        }
-        .home-cat-card .hc-emoji { font-size: 1.6rem; }
-        .home-cat-card .hc-name {
-            font-size: 0.68rem; font-weight: 600;
-            text-align: center; line-height: 1.2;
-        }
-
-        /* ===== MAP SCREEN ===== */
-        #map {
             background: var(--violet-pale);
-            color: var(--noir);
-            min-height: 100vh;
-            padding-bottom: 90px;
-        }
-
-        .map-header {
-            display: flex; align-items: center; gap: 14px;
-            padding: 56px 18px 16px;
-            background: rgba(243,236,248,0.95);
-            backdrop-filter: blur(16px);
-            position: sticky; top: 0; z-index: 10;
-        }
-        .map-back {
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--blanc); border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: background 0.2s; flex-shrink: 0;
-        }
-        .map-back:hover { background: var(--violet-soft); }
-        .map-back svg { width: 18px; height: 18px; stroke: var(--noir); }
-        .map-header-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.15rem; font-weight: 800;
-        }
-        .map-header-title span { font-weight: 400; }
-        .map-header-right {
-            margin-left: auto;
-            width: 36px; height: 36px; border-radius: 50%;
-            background: var(--violet-light);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer;
-        }
-        .map-header-right svg { width: 16px; height: 16px; stroke: var(--noir); }
-
-        /* Search */
-        .map-search {
-            margin: 12px 18px;
-            background: var(--blanc);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 13px 16px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .map-search svg { width: 18px; height: 18px; stroke: var(--violet-medium); flex-shrink: 0; }
-        .map-search input {
-            flex: 1; border: none; outline: none; background: none;
-            font-size: 0.9rem; font-family: 'DM Sans', sans-serif;
-            color: var(--noir);
-        }
-        .map-search input::placeholder { color: var(--noir); opacity: 0.35; }
-
-        /* Location pills */
-        .map-loc-pills {
-            display: flex; gap: 8px; padding: 0 18px; margin-bottom: 14px;
-        }
-        .map-pill {
-            flex: 1; padding: 11px 8px; border-radius: 12px;
-            background: var(--violet-light); color: var(--noir);
-            font-size: 0.76rem; font-weight: 600; text-align: center;
-            cursor: pointer; transition: all 0.25s;
-            border: 2px solid transparent;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .map-pill.active {
-            background: var(--noir); color: var(--blanc-casse);
-            border-color: var(--violet-light);
-        }
-
-        /* Map visual */
-        .map-visual {
-            margin: 0 18px 14px;
-            border-radius: 20px;
-            overflow: hidden;
-            height: 320px;
-            background: #E8DFF0;
-            position: relative;
-            border: 1px solid var(--glass-border);
-        }
-        .map-visual iframe {
-            width: 100%; height: 100%; border: none;
-            filter: saturate(0.3) brightness(1.05) hue-rotate(240deg);
-        }
-        /* Map pins overlay */
-        .map-pins {
-            position: absolute; inset: 0; pointer-events: none;
-        }
-        .map-pin {
-            position: absolute; width: 44px; height: 52px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .map-pin-avatar {
-            width: 38px; height: 38px; border-radius: 50%;
-            border: 3px solid var(--violet-dark);
-            background: var(--violet-light);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(123,94,167,0.3);
-        }
-        .map-pin-point {
-            width: 0; height: 0;
-            border-left: 6px solid transparent;
-            border-right: 6px solid transparent;
-            border-top: 8px solid var(--violet-dark);
-            margin-top: -1px;
-        }
-        .pin1 { top: 25%; left: 30%; }
-        .pin2 { top: 40%; left: 65%; }
-        .pin3 { top: 60%; left: 25%; }
-
-        /* Category grid on map */
-        .map-cats-title {
-            padding: 0 18px; margin-bottom: 12px;
-            font-size: 0.8rem; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase;
-            color: var(--noir);
-        }
-        .map-cats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px; padding: 0 18px; margin-bottom: 24px;
-        }
-        .map-cat-item {
-            background: var(--violet-soft);
-            border-radius: 14px; padding: 16px 8px;
-            text-align: center; cursor: pointer;
-            transition: all 0.25s; border: 1px solid transparent;
-        }
-        .map-cat-item:hover {
-            background: var(--violet-light);
-            border-color: var(--violet-medium);
-        }
-        .map-cat-item .mc-emoji { font-size: 1.4rem; display: block; margin-bottom: 6px; }
-        .map-cat-item .mc-name { font-size: 0.72rem; font-weight: 600; color: var(--noir); }
-
-        /* Provider cards */
-        .providers-title {
-            padding: 0 18px; margin-bottom: 14px;
-            font-size: 0.8rem; font-weight: 700;
-            letter-spacing: 1px; text-transform: uppercase;
-            color: var(--noir);
-        }
-        .provider-card {
-            margin: 0 18px 14px; padding: 16px;
-            background: var(--blanc); border-radius: 18px;
-            display: flex; align-items: center; gap: 14px;
-            border: 1px solid rgba(212,184,232,0.15);
-            transition: all 0.25s; cursor: pointer;
-        }
-        .provider-card:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-        .provider-avatar {
-            width: 54px; height: 54px; border-radius: 16px;
-            background: var(--violet-soft);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem; flex-shrink: 0;
-        }
-        .provider-info { flex: 1; }
-        .provider-name { font-weight: 700; font-size: 0.95rem; color: var(--noir); }
-        .provider-cat { font-size: 0.78rem; color: var(--violet-dark); font-weight: 500; margin-top: 2px; }
-        .provider-meta {
-            display: flex; align-items: center; gap: 8px; margin-top: 4px;
-        }
-        .provider-rating {
-            font-size: 0.75rem; font-weight: 600; color: var(--noir);
-            display: flex; align-items: center; gap: 3px;
-        }
-        .provider-rating svg { width: 12px; height: 12px; fill: var(--violet-medium); stroke: none; }
-        .provider-dist { font-size: 0.72rem; color: var(--noir); opacity: 0.45; }
-        .provider-price {
-            margin-left: auto; font-weight: 700;
-            font-size: 0.95rem; color: var(--noir);
-        }
-
-        /* ===== PROFILE SCREEN ===== */
-        #profile {
-            background: var(--noir);
-            min-height: 100vh;
-            padding: 60px 20px 100px;
+            padding: 40px 24px;
             text-align: center;
         }
-        .profile-avatar-big {
-            width: 80px; height: 80px; border-radius: 50%;
-            background: var(--violet-light); margin: 0 auto 16px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .profile-avatar-big svg { width: 36px; height: 36px; stroke: var(--noir); }
-        .profile-name {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;
-        }
-        .profile-email { font-size: 0.85rem; opacity: 0.5; margin-bottom: 32px; }
+        .splash-logo { width: 110px; height: 110px; border-radius: 28px; object-fit: contain; margin-bottom: 16px; background: var(--blanc); padding: 8px; box-shadow: var(--shadow-lg); }
+        .splash-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; letter-spacing: 3px; color: var(--noir); margin-bottom: 28px; }
 
-        .profile-menu { text-align: left; }
-        .profile-menu-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 18px 0; border-bottom: 1px solid rgba(212,184,232,0.08);
-            cursor: pointer; transition: opacity 0.2s;
-        }
-        .profile-menu-item:hover { opacity: 0.7; }
-        .profile-menu-item .pm-icon {
-            width: 40px; height: 40px; border-radius: 12px;
-            background: var(--noir-card);
-            display: flex; align-items: center; justify-content: center;
-        }
-        .profile-menu-item .pm-icon svg { width: 18px; height: 18px; stroke: var(--violet-light); }
-        .profile-menu-item .pm-text { font-size: 0.92rem; font-weight: 500; }
-        .profile-menu-item .pm-arrow { margin-left: auto; opacity: 0.3; font-size: 0.8rem; }
+        /* Animated steps */
+        .splash-steps { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
+        .splash-step { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; animation: stepFade 0.5s ease forwards; }
+        .splash-step:nth-child(1) { animation-delay: 0.3s; }
+        .splash-step:nth-child(3) { animation-delay: 0.6s; }
+        .splash-step:nth-child(5) { animation-delay: 0.9s; }
+        .splash-step .step-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blanc); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; }
+        .splash-step .step-icon svg { width: 20px; height: 20px; stroke: var(--violet-deep); }
+        .splash-step span { font-size: 0.68rem; font-weight: 600; color: var(--noir); opacity: 0.6; }
+        .splash-arrow { color: var(--violet-medium); font-size: 1rem; margin-top: -14px; opacity: 0; animation: stepFade 0.5s ease forwards; }
+        .splash-arrow:nth-child(2) { animation-delay: 0.45s; }
+        .splash-arrow:nth-child(4) { animation-delay: 0.75s; }
+        @keyframes stepFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* ===== iOS NAV BAR ===== */
-        .ios-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(26,26,46,0.82);
-            backdrop-filter: blur(24px) saturate(180%);
-            -webkit-backdrop-filter: blur(24px) saturate(180%);
-            border-top: 1px solid rgba(212,184,232,0.12);
-            padding: 6px 0 max(6px, env(safe-area-inset-bottom));
-        }
-        .ios-nav-inner {
-            display: flex; justify-content: space-around; align-items: center;
-            max-width: 430px; margin: 0 auto; padding: 4px 0;
-        }
-        .ios-nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 2px;
-            color: rgba(212,184,232,0.45); font-size: 0.62rem; font-weight: 500;
-            transition: color 0.2s; cursor: pointer; padding: 6px 16px;
-            background: none; border: none;
-            font-family: 'DM Sans', sans-serif;
-        }
-        .ios-nav-item:hover, .ios-nav-item.active { color: var(--violet-light); }
+        /* CTA buttons */
+        .splash-ctas { display: flex; gap: 12px; width: 100%; margin-bottom: 20px; }
+        .splash-cta { flex: 1; padding: 16px; border-radius: 50px; font-size: 0.95rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.3px; }
+        .cta-client { background: var(--blanc); color: var(--noir); border: 2px solid var(--glass-border); box-shadow: var(--shadow-sm); }
+        .cta-client:hover { border-color: var(--violet-medium); box-shadow: var(--shadow-md); }
+        .cta-pro { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); box-shadow: 0 4px 20px rgba(168,85,247,0.3); }
+        .cta-pro:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(168,85,247,0.4); }
+
+        .splash-auth { display: flex; gap: 16px; justify-content: center; }
+        .splash-auth a { font-size: 0.85rem; font-weight: 500; color: var(--violet-deep); padding: 8px 16px; transition: opacity 0.2s; }
+        .splash-auth a:hover { opacity: 0.7; }
+        .splash-back { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; color: var(--violet-medium); opacity: 0.5; }
+        .splash-back:hover { opacity: 1; }
+
+        /* ==================== AUTH SCREENS ==================== */
+        .auth-screen { padding: 60px 24px 40px; background: var(--violet-pale); }
+        .auth-back { width: 36px; height: 36px; border-radius: 50%; background: var(--blanc); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 24px; }
+        .auth-back svg { width: 18px; height: 18px; stroke: var(--noir); }
+        .auth-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800; color: var(--noir); margin-bottom: 6px; }
+        .auth-sub { font-size: 0.9rem; color: var(--noir); opacity: 0.5; margin-bottom: 28px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--noir); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.6; }
+        .form-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); font-size: 0.92rem; color: var(--noir); outline: none; transition: border-color 0.2s; }
+        .form-input:focus { border-color: var(--violet-neon); }
+        .form-input::placeholder { color: var(--noir); opacity: 0.3; }
+        .form-optional { font-size: 0.72rem; color: var(--violet-medium); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+        .form-submit { width: 100%; padding: 16px; border-radius: 50px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.3s; }
+        .form-submit.client-submit { background: var(--noir); color: var(--blanc-casse); }
+        .form-submit.pro-submit { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); }
+        .form-submit:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+
+        .google-btn { width: 100%; padding: 14px; border-radius: 50px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); font-size: 0.9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; transition: all 0.2s; color: var(--noir); }
+        .google-btn:hover { border-color: var(--violet-medium); background: var(--violet-soft); }
+        .google-btn svg { width: 18px; height: 18px; }
+
+        .auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+        .auth-divider span { font-size: 0.78rem; color: var(--noir); opacity: 0.35; white-space: nowrap; }
+        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: rgba(212,184,232,0.3); }
+
+        .auth-switch { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--noir); opacity: 0.5; }
+        .auth-switch a { color: var(--violet-deep); font-weight: 600; opacity: 1; cursor: pointer; }
+
+        /* ==================== CLIENT INTERFACE ==================== */
+        #clientHome { background: var(--violet-pale); padding-bottom: 90px; }
+
+        .client-header { display: flex; align-items: center; justify-content: space-between; padding: 56px 18px 14px; position: sticky; top: 0; z-index: 10; background: rgba(243,236,248,0.95); backdrop-filter: blur(16px); }
+        .client-header-left { display: flex; align-items: center; gap: 10px; }
+        .client-header-left .ch-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; }
+        .client-header-left .ch-title span { font-weight: 400; }
+        .client-profile-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--violet-light); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; position: relative; }
+        .client-profile-btn svg { width: 18px; height: 18px; stroke: var(--noir); }
+
+        /* Profile dropdown */
+        .profile-dropdown { display: none; position: absolute; top: 48px; right: 0; background: var(--blanc); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); min-width: 200px; z-index: 100; overflow: hidden; }
+        .profile-dropdown.open { display: block; }
+        .pd-item { display: flex; align-items: center; gap: 10px; padding: 14px 18px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+        .pd-item:hover { background: var(--violet-soft); }
+        .pd-item svg { width: 16px; height: 16px; stroke: var(--violet-deep); }
+        .pd-item.danger { color: var(--red); }
+        .pd-item.danger svg { stroke: var(--red); }
+        .pd-divider { height: 1px; background: rgba(212,184,232,0.2); margin: 0 14px; }
+
+        /* Search */
+        .client-search { margin: 10px 18px; background: var(--blanc); border: 1px solid var(--glass-border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
+        .client-search svg { width: 18px; height: 18px; stroke: var(--violet-medium); flex-shrink: 0; }
+        .client-search input { flex: 1; border: none; outline: none; background: none; font-size: 0.88rem; color: var(--noir); }
+        .client-search input::placeholder { color: var(--noir); opacity: 0.3; }
+
+        /* Location pills */
+        .loc-pills { display: flex; gap: 8px; padding: 10px 18px; }
+        .loc-pill { flex: 1; padding: 10px 6px; border-radius: 12px; background: var(--violet-light); color: var(--noir); font-size: 0.74rem; font-weight: 600; text-align: center; cursor: pointer; transition: all 0.25s; border: 2px solid transparent; }
+        .loc-pill.active { background: var(--noir); color: var(--blanc-casse); border-color: var(--violet-light); }
+
+        /* Map */
+        .client-map { margin: 10px 18px; border-radius: 20px; overflow: hidden; height: 280px; background: #E8DFF0; position: relative; border: 1px solid var(--glass-border); }
+        .client-map iframe { width: 100%; height: 100%; border: none; filter: saturate(0.3) brightness(1.05) hue-rotate(240deg); }
+        .map-pins { position: absolute; inset: 0; pointer-events: none; }
+        .map-pin { position: absolute; display: flex; flex-direction: column; align-items: center; }
+        .map-pin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--violet-deep); background: var(--violet-light); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(108,63,160,0.3); }
+        .map-pin-avatar.certified { border-color: var(--green); }
+        .map-pin-badge { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--blanc); }
+        .map-pin-badge svg { width: 8px; height: 8px; stroke: var(--blanc); stroke-width: 3; }
+        .map-pin-point { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--violet-deep); margin-top: -1px; }
+        .pin1 { top: 22%; left: 28%; }
+        .pin2 { top: 38%; left: 62%; }
+        .pin3 { top: 58%; left: 22%; }
+        .my-location { position: absolute; bottom: 12px; right: 12px; background: var(--blanc); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); pointer-events: auto; cursor: pointer; border: none; }
+        .my-location svg { width: 16px; height: 16px; stroke: var(--violet-deep); }
+
+        /* Categories */
+        .cats-section { padding: 14px 18px 0; }
+        .cats-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
+        .cats-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 8px; }
+        .cats-scroll::-webkit-scrollbar { display: none; }
+        .cat-chip { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 50px; background: var(--blanc); border: 1.5px solid rgba(212,184,232,0.3); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .cat-chip:hover, .cat-chip.active { background: var(--violet-light); border-color: var(--violet-medium); }
+        .cat-chip .cc-emoji { font-size: 1rem; }
+
+        /* CTA Pros disponibles */
+        .pros-cta { margin: 14px 18px; padding: 14px 18px; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border-radius: 16px; color: var(--blanc); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: none; width: calc(100% - 36px); font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
+        .pros-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(168,85,247,0.35); }
+        .pros-cta-text { font-size: 0.92rem; font-weight: 600; }
+        .pros-cta-count { font-size: 0.78rem; opacity: 0.8; }
+        .pros-cta svg { width: 18px; height: 18px; }
+
+        /* Provider list */
+        .providers-section { padding: 10px 18px; }
+        .providers-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
+        .provider-card { padding: 14px; background: var(--blanc); border-radius: 16px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(212,184,232,0.15); transition: all 0.25s; cursor: pointer; margin-bottom: 10px; }
+        .provider-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .provider-avatar { width: 52px; height: 52px; border-radius: 14px; background: var(--violet-soft); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; position: relative; }
+        .provider-avatar .cert-badge { position: absolute; bottom: -3px; right: -3px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--blanc); }
+        .provider-avatar .cert-badge svg { width: 9px; height: 9px; stroke: var(--blanc); stroke-width: 3; }
+        .provider-info { flex: 1; min-width: 0; }
+        .provider-name { font-weight: 700; font-size: 0.92rem; color: var(--noir); display: flex; align-items: center; gap: 6px; }
+        .provider-cat { font-size: 0.76rem; color: var(--violet-deep); font-weight: 500; margin-top: 1px; }
+        .provider-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+        .provider-rating { font-size: 0.73rem; font-weight: 600; color: var(--noir); display: flex; align-items: center; gap: 3px; }
+        .provider-rating .star { color: var(--gold); }
+        .provider-dist { font-size: 0.7rem; color: var(--noir); opacity: 0.4; }
+        .provider-avail { font-size: 0.68rem; color: var(--green); font-weight: 600; }
+        .provider-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+        .provider-price { font-weight: 700; font-size: 0.92rem; color: var(--noir); }
+        .btn-reserve { padding: 6px 14px; border-radius: 8px; background: var(--violet-light); border: none; font-size: 0.72rem; font-weight: 600; color: var(--violet-deep); cursor: pointer; transition: all 0.2s; }
+        .btn-reserve:hover { background: var(--violet-medium); color: var(--blanc); }
+        .btn-fav { background: none; border: none; cursor: pointer; padding: 4px; }
+        .btn-fav svg { width: 16px; height: 16px; stroke: var(--violet-medium); fill: none; transition: all 0.2s; }
+        .btn-fav.faved svg { fill: var(--red); stroke: var(--red); }
+
+        /* ==================== PRO DASHBOARD ==================== */
+        #proDash { background: var(--violet-pale); padding-bottom: 90px; }
+        .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 56px 18px 14px; background: rgba(243,236,248,0.95); backdrop-filter: blur(16px); position: sticky; top: 0; z-index: 10; }
+        .pro-header-left { display: flex; align-items: center; gap: 10px; }
+        .pro-header-left .ph-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+        .pro-certified { display: inline-flex; align-items: center; gap: 4px; background: rgba(34,197,94,0.1); color: var(--green); padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; }
+        .pro-certified svg { width: 10px; height: 10px; }
+
+        /* Online/Offline toggle */
+        .online-toggle { display: flex; align-items: center; gap: 8px; }
+        .online-label { font-size: 0.72rem; font-weight: 600; }
+        .online-label.on { color: var(--green); }
+        .online-label.off { color: var(--red); }
+        .toggle-switch { width: 48px; height: 26px; border-radius: 13px; background: #ddd; position: relative; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.on { background: var(--green); }
+        .toggle-switch .toggle-knob { width: 22px; height: 22px; border-radius: 50%; background: var(--blanc); position: absolute; top: 2px; left: 2px; transition: left 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+        .toggle-switch.on .toggle-knob { left: 24px; }
+
+        /* Stats */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 18px; }
+        .stat-card { background: var(--blanc); border-radius: 16px; padding: 18px 16px; border: 1px solid rgba(212,184,232,0.15); }
+        .stat-card .stat-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800; color: var(--noir); }
+        .stat-card .stat-label { font-size: 0.72rem; color: var(--noir); opacity: 0.5; margin-top: 2px; font-weight: 500; }
+        .stat-card.highlight { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border: none; }
+        .stat-card.highlight .stat-value { color: var(--blanc); }
+        .stat-card.highlight .stat-label { color: var(--blanc); opacity: 0.7; }
+
+        /* Pro action buttons */
+        .pro-actions { display: flex; gap: 10px; padding: 0 18px 14px; }
+        .pro-action-btn { flex: 1; padding: 14px 10px; border-radius: 14px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
+        .pro-action-btn:hover { border-color: var(--violet-medium); background: var(--violet-soft); }
+        .pro-action-btn svg { width: 20px; height: 20px; stroke: var(--violet-deep); }
+        .pro-action-btn span { font-size: 0.72rem; font-weight: 600; color: var(--noir); }
+
+        /* RDV list */
+        .rdv-section { padding: 0 18px; }
+        .rdv-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
+        .rdv-card { background: var(--blanc); border-radius: 14px; padding: 14px 16px; border: 1px solid rgba(212,184,232,0.12); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
+        .rdv-time { text-align: center; min-width: 48px; }
+        .rdv-time .rdv-hour { font-size: 0.95rem; font-weight: 700; color: var(--noir); }
+        .rdv-time .rdv-date { font-size: 0.65rem; color: var(--noir); opacity: 0.4; }
+        .rdv-info { flex: 1; }
+        .rdv-client { font-weight: 600; font-size: 0.88rem; }
+        .rdv-service { font-size: 0.75rem; color: var(--violet-deep); }
+        .rdv-price { font-weight: 700; font-size: 0.92rem; }
+        .rdv-status { font-size: 0.68rem; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
+        .rdv-status.confirmed { background: rgba(34,197,94,0.1); color: var(--green); }
+        .rdv-status.pending { background: rgba(245,158,11,0.1); color: var(--gold); }
+
+        /* ==================== MESSAGING ==================== */
+        #messaging { background: var(--blanc); }
+        .msg-header { display: flex; align-items: center; gap: 12px; padding: 56px 18px 14px; background: var(--blanc); border-bottom: 1px solid rgba(212,184,232,0.15); position: sticky; top: 0; z-index: 10; }
+        .msg-header .msg-back { width: 32px; height: 32px; border-radius: 50%; background: var(--violet-soft); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
+        .msg-header .msg-back svg { width: 16px; height: 16px; stroke: var(--noir); }
+        .msg-header .msg-name { font-weight: 700; font-size: 0.95rem; }
+        .msg-header .msg-status { font-size: 0.72rem; color: var(--green); }
+
+        .msg-body { flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+        .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.88rem; line-height: 1.5; }
+        .msg-bubble.sent { align-self: flex-end; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); border-bottom-right-radius: 4px; }
+        .msg-bubble.received { align-self: flex-start; background: var(--violet-soft); color: var(--noir); border-bottom-left-radius: 4px; }
+        .msg-time { font-size: 0.65rem; opacity: 0.5; margin-top: 4px; }
+        .msg-bubble.sent .msg-time { text-align: right; }
+
+        .msg-input-bar { display: flex; gap: 10px; padding: 12px 18px; border-top: 1px solid rgba(212,184,232,0.15); background: var(--blanc); align-items: center; }
+        .msg-input-bar input { flex: 1; padding: 12px 16px; border-radius: 50px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--violet-soft); font-size: 0.88rem; outline: none; }
+        .msg-input-bar input:focus { border-color: var(--violet-neon); }
+        .msg-send-btn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .msg-send-btn svg { width: 18px; height: 18px; stroke: var(--blanc); }
+        .msg-locked { padding: 20px; text-align: center; color: var(--noir); opacity: 0.4; font-size: 0.85rem; }
+
+        /* ==================== iOS NAV ==================== */
+        .ios-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(243,236,248,0.88); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-top: 1px solid rgba(212,184,232,0.2); padding: 6px 0 max(6px, env(safe-area-inset-bottom)); }
+        .ios-nav-inner { display: flex; justify-content: space-around; align-items: center; max-width: 430px; margin: 0 auto; padding: 4px 0; }
+        .ios-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: rgba(17,17,17,0.3); font-size: 0.62rem; font-weight: 500; cursor: pointer; padding: 6px 14px; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
+        .ios-nav-item:hover, .ios-nav-item.active { color: var(--violet-deep); }
         .ios-nav-item svg { width: 22px; height: 22px; stroke-width: 1.5; }
 
-        /* Map screen gets its own nav colors */
-        #map ~ .ios-nav,
-        .ios-nav.light-mode {
-            background: rgba(243,236,248,0.88);
-            border-top-color: rgba(212,184,232,0.2);
-        }
-        .ios-nav.light-mode .ios-nav-item {
-            color: rgba(17,17,17,0.3);
-        }
-        .ios-nav.light-mode .ios-nav-item:hover,
-        .ios-nav.light-mode .ios-nav-item.active {
-            color: var(--violet-dark);
-        }
+        .ios-nav.hidden { display: none; }
 
-        /* ===== ANIMATIONS ===== */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-in { animation: fadeIn 0.5s ease forwards; }
-        .fade-in-d1 { animation-delay: 0.1s; opacity: 0; }
-        .fade-in-d2 { animation-delay: 0.2s; opacity: 0; }
-        .fade-in-d3 { animation-delay: 0.3s; opacity: 0; }
-        .fade-in-d4 { animation-delay: 0.4s; opacity: 0; }
+        /* ==================== ANIMATIONS ==================== */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+
+        /* ==================== UTILITIES ==================== */
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 <div class="app-shell">
 
-    <!-- ===== SPLASH ===== -->
+    <!-- ==================== SPLASH ==================== -->
     <div id="splash" class="screen active">
-        <img src="assets/logo-ubodrop.jpeg" alt="UBO DROP" class="splash-logo">
+        <img src="assets/img/ubo-drop-logo.png" alt="UBO DROP" class="splash-logo">
         <div class="splash-title">UBO DROP</div>
-        <div class="splash-sub">Beauté & bien-être à portée de main</div>
-        <button class="splash-enter" onclick="goTo('home')">
-            Commencer
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-        </button>
+        <div class="splash-steps">
+            <div class="splash-step">
+                <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
+                <span>Choisis<br>ton service</span>
+            </div>
+            <div class="splash-arrow">›</div>
+            <div class="splash-step">
+                <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+                <span>Réserve</span>
+            </div>
+            <div class="splash-arrow">›</div>
+            <div class="splash-step">
+                <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+                <span>Le pro<br>arrive</span>
+            </div>
+        </div>
+        <div class="splash-ctas">
+            <button class="splash-cta cta-client" onclick="goTo('registerClient')">Client</button>
+            <button class="splash-cta cta-pro" onclick="goTo('registerPro')">Pro</button>
+        </div>
+        <div class="splash-auth">
+            <a onclick="goTo('registerClient')">Créer un compte</a>
+            <a onclick="goTo('login')">Se connecter</a>
+        </div>
         <a href="./index.html" class="splash-back">← ubodrop.fr</a>
     </div>
 
-    <!-- ===== HOME ===== -->
-    <div id="home" class="screen">
-        <div class="home-header fade-in">
-            <div class="home-greeting">Bonjour <span>👋</span></div>
-            <div class="home-avatar" onclick="goTo('profile')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
-        </div>
-
-        <div class="home-search fade-in fade-in-d1" onclick="goTo('map')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Rechercher un professionnel…</span>
-        </div>
-
-        <div class="location-filter fade-in fade-in-d2">
-            <div class="loc-btn active">À domicile</div>
-            <div class="loc-btn">Chez le pro</div>
-            <div class="loc-btn">En salon</div>
-        </div>
-
-        <div class="home-cats-label fade-in fade-in-d3">Catégories</div>
-        <div class="home-cats-scroll fade-in fade-in-d3">
-            <div class="home-cat-card active" onclick="goTo('map')"><span class="hc-emoji">✂️</span><span class="hc-name">Barber</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">💇</span><span class="hc-name">Coiffeuse</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">💅</span><span class="hc-name">Manucure</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">🌿</span><span class="hc-name">Henné</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">💄</span><span class="hc-name">Maquillage</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">🌸</span><span class="hc-name">Esthétique</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">🖋️</span><span class="hc-name">Tatoueur</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">👁️</span><span class="hc-name">Cils</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">🎯</span><span class="hc-name">SMP</span></div>
-            <div class="home-cat-card" onclick="goTo('map')"><span class="hc-emoji">🦷</span><span class="hc-name">Dentaire</span></div>
-        </div>
-
-        <!-- Featured providers -->
-        <div class="providers-title fade-in fade-in-d4" style="padding:0 20px;margin-bottom:14px;color:var(--blanc-casse);opacity:0.5;">Proches de vous</div>
-
-        <div class="provider-card fade-in fade-in-d4" style="background:var(--noir-card);border-color:rgba(212,184,232,0.08);" onclick="goTo('map')">
-            <div class="provider-avatar" style="background:var(--violet-dark);">✂️</div>
-            <div class="provider-info">
-                <div class="provider-name" style="color:var(--blanc-casse);">Karim B.</div>
-                <div class="provider-cat" style="color:var(--violet-light);">Barber · Fade spécialiste</div>
-                <div class="provider-meta">
-                    <span class="provider-rating" style="color:var(--blanc-casse);">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        4.9
-                    </span>
-                    <span class="provider-dist" style="color:var(--blanc-casse);">1.2 km</span>
-                </div>
-            </div>
-            <div class="provider-price" style="color:var(--violet-light);">25 €</div>
-        </div>
-
-        <div class="provider-card fade-in fade-in-d4" style="background:var(--noir-card);border-color:rgba(212,184,232,0.08);" onclick="goTo('map')">
-            <div class="provider-avatar" style="background:var(--violet-dark);">💅</div>
-            <div class="provider-info">
-                <div class="provider-name" style="color:var(--blanc-casse);">Amina L.</div>
-                <div class="provider-cat" style="color:var(--violet-light);">Manucure · Nail art</div>
-                <div class="provider-meta">
-                    <span class="provider-rating" style="color:var(--blanc-casse);">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        4.8
-                    </span>
-                    <span class="provider-dist" style="color:var(--blanc-casse);">0.8 km</span>
-                </div>
-            </div>
-            <div class="provider-price" style="color:var(--violet-light);">35 €</div>
-        </div>
-
-        <div class="provider-card fade-in fade-in-d4" style="background:var(--noir-card);border-color:rgba(212,184,232,0.08);" onclick="goTo('map')">
-            <div class="provider-avatar" style="background:var(--violet-dark);">🌿</div>
-            <div class="provider-info">
-                <div class="provider-name" style="color:var(--blanc-casse);">Fatima D.</div>
-                <div class="provider-cat" style="color:var(--violet-light);">Henné · Traditions</div>
-                <div class="provider-meta">
-                    <span class="provider-rating" style="color:var(--blanc-casse);">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        5.0
-                    </span>
-                    <span class="provider-dist" style="color:var(--blanc-casse);">2.1 km</span>
-                </div>
-            </div>
-            <div class="provider-price" style="color:var(--violet-light);">40 €</div>
-        </div>
-
-        <!-- Back to site link -->
-        <div style="text-align:center;padding:32px 20px 20px;">
-            <a href="./index.html" style="font-size:0.82rem;color:var(--violet-light);opacity:0.5;">← ubodrop.fr</a>
-        </div>
+    <!-- ==================== REGISTER CLIENT ==================== -->
+    <div id="registerClient" class="screen auth-screen">
+        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Créer un compte</div>
+        <div class="auth-sub">Rejoins UBO DROP en quelques secondes.</div>
+        <div class="form-group"><label>Prénom</label><input class="form-input" type="text" placeholder="Ton prénom"></div>
+        <div class="form-group"><label>Nom</label><input class="form-input" type="text" placeholder="Ton nom"></div>
+        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
+        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
+        <div class="form-group"><label>Téléphone</label><input class="form-input" type="tel" placeholder="06 12 34 56 78"></div>
+        <button class="form-submit client-submit" onclick="goTo('clientHome')">Créer mon compte</button>
+        <div class="auth-divider"><span>ou</span></div>
+        <button class="google-btn" onclick="goTo('clientHome')">
+            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continuer avec Google
+        </button>
+        <div class="auth-switch">Déjà un compte ? <a onclick="goTo('login')">Se connecter</a></div>
     </div>
 
-    <!-- ===== MAP SCREEN ===== -->
-    <div id="map" class="screen">
-        <div class="map-header">
-            <div class="map-back" onclick="goTo('home')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <!-- ==================== REGISTER PRO ==================== -->
+    <div id="registerPro" class="screen auth-screen">
+        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Devenir Pro</div>
+        <div class="auth-sub">Rejoins la communauté de professionnels UBO DROP.</div>
+        <div class="form-group"><label>Prénom</label><input class="form-input" type="text" placeholder="Ton prénom"></div>
+        <div class="form-group"><label>Nom</label><input class="form-input" type="text" placeholder="Ton nom"></div>
+        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
+        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
+        <div class="form-group"><label>Années d'expérience</label><input class="form-input" type="number" placeholder="Ex : 5" min="0"></div>
+        <div class="form-group"><label>SIRET <span class="form-optional">(optionnel — active le badge certifié)</span></label><input class="form-input" type="text" placeholder="123 456 789 00012"></div>
+        <button class="form-submit pro-submit" onclick="goTo('proDash')">Créer mon compte Pro</button>
+        <div class="auth-switch">Déjà inscrit ? <a onclick="goTo('login')">Se connecter</a></div>
+    </div>
+
+    <!-- ==================== LOGIN ==================== -->
+    <div id="login" class="screen auth-screen">
+        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Se connecter</div>
+        <div class="auth-sub">Content de te revoir.</div>
+        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
+        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
+        <button class="form-submit client-submit" onclick="goTo('clientHome')">Se connecter</button>
+        <div class="auth-divider"><span>ou</span></div>
+        <button class="google-btn" onclick="goTo('clientHome')">
+            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continuer avec Google
+        </button>
+        <div class="auth-switch">Pas encore de compte ? <a onclick="goTo('registerClient')">S'inscrire</a></div>
+        <div class="auth-switch" style="margin-top:8px;">Tu es un pro ? <a onclick="goTo('registerPro')">Inscription Pro</a></div>
+    </div>
+
+    <!-- ==================== CLIENT HOME ==================== -->
+    <div id="clientHome" class="screen">
+        <div class="client-header">
+            <div class="client-header-left">
+                <div class="ch-title"><strong>Trouver</strong> <span>un professionnel</span></div>
             </div>
-            <div class="map-header-title"><strong>Trouver</strong> <span>un professionnel</span></div>
-            <div class="map-header-right">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            <div style="position:relative;">
+                <button class="client-profile-btn" onclick="toggleDropdown()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <div class="pd-item" onclick="goTo('clientRdv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mes RDV</div>
+                    <div class="pd-item" onclick="goTo('clientFavs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Favoris</div>
+                    <div class="pd-divider"></div>
+                    <div class="pd-item danger" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</div>
+                </div>
             </div>
         </div>
 
-        <div class="map-search">
+        <div class="client-search">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="Adresse…" readonly>
+            <input type="text" placeholder="Adresse, quartier, code postal…">
         </div>
 
-        <div class="map-loc-pills">
-            <div class="map-pill active">À domicile</div>
-            <div class="map-pill">Chez le pro</div>
-            <div class="map-pill">En salon</div>
+        <div class="loc-pills">
+            <div class="loc-pill active" onclick="setLocPill(this)">À domicile</div>
+            <div class="loc-pill" onclick="setLocPill(this)">Chez le pro</div>
+            <div class="loc-pill" onclick="setLocPill(this)">En salon</div>
         </div>
 
-        <!-- Map visual -->
-        <div class="map-visual">
+        <!-- Map -->
+        <div class="client-map">
             <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=2.25,48.82,2.42,48.90&layer=mapnik" loading="lazy"></iframe>
             <div class="map-pins">
                 <div class="map-pin pin1">
-                    <div class="map-pin-avatar">✂️</div>
+                    <div class="map-pin-avatar certified">✂️<div class="map-pin-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
                     <div class="map-pin-point"></div>
                 </div>
                 <div class="map-pin pin2">
@@ -591,226 +417,312 @@
                     <div class="map-pin-point"></div>
                 </div>
                 <div class="map-pin pin3">
-                    <div class="map-pin-avatar">🌿</div>
+                    <div class="map-pin-avatar certified">💇<div class="map-pin-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
                     <div class="map-pin-point"></div>
                 </div>
             </div>
+            <button class="my-location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></button>
         </div>
 
-        <div class="map-cats-title">Catégorie</div>
-        <div class="map-cats-grid">
-            <div class="map-cat-item"><span class="mc-emoji">✂️</span><span class="mc-name">Barber</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">💇</span><span class="mc-name">Coiffeuse</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">💅</span><span class="mc-name">Manucure</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">🌿</span><span class="mc-name">Henné</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">💄</span><span class="mc-name">Maquillage</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">🌸</span><span class="mc-name">Esthétique</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">🖋️</span><span class="mc-name">Tatoueur</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">👁️</span><span class="mc-name">Cils</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">🎯</span><span class="mc-name">SMP</span></div>
-            <div class="map-cat-item"><span class="mc-emoji">🦷</span><span class="mc-name">Dentaire</span></div>
+        <!-- Categories -->
+        <div class="cats-section">
+            <div class="cats-title">Catégories</div>
+            <div class="cats-scroll">
+                <div class="cat-chip active" onclick="setCat(this)"><span class="cc-emoji">✂️</span>Barber</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💇</span>Coiffeuse</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💅</span>Ongles</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">👁️</span>Cils</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🌿</span>Henné</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💄</span>Maquillage</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🌸</span>Esthétique</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🖋️</span>Tatoueur</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🎯</span>SMP</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💆</span>Massage</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🦷</span>Dentaire</div>
+                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🔗</span>Perceur</div>
+            </div>
         </div>
 
-        <!-- Provider cards -->
-        <div class="providers-title">Professionnels à proximité</div>
+        <!-- CTA Voir les pros -->
+        <button class="pros-cta" onclick="document.querySelector('.providers-section').scrollIntoView({behavior:'smooth'})">
+            <div><div class="pros-cta-text">Voir les pros disponibles</div><div class="pros-cta-count">12 professionnels autour de vous</div></div>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
 
-        <div class="provider-card">
-            <div class="provider-avatar">✂️</div>
-            <div class="provider-info">
-                <div class="provider-name">Karim B.</div>
-                <div class="provider-cat">Barber · Fade spécialiste</div>
-                <div class="provider-meta">
-                    <span class="provider-rating">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        4.9
-                    </span>
-                    <span class="provider-dist">1.2 km</span>
+        <!-- Providers list -->
+        <div class="providers-section">
+            <div class="providers-label">Pros disponibles</div>
+
+            <div class="provider-card" onclick="goTo('messaging')">
+                <div class="provider-avatar">✂️<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="provider-info">
+                    <div class="provider-name">Karim B.</div>
+                    <div class="provider-cat">Barber · Fade spécialiste</div>
+                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.9</span><span class="provider-dist">1.2 km</span><span class="provider-avail">Disponible</span></div>
+                </div>
+                <div class="provider-actions">
+                    <div class="provider-price">25 €</div>
+                    <button class="btn-reserve">Réserver</button>
+                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
                 </div>
             </div>
-            <div class="provider-price">25 €</div>
-        </div>
 
-        <div class="provider-card">
-            <div class="provider-avatar">💅</div>
-            <div class="provider-info">
-                <div class="provider-name">Amina L.</div>
-                <div class="provider-cat">Manucure · Nail art</div>
-                <div class="provider-meta">
-                    <span class="provider-rating">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        4.8
-                    </span>
-                    <span class="provider-dist">0.8 km</span>
+            <div class="provider-card">
+                <div class="provider-avatar">💅<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="provider-info">
+                    <div class="provider-name">Amina L.</div>
+                    <div class="provider-cat">Ongles · Nail art · Semi</div>
+                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 5.0</span><span class="provider-dist">0.8 km</span><span class="provider-avail">Disponible</span></div>
+                </div>
+                <div class="provider-actions">
+                    <div class="provider-price">35 €</div>
+                    <button class="btn-reserve">Réserver</button>
+                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
                 </div>
             </div>
-            <div class="provider-price">35 €</div>
-        </div>
 
-        <div class="provider-card">
-            <div class="provider-avatar">🌿</div>
-            <div class="provider-info">
-                <div class="provider-name">Fatima D.</div>
-                <div class="provider-cat">Henné · Traditions</div>
-                <div class="provider-meta">
-                    <span class="provider-rating">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        5.0
-                    </span>
-                    <span class="provider-dist">2.1 km</span>
+            <div class="provider-card">
+                <div class="provider-avatar">🌿</div>
+                <div class="provider-info">
+                    <div class="provider-name">Fatima D.</div>
+                    <div class="provider-cat">Henné · Traditions · Mariages</div>
+                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.8</span><span class="provider-dist">2.1 km</span><span class="provider-avail">Disponible</span></div>
+                </div>
+                <div class="provider-actions">
+                    <div class="provider-price">40 €</div>
+                    <button class="btn-reserve">Réserver</button>
+                    <button class="btn-fav faved" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
                 </div>
             </div>
-            <div class="provider-price">40 €</div>
-        </div>
 
-        <div class="provider-card">
-            <div class="provider-avatar">🎯</div>
-            <div class="provider-info">
-                <div class="provider-name">David M.</div>
-                <div class="provider-cat">SMP · Micro-Pigmentation</div>
-                <div class="provider-meta">
-                    <span class="provider-rating">
-                        <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                        4.7
-                    </span>
-                    <span class="provider-dist">3.0 km</span>
+            <div class="provider-card">
+                <div class="provider-avatar">💇<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="provider-info">
+                    <div class="provider-name">Sarah C.</div>
+                    <div class="provider-cat">Coiffeuse · Balayage · Brushing</div>
+                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.9</span><span class="provider-dist">1.8 km</span><span class="provider-avail">Disponible</span></div>
                 </div>
-            </div>
-            <div class="provider-price">90 €</div>
-        </div>
-
-        <!-- Search bar at bottom (matching mockup) -->
-        <div style="margin:20px 18px 20px;">
-            <div class="map-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" placeholder="Rechercher un professionnel…" readonly>
+                <div class="provider-actions">
+                    <div class="provider-price">55 €</div>
+                    <button class="btn-reserve">Réserver</button>
+                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- ===== PROFILE ===== -->
-    <div id="profile" class="screen">
-        <div class="profile-avatar-big">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        </div>
-        <div class="profile-name">Utilisateur</div>
-        <div class="profile-email">utilisateur@email.com</div>
+    <!-- ==================== CLIENT RDV ==================== -->
+    <div id="clientRdv" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
+        <div class="auth-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Mes RDV</div>
+        <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">14:30</div><div class="rdv-date">27 mars</div></div><div class="rdv-info"><div class="rdv-client">Karim B.</div><div class="rdv-service">Barber · Fade</div></div><div class="rdv-price">25 €</div><span class="rdv-status confirmed">Confirmé</span></div>
+        <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">10:00</div><div class="rdv-date">29 mars</div></div><div class="rdv-info"><div class="rdv-client">Sarah C.</div><div class="rdv-service">Brushing</div></div><div class="rdv-price">35 €</div><span class="rdv-status pending">En attente</span></div>
+    </div>
 
-        <div class="profile-menu">
-            <div class="profile-menu-item">
-                <div class="pm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </div>
-                <span class="pm-text">Mon profil</span>
-                <span class="pm-arrow">›</span>
+    <!-- ==================== CLIENT FAVORIS ==================== -->
+    <div id="clientFavs" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
+        <div class="auth-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Mes favoris</div>
+        <div class="auth-sub">Tes pros préférés pour réserver plus vite.</div>
+        <div class="provider-card">
+            <div class="provider-avatar">🌿</div>
+            <div class="provider-info"><div class="provider-name">Fatima D.</div><div class="provider-cat">Henné · Traditions</div><div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.8</span></div></div>
+            <div class="provider-actions"><button class="btn-reserve">Réserver</button><button class="btn-fav faved" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button></div>
+        </div>
+    </div>
+
+    <!-- ==================== PRO DASHBOARD ==================== -->
+    <div id="proDash" class="screen">
+        <div class="pro-header">
+            <div class="pro-header-left">
+                <div class="ph-name">Bonjour, Karim</div>
+                <div class="pro-certified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Certifié</div>
             </div>
-            <div class="profile-menu-item">
-                <div class="pm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
-                </div>
-                <span class="pm-text">Mes réservations</span>
-                <span class="pm-arrow">›</span>
+            <div class="online-toggle">
+                <span class="online-label on" id="onlineLabel">En ligne</span>
+                <div class="toggle-switch on" id="toggleSwitch" onclick="toggleOnline()"><div class="toggle-knob"></div></div>
             </div>
-            <div class="profile-menu-item">
-                <div class="pm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-                </div>
-                <span class="pm-text">Mes favoris</span>
-                <span class="pm-arrow">›</span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">47</div><div class="stat-label">RDV ce mois</div></div>
+            <div class="stat-card highlight"><div class="stat-value">1 240 €</div><div class="stat-label">Revenus ce mois</div></div>
+            <div class="stat-card"><div class="stat-value">185 €</div><div class="stat-label">Revenus aujourd'hui</div></div>
+            <div class="stat-card"><div class="stat-value">4.9 ★</div><div class="stat-label">Note moyenne</div></div>
+        </div>
+
+        <!-- Quick actions -->
+        <div class="pro-actions">
+            <div class="pro-action-btn" onclick="goTo('proMessages')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Messages</span>
             </div>
-            <div class="profile-menu-item">
-                <div class="pm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                </div>
-                <span class="pm-text">Paramètres</span>
-                <span class="pm-arrow">›</span>
+            <div class="pro-action-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Promotion</span>
             </div>
-            <div class="profile-menu-item" onclick="window.location.href='./index.html'">
-                <div class="pm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                </div>
-                <span class="pm-text">← ubodrop.fr</span>
-                <span class="pm-arrow">›</span>
+            <div class="pro-action-btn" onclick="goTo('splash')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>Déconnexion</span>
             </div>
+        </div>
+
+        <!-- Derniers RDV -->
+        <div class="rdv-section">
+            <div class="rdv-label">Derniers RDV</div>
+            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">14:30</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Lucas M.</div><div class="rdv-service">Fade + Barbe</div></div><div class="rdv-price">35 €</div><span class="rdv-status confirmed">Confirmé</span></div>
+            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">16:00</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Thomas R.</div><div class="rdv-service">Coupe complète</div></div><div class="rdv-price">25 €</div><span class="rdv-status confirmed">Confirmé</span></div>
+            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">18:00</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Youssef A.</div><div class="rdv-service">Dégradé</div></div><div class="rdv-price">20 €</div><span class="rdv-status pending">En attente</span></div>
+            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">10:00</div><div class="rdv-date">Hier</div></div><div class="rdv-info"><div class="rdv-client">Maxime D.</div><div class="rdv-service">Fade + Design</div></div><div class="rdv-price">40 €</div><span class="rdv-status confirmed">Terminé</span></div>
+        </div>
+        <div style="text-align:center;padding:24px 18px;"><a href="./index.html" style="font-size:0.78rem;color:var(--violet-medium);opacity:0.5;">← ubodrop.fr</a></div>
+    </div>
+
+    <!-- ==================== MESSAGING ==================== -->
+    <div id="messaging" class="screen">
+        <div class="msg-header">
+            <button class="msg-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+            <div><div class="msg-name">Karim B.</div><div class="msg-status">En ligne</div></div>
+        </div>
+        <div class="msg-body">
+            <div class="msg-bubble received">Bonjour ! J'ai bien reçu votre réservation pour un fade à 14h30. Je serai chez vous à l'heure.<div class="msg-time">14:02</div></div>
+            <div class="msg-bubble sent">Super merci ! Est-ce que vous pouvez aussi faire la barbe ?<div class="msg-time">14:05</div></div>
+            <div class="msg-bubble received">Bien sûr, je rajoute ça. Le total sera 35€ au lieu de 25€, ça vous va ?<div class="msg-time">14:06</div></div>
+            <div class="msg-bubble sent">Parfait, à tout à l'heure !<div class="msg-time">14:07</div></div>
+        </div>
+        <div class="msg-input-bar">
+            <input type="text" placeholder="Écrire un message…">
+            <button class="msg-send-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+        </div>
+    </div>
+
+    <!-- ==================== PRO MESSAGES LIST ==================== -->
+    <div id="proMessages" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
+        <div class="auth-back" onclick="goTo('proDash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
+        <div class="auth-title">Messages</div>
+        <div class="auth-sub">Uniquement les clients ayant payé la prestation.</div>
+        <div class="provider-card" onclick="goTo('messaging')">
+            <div class="provider-avatar" style="font-size:1rem;">👤</div>
+            <div class="provider-info"><div class="provider-name">Lucas M.</div><div class="provider-cat">Fade + Barbe · 35€ payé</div><div class="provider-meta"><span class="provider-avail">En ligne</span></div></div>
+            <div style="font-size:0.75rem;color:var(--violet-medium);">14:07</div>
+        </div>
+        <div class="provider-card" onclick="goTo('messaging')">
+            <div class="provider-avatar" style="font-size:1rem;">👤</div>
+            <div class="provider-info"><div class="provider-name">Thomas R.</div><div class="provider-cat">Coupe complète · 25€ payé</div><div class="provider-meta"><span class="provider-dist">Il y a 2h</span></div></div>
+            <div style="font-size:0.75rem;color:var(--violet-medium);">12:30</div>
         </div>
     </div>
 
 </div><!-- /app-shell -->
 
-<!-- iOS Nav Bar -->
+<!-- iOS Nav -->
 <nav class="ios-nav" id="appNav">
     <div class="ios-nav-inner">
-        <button class="ios-nav-item active" data-screen="home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-            <span>Accueil</span>
-        </button>
-        <button class="ios-nav-item" data-screen="map">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <span>Explorer</span>
-        </button>
-        <button class="ios-nav-item" data-screen="map">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            <span>Carte</span>
-        </button>
-        <button class="ios-nav-item" data-screen="profile">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Profil</span>
-        </button>
+        <button class="ios-nav-item active" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Accueil</span></button>
+        <button class="ios-nav-item" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Explorer</span></button>
+        <button class="ios-nav-item" data-screen="clientFavs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Favoris</span></button>
+        <button class="ios-nav-item" data-screen="clientRdv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>RDV</span></button>
     </div>
 </nav>
 
 <script>
-    // Screen navigation
+    const noNavScreens = ['splash', 'registerClient', 'registerPro', 'login'];
+
     function goTo(screenId) {
+        // Close dropdown
+        const dd = document.getElementById('profileDropdown');
+        if (dd) dd.classList.remove('open');
+
+        // Switch screens
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
         const target = document.getElementById(screenId);
-        if (target) {
-            target.classList.add('active');
-            window.scrollTo(0, 0);
+        if (target) { target.classList.add('active'); window.scrollTo(0, 0); }
+
+        // Nav visibility
+        const nav = document.getElementById('appNav');
+        if (noNavScreens.includes(screenId)) {
+            nav.classList.add('hidden');
+        } else {
+            nav.classList.remove('hidden');
+            // Update active nav item
+            nav.querySelectorAll('.ios-nav-item').forEach(btn => btn.classList.remove('active'));
+            nav.querySelectorAll(`.ios-nav-item[data-screen="${screenId}"]`).forEach(btn => btn.classList.add('active'));
         }
 
-        // Update nav
-        const nav = document.getElementById('appNav');
-        nav.querySelectorAll('.ios-nav-item').forEach(btn => btn.classList.remove('active'));
-        nav.querySelectorAll(`.ios-nav-item[data-screen="${screenId}"]`).forEach(btn => btn.classList.add('active'));
-
-        // Light mode nav for map
-        if (screenId === 'map') {
-            nav.classList.add('light-mode');
-        } else {
-            nav.classList.remove('light-mode');
+        // Switch nav for pro dashboard
+        if (screenId === 'proDash' || screenId === 'proMessages') {
+            nav.innerHTML = `<div class="ios-nav-inner">
+                <button class="ios-nav-item active" data-screen="proDash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Dashboard</span></button>
+                <button class="ios-nav-item" data-screen="proMessages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Messages</span></button>
+            </div>`;
+            attachNavListeners();
+        } else if (!noNavScreens.includes(screenId)) {
+            nav.innerHTML = `<div class="ios-nav-inner">
+                <button class="ios-nav-item" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Accueil</span></button>
+                <button class="ios-nav-item" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Explorer</span></button>
+                <button class="ios-nav-item" data-screen="clientFavs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Favoris</span></button>
+                <button class="ios-nav-item" data-screen="clientRdv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>RDV</span></button>
+            </div>`;
+            attachNavListeners();
+            nav.querySelectorAll(`.ios-nav-item[data-screen="${screenId}"]`).forEach(btn => btn.classList.add('active'));
         }
     }
 
-    // Nav buttons
-    document.querySelectorAll('.ios-nav-item[data-screen]').forEach(btn => {
-        btn.addEventListener('click', () => goTo(btn.dataset.screen));
-    });
-
-    // Location filter toggles
-    document.querySelectorAll('.loc-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            btn.parentElement.querySelectorAll('.loc-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
+    function attachNavListeners() {
+        document.querySelectorAll('.ios-nav-item[data-screen]').forEach(btn => {
+            btn.addEventListener('click', () => goTo(btn.dataset.screen));
         });
+    }
+
+    // Init nav listeners
+    attachNavListeners();
+
+    // Profile dropdown
+    function toggleDropdown() {
+        document.getElementById('profileDropdown').classList.toggle('open');
+    }
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.client-profile-btn') && !e.target.closest('.profile-dropdown')) {
+            const dd = document.getElementById('profileDropdown');
+            if (dd) dd.classList.remove('open');
+        }
     });
 
-    document.querySelectorAll('.map-pill').forEach(pill => {
-        pill.addEventListener('click', () => {
-            pill.parentElement.querySelectorAll('.map-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-        });
-    });
+    // Location pills
+    function setLocPill(el) {
+        el.parentElement.querySelectorAll('.loc-pill').forEach(p => p.classList.remove('active'));
+        el.classList.add('active');
+    }
 
-    // Handle hash navigation
+    // Category chips
+    function setCat(el) {
+        el.parentElement.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    // Pro online toggle
+    function toggleOnline() {
+        const sw = document.getElementById('toggleSwitch');
+        const label = document.getElementById('onlineLabel');
+        sw.classList.toggle('on');
+        if (sw.classList.contains('on')) {
+            label.textContent = 'En ligne';
+            label.className = 'online-label on';
+        } else {
+            label.textContent = 'Hors ligne';
+            label.className = 'online-label off';
+        }
+    }
+
+    // Hash navigation from index.html
     if (window.location.hash) {
         const hash = window.location.hash.replace('#', '');
-        if (document.getElementById(hash)) {
-            goTo(hash);
-        }
+        if (document.getElementById(hash)) goTo(hash);
     }
 
-    // Auto-skip splash after 3s (optional UX)
-    // setTimeout(() => { if (document.getElementById('splash').classList.contains('active')) goTo('home'); }, 3000);
+    // Hide nav on splash
+    document.getElementById('appNav').classList.add('hidden');
 </script>
 </body>
 </html>

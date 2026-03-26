@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UBO DROP</title>
     <meta name="description" content="UBO DROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="UBO DROP">
+    <meta property="og:description" content="Réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon.">
+    <meta property="og:url" content="https://ubo-drop-violet.vercel.app/">
+    <meta property="og:image" content="https://ubo-drop-violet.vercel.app/assets/img/ubo-drop-logo.png">
+    <meta property="og:image:width" content="1024">
+    <meta property="og:image:height" content="1024">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="UBO DROP">
+    <meta name="twitter:description" content="Réservez un professionnel beauté à domicile ou en salon.">
+    <meta name="twitter:image" content="https://ubo-drop-violet.vercel.app/assets/img/ubo-drop-logo.png">
+    <link rel="icon" type="image/png" href="assets/img/ubo-drop-logo.png">
+    <link rel="apple-touch-icon" href="assets/img/ubo-drop-logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -167,9 +180,10 @@
         .hero-logo {
             width: 100px; height: 100px; border-radius: 24px;
             margin: 0 auto 20px; object-fit: contain;
-            box-shadow: 0 8px 30px rgba(108, 63, 160, 0.25);
-            background: var(--blanc);
-            padding: 8px;
+            background: transparent;
+            padding: 0;
+            box-shadow: none;
+            display: block;
         }
         .hero-title {
             font-family: 'Playfair Display', serif;
@@ -512,7 +526,23 @@
         }
         @media (max-width: 768px) {
             .hero { min-height: 550px; max-height: 750px; }
-            .hero-logo { width: 80px; height: 80px; border-radius: 20px; }
+            .hero-bands { display: flex; gap: 0; width: 100%; left: 0; transform: none; }
+            .hero-band {
+                flex: 1 1 50%;
+                width: 50%;
+                height: 100%;
+                border-radius: 0;
+                transform: none;
+                margin: 0;
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+            .hero-band:nth-child(1) { background-image: url('assets/img/hero-barber.jpeg'); background-position: center; }
+            .hero-band:nth-child(2) { background-image: url('assets/img/hero-beauty.jpg'); background-position: center top; }
+            .hero-band:nth-child(3),
+            .hero-band:nth-child(4) { display: none; }
+            .hero-band + .hero-band { margin-left: 0; }
+            .hero-logo { width: 80px; height: 80px; border-radius: 20px; background: transparent; padding: 0; box-shadow: none; }
             .section { padding: 60px 16px; }
             .steps-grid { grid-template-columns: 1fr; }
             .service-card { width: 280px; height: 370px; }

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UBO DROP — Application</title>
+    <link rel="icon" type="image/png" href="assets/img/ubo-drop-logo.png">
+    <link rel="apple-touch-icon" href="assets/img/ubo-drop-logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -288,44 +290,9 @@
         /* ==================== UTILITIES ==================== */
         .hidden { display: none !important; }
 
-        /* ==================== HERO CAROUSEL MOBILE (SPLASH) ==================== */
-        #splash { position: relative; overflow: hidden; }
-        .hero-carousel {
-            position: absolute;
-            inset: 0;
-            overflow: hidden;
-            z-index: 0;
-        }
-        .hero-track {
-            display: flex;
-            height: 100%;
-            animation: heroScroll 14s linear infinite;
-        }
-        .hero-slide {
-            min-width: 100%;
-            height: 100%;
-            object-fit: cover;
-            object-position: center top;
-            flex-shrink: 0;
-        }
-        .hero-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                180deg,
-                rgba(243,236,248,0.35) 0%,
-                rgba(243,236,248,0.70) 60%,
-                rgba(243,236,248,0.92) 100%
-            );
-            z-index: 1;
-        }
-        @keyframes heroScroll {
-            0%   { transform: translateX(0); }
-            100% { transform: translateX(-80%); } /* 4 slides sur 5 = seamless */
-        }
         .splash-content {
             position: relative;
-            z-index: 2;
+            z-index: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -339,17 +306,6 @@
     <!-- ==================== SPLASH ==================== -->
     <div id="splash" class="screen active">
 
-        <!-- Carousel background (mobile) -->
-        <div class="hero-carousel">
-            <div class="hero-track">
-                <img src="assets/img/hero1.jpg" class="hero-slide" alt="">
-                <img src="assets/img/hero2.jpg" class="hero-slide" alt="">
-                <img src="assets/img/hero3.jpg" class="hero-slide" alt="">
-                <img src="assets/img/hero4.jpg" class="hero-slide" alt="">
-                <img src="assets/img/hero1.jpg" class="hero-slide" alt=""> <!-- clone seamless -->
-            </div>
-            <div class="hero-overlay"></div>
-        </div>
 
         <!-- Contenu splash -->
         <div class="splash-content">

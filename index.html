@@ -5,19 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UBO DROP</title>
     <meta name="description" content="UBO DROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="UBO DROP">
-    <meta property="og:description" content="Réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon.">
-    <meta property="og:url" content="https://ubo-drop-violet.vercel.app/">
-    <meta property="og:image" content="https://ubo-drop-violet.vercel.app/assets/img/ubo-drop-logo.png">
-    <meta property="og:image:width" content="1024">
-    <meta property="og:image:height" content="1024">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="UBO DROP">
-    <meta name="twitter:description" content="Réservez un professionnel beauté à domicile ou en salon.">
-    <meta name="twitter:image" content="https://ubo-drop-violet.vercel.app/assets/img/ubo-drop-logo.png">
-    <link rel="icon" type="image/png" href="assets/img/ubo-drop-logo.png">
-    <link rel="apple-touch-icon" href="assets/img/ubo-drop-logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -79,30 +66,71 @@
             font-family: 'Playfair Display', serif; font-weight: 800;
             font-size: 1.15rem; color: var(--noir); letter-spacing: 1px;
         }
-        .btn-open-app {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
-            color: var(--blanc);
-            padding: 10px 20px; border-radius: 50px;
-            font-size: 0.82rem; font-weight: 600; letter-spacing: 0.5px;
-            transition: all 0.3s ease; border: none; cursor: pointer;
+        .btn-open-app,
+        .hero-cta {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #eadcf5 0%, #dcc4ee 45%, #cfafe8 100%);
+            color: var(--noir);
+            border: 1px solid rgba(108, 63, 160, 0.12);
+            box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
             font-family: 'DM Sans', sans-serif;
         }
-        .btn-open-app:hover {
+        .btn-open-app::before,
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: linear-gradient(180deg, rgba(255,255,255,0.46), rgba(255,255,255,0));
+            pointer-events: none;
+            z-index: -1;
+        }
+        .btn-open-app::after,
+        .hero-cta::after {
+            content: '';
+            position: absolute;
+            top: -120%; left: -30%;
+            width: 42%; height: 300%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 48%, transparent 100%);
+            transform: rotate(18deg);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.35s ease;
+            pointer-events: none;
+        }
+        .btn-open-app {
+            padding: 10px 20px; border-radius: 50px;
+            font-size: 0.82rem; font-weight: 600; letter-spacing: 0.2px;
+            cursor: pointer;
+        }
+        .btn-open-app:hover,
+        .hero-cta:hover {
+            background: linear-gradient(135deg, var(--violet-medium) 0%, var(--violet-neon) 55%, var(--violet-deep) 100%);
+            color: var(--blanc);
             transform: translateY(-1px);
-            box-shadow: var(--shadow-glow);
+            box-shadow: 0 14px 32px rgba(108, 63, 160, 0.24), 0 0 28px rgba(168, 85, 247, 0.22);
+        }
+        .btn-open-app:hover::after,
+        .hero-cta:hover::after {
+            opacity: 1;
+            transform: translateX(220%) rotate(18deg);
         }
         .btn-open-app svg { width: 16px; height: 16px; }
 
         /* ===== SCROLLING BANNER ===== */
         .providers-banner {
-            position: fixed; top: 62px; left: 0; right: 0; z-index: 999;
-            background: rgba(237, 228, 243, 0.92);
+            position: relative;
+            z-index: 4;
+            background: rgba(255, 255, 255, 0.62);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid rgba(180, 142, 208, 0.3);
+            border-top: 1px solid rgba(180, 142, 208, 0.16);
+            border-bottom: 1px solid rgba(180, 142, 208, 0.22);
             overflow: hidden;
-            padding: 10px 0;
+            padding: 14px 0;
         }
         .banner-track {
             display: flex;
@@ -111,16 +139,23 @@
         }
         .banner-track:hover { animation-play-state: paused; }
         .banner-item {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 6px 20px;
-            font-size: 0.82rem; font-weight: 500;
-            color: var(--violet-deep);
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 6px 22px;
+            font-size: 0.9rem; font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            color: var(--noir);
             white-space: nowrap;
-            transition: color 0.2s;
+            transition: color 0.2s ease, opacity 0.2s ease;
             cursor: pointer;
+            letter-spacing: 0.01em;
         }
-        .banner-item:hover { color: var(--noir); }
-        .banner-item .b-emoji { font-size: 1rem; }
+        .banner-item:hover { color: var(--violet-deep); opacity: 1; }
+        .banner-item .b-icon {
+            width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center;
+            color: var(--violet-deep);
+            opacity: 0.9;
+        }
+        .banner-item .b-icon svg { width: 16px; height: 16px; stroke: currentColor; }
         .banner-sep {
             color: rgba(180, 142, 208, 0.6);
             padding: 0 4px;
@@ -175,22 +210,32 @@
         }
         .hero-content {
             position: relative; z-index: 3;
-            text-align: center; padding: 0 24px; margin-top: 60px;
+            text-align: center; padding: 0 24px; margin-top: 42px;
+            max-width: 720px;
         }
-        .hero-logo {
-            width: 100px; height: 100px; border-radius: 24px;
-            margin: 0 auto 20px; object-fit: contain;
-            background: transparent;
-            padding: 0;
-            box-shadow: none;
-            display: block;
+        .hero-welcome {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            margin-bottom: 18px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.55);
+            border: 1px solid rgba(180, 142, 208, 0.25);
+            color: var(--violet-deep);
+            font-size: 0.82rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
         .hero-title {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(2.5rem, 8vw, 4.5rem);
+            font-size: clamp(2.8rem, 8vw, 4.9rem);
             font-weight: 900; color: var(--noir);
-            letter-spacing: 3px; line-height: 1.1;
-            margin-bottom: 16px; text-transform: uppercase;
+            letter-spacing: 0.12em; line-height: 0.98;
+            margin-bottom: 18px; text-transform: uppercase;
         }
         .hero-title span {
             background: linear-gradient(135deg, var(--violet-light), var(--violet-neon));
@@ -199,22 +244,15 @@
             background-clip: text;
         }
         .hero-subtitle {
-            font-size: clamp(0.95rem, 2.5vw, 1.15rem);
+            font-size: clamp(0.98rem, 2.5vw, 1.14rem);
             color: var(--noir); font-weight: 400;
-            max-width: 480px; margin: 0 auto 32px;
-            opacity: 0.75; line-height: 1.7;
+            max-width: 480px; margin: 0 auto 34px;
+            opacity: 0.76; line-height: 1.72;
         }
         .hero-cta {
-            display: inline-flex; align-items: center; gap: 10px;
-            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
-            color: var(--blanc);
             padding: 16px 36px; border-radius: 50px;
-            font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow-glow);
-            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 600; letter-spacing: 0.2px;
         }
-        .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 0 50px rgba(168, 85, 247, 0.5); }
         .hero-cta svg { width: 18px; height: 18px; }
 
         /* ===== SECTIONS GLOBAL ===== */
@@ -526,6 +564,14 @@
         }
         @media (max-width: 768px) {
             .hero { min-height: 550px; max-height: 750px; }
+            .providers-banner { padding: 12px 0; }
+            .banner-item { padding: 6px 18px; font-size: 0.82rem; }
+            .hero-content { margin-top: 36px; padding: 0 18px; }
+            .hero-welcome { margin-bottom: 14px; font-size: 0.75rem; }
+            .hero-title { font-size: clamp(2.45rem, 13vw, 3.4rem); letter-spacing: 0.08em; margin-bottom: 16px; }
+            .hero-subtitle { max-width: 330px; margin-bottom: 26px; }
+            .btn-open-app { padding: 10px 16px; font-size: 0.78rem; }
+            .hero-cta { padding: 15px 28px; }
             .hero-bands { display: flex; gap: 0; width: 100%; left: 0; transform: none; }
             .hero-band {
                 flex: 1 1 50%;
@@ -542,7 +588,7 @@
             .hero-band:nth-child(3),
             .hero-band:nth-child(4) { display: none; }
             .hero-band + .hero-band { margin-left: 0; }
-            .hero-logo { width: 80px; height: 80px; border-radius: 20px; background: transparent; padding: 0; box-shadow: none; }
+            .hero-logo { width: 80px; height: 80px; border-radius: 20px; }
             .section { padding: 60px 16px; }
             .steps-grid { grid-template-columns: 1fr; }
             .service-card { width: 280px; height: 370px; }
@@ -552,6 +598,14 @@
         }
         @media (max-width: 480px) {
             .header-top { padding: 10px 14px; }
+            .header-logo { gap: 8px; }
+            .header-logo img { width: 34px; height: 34px; }
+            .header-logo span { font-size: 1rem; letter-spacing: 0.06em; }
+            .btn-open-app { padding: 9px 14px; font-size: 0.74rem; }
+            .hero-content { margin-top: 30px; }
+            .hero-welcome { padding: 7px 14px; }
+            .hero-title { font-size: 2.25rem; letter-spacing: 0.07em; }
+            .hero-subtitle { font-size: 0.95rem; line-height: 1.65; }
             .phone-mockup { width: 150px; }
             .service-card { width: 240px; height: 320px; }
         }
@@ -573,57 +627,6 @@
         </div>
     </header>
 
-    <!-- BANDE DÉROULANTE PRESTATAIRES -->
-    <div class="providers-banner">
-        <div class="banner-track">
-            <a href="./app.html" class="banner-item"><span class="b-emoji">✂️</span> Barber</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💇</span> Coiffeuse</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💅</span> Manucure</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🌿</span> Henné</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💄</span> Maquillage</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🌸</span> Esthéticienne</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🔗</span> Perceur</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🦷</span> Blanchiment Dentaire</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💆</span> Masso-Thérapeute</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🖋️</span> Tatoueur</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🎯</span> Micro-Pigmentation</a>
-            <span class="banner-sep">•</span>
-            <!-- Duplicate for seamless loop -->
-            <a href="./app.html" class="banner-item"><span class="b-emoji">✂️</span> Barber</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💇</span> Coiffeuse</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💅</span> Manucure</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🌿</span> Henné</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💄</span> Maquillage</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🌸</span> Esthéticienne</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🔗</span> Perceur</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🦷</span> Blanchiment Dentaire</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">💆</span> Masso-Thérapeute</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🖋️</span> Tatoueur</a>
-            <span class="banner-sep">•</span>
-            <a href="./app.html" class="banner-item"><span class="b-emoji">🎯</span> Micro-Pigmentation</a>
-            <span class="banner-sep">•</span>
-        </div>
-    </div>
-
     <!-- HERO -->
     <section class="hero">
         <div class="hero-bands">
@@ -634,15 +637,65 @@
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <img src="assets/img/ubo-drop-logo.png" alt="UBO DROP Logo" class="hero-logo">
+            <div class="hero-welcome">Bienvenue chez UBO DROP</div>
             <h1 class="hero-title">UBO <span>DROP</span></h1>
-            
+            <p class="hero-subtitle">Réservez un barber, une coiffeuse ou un professionnel beauté premium à domicile, chez le pro ou en salon.</p>
             <a href="./app.html" class="hero-cta">
                 Découvrir l'app
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
             </a>
         </div>
     </section>
+
+    <!-- BANDE DÉROULANTE PRESTATAIRES -->
+    <div class="providers-banner">
+        <div class="banner-track">
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/><path d="M7 9V5"/><path d="M17 15v4"/></svg></span>Barber</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18c2.5-5 11.5-5 14 0"/><path d="M7 9h10"/><path d="M9 6h6"/><path d="M8 13h8"/></svg></span>Manucure</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4-4 6-7.3 6-10a6 6 0 1 0-12 0c0 2.7 2 6 6 10Z"/><path d="M12 9c1.4 0 2.5 1.1 2.5 2.5"/></svg></span>Henné</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c0-4 2.2-7 5-7s5 3 5 7"/><path d="M8.5 10a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0Z"/></svg></span>Esthéticienne</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l8 8"/><path d="M16 6l-8 8"/><path d="M12 14v5"/></svg></span>Perceur</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13c1.2 1.5 2.8 2.2 5 2.2s3.8-.7 5-2.2"/><path d="M8 9c.8-1 2.1-1.5 4-1.5S15.2 8 16 9"/><path d="M5 15c1.3 2.4 3.8 4 7 4s5.7-1.6 7-4"/></svg></span>Blanchiment Dentaire</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><path d="M9.5 10.5c.8 1 1.7 1.5 2.5 1.5s1.7-.5 2.5-1.5"/></svg></span>Masso-Thérapeute</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 2 5.5 4.9 5.5 8.4 0 4.5-3 7.8-5.5 9.6-2.5-1.8-5.5-5.1-5.5-9.6C6.5 7.9 8.5 5 12 3Z"/><path d="M10 11c.6-.7 1.2-1 2-1 1 0 1.8.5 2.4 1.5"/></svg></span>Micro-Pigmentation</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/><path d="M7 9V5"/><path d="M17 15v4"/></svg></span>Barber</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18c2.5-5 11.5-5 14 0"/><path d="M7 9h10"/><path d="M9 6h6"/><path d="M8 13h8"/></svg></span>Manucure</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4-4 6-7.3 6-10a6 6 0 1 0-12 0c0 2.7 2 6 6 10Z"/><path d="M12 9c1.4 0 2.5 1.1 2.5 2.5"/></svg></span>Henné</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c0-4 2.2-7 5-7s5 3 5 7"/><path d="M8.5 10a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0Z"/></svg></span>Esthéticienne</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l8 8"/><path d="M16 6l-8 8"/><path d="M12 14v5"/></svg></span>Perceur</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13c1.2 1.5 2.8 2.2 5 2.2s3.8-.7 5-2.2"/><path d="M8 9c.8-1 2.1-1.5 4-1.5S15.2 8 16 9"/><path d="M5 15c1.3 2.4 3.8 4 7 4s5.7-1.6 7-4"/></svg></span>Blanchiment Dentaire</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><path d="M9.5 10.5c.8 1 1.7 1.5 2.5 1.5s1.7-.5 2.5-1.5"/></svg></span>Masso-Thérapeute</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</a>
+            <span class="banner-sep">•</span>
+            <a href="./app.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 2 5.5 4.9 5.5 8.4 0 4.5-3 7.8-5.5 9.6-2.5-1.8-5.5-5.1-5.5-9.6C6.5 7.9 8.5 5 12 3Z"/><path d="M10 11c.6-.7 1.2-1 2-1 1 0 1.8.5 2.4 1.5"/></svg></span>Micro-Pigmentation</a>
+            <span class="banner-sep">•</span>
+        </div>
+    </div>
 
     <!-- UBO DROP C'EST QUOI ? -->
     <section class="concept-section">
@@ -693,7 +746,7 @@
     <section class="services-section">
         <div class="services-header">
             <span class="section-label">Nos services</span>
-            <h2 class="section-title">Tous les métiers de la beauté</h2>
+            <h2 class="section-title">Tous les métiers</h2>
             <p class="section-desc">Des professionnels certifiés dans chaque discipline — défilez pour découvrir.</p>
         </div>
         <div class="services-track-wrapper">

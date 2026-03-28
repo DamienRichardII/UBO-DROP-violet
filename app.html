@@ -1,743 +1,1259 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UBO DROP — Application</title>
-    <link rel="icon" type="image/png" href="assets/img/ubo-drop-logo.png">
-    <link rel="apple-touch-icon" href="assets/img/ubo-drop-logo.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --violet-deep: #6C3FA0;
-            --violet-neon: #A855F7;
-            --violet-light: #D4B8E8;
-            --violet-medium: #B48ED0;
-            --violet-soft: #EDE4F3;
-            --violet-pale: #F3ECF8;
-            --noir: #111111;
-            --noir-soft: #1A1A2E;
-            --blanc-casse: #F5F0EB;
-            --blanc: #FFFFFF;
-            --green: #22C55E;
-            --red: #EF4444;
-            --gold: #F59E0B;
-            --glass-border: rgba(212,184,232,0.25);
-            --shadow-sm: 0 2px 8px rgba(17,17,17,0.06);
-            --shadow-md: 0 4px 20px rgba(17,17,17,0.1);
-            --shadow-lg: 0 8px 40px rgba(17,17,17,0.15);
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UBO DROP — App premium V3</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f6f1f5;
+      --bg-2: #efe8ef;
+      --surface: rgba(255,255,255,.9);
+      --surface-strong: rgba(255,255,255,.98);
+      --surface-soft: #fbf8fc;
+      --ink: #17131c;
+      --muted: #8f8799;
+      --line: rgba(117, 92, 147, .12);
+      --line-2: rgba(117, 92, 147, .18);
+      --violet: #5a228b;
+      --violet-2: #7f38bc;
+      --violet-3: #bc88ee;
+      --violet-soft: #f1e6fc;
+      --glow: rgba(126, 56, 188, .32);
+      --green: #dff5eb;
+      --green-ink: #1f8f62;
+      --gold: #f2b317;
+      --danger: #ef6363;
+      --shadow-xs: 0 8px 20px rgba(40, 21, 61, .06);
+      --shadow-sm: 0 18px 44px rgba(40, 21, 61, .09);
+      --shadow-md: 0 24px 56px rgba(40, 21, 61, .13);
+      --shadow-lg: 0 28px 80px rgba(40, 21, 61, .18);
+      --glossy: linear-gradient(180deg, #8d4cd0 0%, #6e2eaa 18%, #421463 100%);
+      --phone-w: 390px;
+      --phone-h: 844px;
+      --radius-xxl: 36px;
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 14px;
+      --bottom-nav-h: 88px;
+    }
 
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
-            background: var(--violet-pale);
-            color: var(--noir);
-            line-height: 1.6; overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-            min-height: 100vh;
-        }
-        img { max-width: 100%; display: block; }
-        a { text-decoration: none; color: inherit; }
-        input, select, button { font-family: 'DM Sans', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(188,136,238,.18), transparent 26%),
+        linear-gradient(180deg, #faf6f8 0%, #f2edf2 100%);
+      color: var(--ink);
+      display: flex;
+      justify-content: center;
+      padding: 22px 12px;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    img { display: block; max-width: 100%; }
+    button, input { font: inherit; }
+    button { border: 0; background: none; cursor: pointer; }
 
-        .app-shell { max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; background: var(--violet-pale); }
-        .screen { display: none; min-height: 100vh; }
-        .screen.active { display: flex; flex-direction: column; }
+    .device {
+      width: min(var(--phone-w), 100%);
+      min-height: var(--phone-h);
+      background: linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.72));
+      border: 1px solid rgba(255,255,255,.68);
+      border-radius: 44px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(28px);
+    }
+    .device::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top center, rgba(191, 141, 242, .12), transparent 22%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 118px;
+      height: 30px;
+      border-radius: 999px;
+      background: #0d0d0f;
+      z-index: 50;
+    }
 
-        /* ==================== SPLASH ==================== */
-        #splash {
-            align-items: center; justify-content: center;
-            min-height: 100vh;
-            background: var(--violet-pale);
-            padding: 40px 24px;
-            text-align: center;
-        }
-        .splash-logo { width: 110px; height: 110px; border-radius: 0; object-fit: contain; margin-bottom: 16px; background: transparent; }
-        .splash-title { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900; letter-spacing: 3px; color: var(--noir); margin-bottom: 28px; }
+    .statusbar {
+      position: absolute;
+      top: 16px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 700;
+      z-index: 40;
+      pointer-events: none;
+    }
+    .status-icons { display: flex; gap: 8px; align-items: center; }
+    .status-icons span { width: 16px; height: 9px; border: 1.5px solid currentColor; border-radius: 2px; display: inline-block; position: relative; }
+    .status-icons span::after { content: ""; position: absolute; right: -3px; top: 2px; width: 2px; height: 4px; border-radius: 2px; background: currentColor; }
 
-        /* Animated steps */
-        .splash-steps { display: flex; align-items: center; gap: 14px; margin-bottom: 36px; }
-        .splash-step { display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0; animation: stepFade 0.5s ease forwards; }
-        .splash-step:nth-child(1) { animation-delay: 0.3s; }
-        .splash-step:nth-child(3) { animation-delay: 0.6s; }
-        .splash-step:nth-child(5) { animation-delay: 0.9s; }
-        .splash-step .step-icon { width: 44px; height: 44px; border-radius: 14px; background: var(--blanc); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; }
-        .splash-step .step-icon svg { width: 20px; height: 20px; stroke: var(--violet-deep); }
-        .splash-step span { font-size: 0.68rem; font-weight: 600; color: var(--noir); opacity: 0.6; }
-        .splash-arrow { color: var(--violet-medium); font-size: 1rem; margin-top: -14px; opacity: 0; animation: stepFade 0.5s ease forwards; }
-        .splash-arrow:nth-child(2) { animation-delay: 0.45s; }
-        .splash-arrow:nth-child(4) { animation-delay: 0.75s; }
-        @keyframes stepFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .app { position: relative; z-index: 1; min-height: var(--phone-h); }
+    .screen {
+      display: none;
+      min-height: var(--phone-h);
+      padding: 58px 18px calc(var(--bottom-nav-h) + 20px);
+      position: relative;
+      animation: fadeUp .32s ease;
+    }
+    .screen.active { display: block; }
 
-        /* CTA buttons */
-        .splash-ctas { display: flex; gap: 12px; width: 100%; margin-bottom: 20px; }
-        .splash-cta { flex: 1; padding: 16px; border-radius: 50px; font-size: 0.95rem; font-weight: 600; border: none; cursor: pointer; transition: all 0.3s ease; letter-spacing: 0.3px; }
-        .cta-client { background: var(--blanc); color: var(--noir); border: 2px solid var(--glass-border); box-shadow: var(--shadow-sm); }
-        .cta-client:hover { border-color: var(--violet-medium); box-shadow: var(--shadow-md); }
-        .cta-pro { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); box-shadow: 0 4px 20px rgba(168,85,247,0.3); }
-        .cta-pro:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(168,85,247,0.4); }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-        .splash-auth { display: flex; gap: 16px; justify-content: center; }
-        .splash-auth a { font-size: 0.85rem; font-weight: 500; color: var(--violet-deep); padding: 8px 16px; transition: opacity 0.2s; }
-        .splash-auth a:hover { opacity: 0.7; }
-        .splash-back { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); font-size: 0.78rem; color: var(--violet-medium); opacity: 0.5; }
-        .splash-back:hover { opacity: 1; }
+    .brand-title {
+      font-family: "Playfair Display", serif;
+      font-size: 3.1rem;
+      line-height: .96;
+      letter-spacing: -.04em;
+    }
+    .brand-drop { color: var(--violet-2); }
+    .muted { color: var(--muted); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid var(--line);
+      backdrop-filter: blur(10px);
+      box-shadow: var(--shadow-xs);
+    }
+    .card {
+      background: var(--surface-strong);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow-sm);
+      backdrop-filter: blur(18px);
+    }
+    .soft-card {
+      background: rgba(255,255,255,.72);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-xs);
+      backdrop-filter: blur(14px);
+    }
+    .section-title { font-size: 1.28rem; font-weight: 800; letter-spacing: -.03em; }
+    .section-sub { font-size: .93rem; line-height: 1.5; color: var(--muted); }
+    .pill-row { display: flex; gap: 8px; overflow: auto; scrollbar-width: none; }
+    .pill-row::-webkit-scrollbar { display: none; }
+    .pill {
+      white-space: nowrap;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.82);
+      border: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 700;
+      color: #695e72;
+      box-shadow: var(--shadow-xs);
+      transition: .25s ease;
+    }
+    .pill.active {
+      color: white;
+      background: var(--glossy);
+      box-shadow: 0 10px 22px var(--glow), inset 0 1px 0 rgba(255,255,255,.25);
+      border-color: rgba(255,255,255,.12);
+    }
+    .icon-btn {
+      width: 42px; height: 42px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,.86); border: 1px solid var(--line); box-shadow: var(--shadow-xs);
+    }
+    .searchbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; border-radius: 18px;
+      background: rgba(255,255,255,.92); border: 1px solid rgba(255,255,255,.9);
+      box-shadow: var(--shadow-xs);
+    }
+    .searchbar input { border: 0; outline: none; flex: 1; background: transparent; font-size: 14px; color: var(--ink); }
+    .searchbar input::placeholder { color: #aaa2b3; }
+    .primary-btn, .secondary-btn {
+      width: 100%; min-height: 56px; border-radius: 999px; font-size: 17px; font-weight: 700; transition: .25s ease;
+    }
+    .primary-btn {
+      color: white;
+      background: var(--glossy);
+      box-shadow: 0 14px 28px rgba(92, 30, 148, .24), inset 0 1px 0 rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .secondary-btn {
+      background: rgba(255,255,255,.9);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow-xs);
+    }
+    .primary-btn:active, .secondary-btn:active, .icon-btn:active { transform: scale(.985); }
 
-        /* ==================== AUTH SCREENS ==================== */
-        .auth-screen { padding: 60px 24px 40px; background: var(--violet-pale); }
-        .auth-back { width: 36px; height: 36px; border-radius: 50%; background: var(--blanc); border: 1px solid var(--glass-border); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-bottom: 24px; }
-        .auth-back svg { width: 18px; height: 18px; stroke: var(--noir); }
-        .auth-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800; color: var(--noir); margin-bottom: 6px; }
-        .auth-sub { font-size: 0.9rem; color: var(--noir); opacity: 0.5; margin-bottom: 28px; }
+    .home-hero {
+      text-align: center;
+      padding-top: 12px;
+    }
+    .home-logo {
+      width: 104px; height: 104px; object-fit: contain; margin: 0 auto 14px;
+      filter: drop-shadow(0 12px 24px rgba(124, 56, 188, .25));
+    }
+    .home-subbrand { display: none; }
+    .hero-copy {
+      margin: 30px auto 0;
+      max-width: 318px;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-size: 2.08rem;
+      line-height: 1.18;
+      font-weight: 700;
+      letter-spacing: -.045em;
+      text-wrap: balance;
+    }
+    .steps-card { padding: 16px 16px 14px; margin-top: 24px; background: rgba(255,255,255,.9); }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; align-items: start; }
+    .step-item { display: flex; flex-direction: column; align-items: center; gap: 9px; font-size: 11.5px; font-weight: 700; color: #5d5566; text-align: center; }
+    .step-icon {
+      width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(247,241,250,.9));
+      border: 1px solid rgba(117, 92, 147, .12);
+      box-shadow: 0 8px 18px rgba(40, 21, 61, .05);
+      color: #5e267f;
+    }
+    .step-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+    .proof-card { margin-top: 16px; padding: 16px 18px; text-align: center; }
+    .proof-line { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
+    .proof-sub { margin-top: 8px; font-size: 14px; color: #595261; }
+    .mini-avatars { display: flex; justify-content: center; margin-top: 10px; }
+    .mini-avatars img {
+      width: 42px; height: 42px; border-radius: 14px; object-fit: cover; border: 2px solid white; margin-left: -8px; box-shadow: var(--shadow-xs);
+    }
+    .mini-avatars img:first-child { margin-left: 0; }
 
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 0.78rem; font-weight: 600; color: var(--noir); margin-bottom: 6px; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.6; }
-        .form-input { width: 100%; padding: 14px 16px; border-radius: 14px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); font-size: 0.92rem; color: var(--noir); outline: none; transition: border-color 0.2s; }
-        .form-input:focus { border-color: var(--violet-neon); }
-        .form-input::placeholder { color: var(--noir); opacity: 0.3; }
-        .form-optional { font-size: 0.72rem; color: var(--violet-medium); font-weight: 400; text-transform: none; letter-spacing: 0; }
+    .screen-topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .screen-topbar .title-wrap { flex: 1; }
+    .screen-topbar h2 { font-size: 1.38rem; font-weight: 800; letter-spacing: -.04em; }
+    .screen-topbar p { margin-top: 4px; font-size: 13px; color: var(--muted); }
 
-        .form-submit { width: 100%; padding: 16px; border-radius: 50px; border: none; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.3s; }
-        .form-submit.client-submit { background: var(--noir); color: var(--blanc-casse); }
-        .form-submit.pro-submit { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); }
-        .form-submit:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); }
+    /* Search screen */
+    #screen-search { padding-bottom: calc(var(--bottom-nav-h) + 8px); }
+    .map-stage {
+      position: relative;
+      margin-top: 14px;
+      margin-left: -8px;
+      margin-right: -8px;
+      min-height: 620px;
+      height: calc(var(--phone-h) - 188px);
+      border-radius: 34px;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(247,243,248,.2), rgba(247,243,248,.04)),
+        url('assets/ref-carte.jpeg') center/cover no-repeat;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255,255,255,.7);
+    }
+    .map-stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.02) 34%, rgba(255,255,255,.1) 100%);
+      pointer-events: none;
+    }
+    .map-controls {
+      position: absolute; left: 14px; right: 14px; top: 14px; z-index: 3;
+      display: grid; gap: 10px;
+    }
+    .map-floating { display: flex; gap: 8px; }
+    .searchbar.compact { padding: 12px 14px; }
+    .place-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .place-chip {
+      min-height: 42px; padding: 10px 8px; border-radius: 16px; font-size: 12px; font-weight: 700;
+      background: rgba(255,255,255,.82); border: 1px solid rgba(255,255,255,.9); color: #5f5868;
+      box-shadow: var(--shadow-xs);
+      backdrop-filter: blur(10px);
+    }
+    .place-chip.active { color: white; background: var(--glossy); border-color: transparent; }
+    .map-pin {
+      position: absolute; z-index: 2; transform: translate(-50%, -100%); text-align: center;
+      transition: transform .2s ease;
+    }
+    .map-pin:hover { transform: translate(-50%, -104%) scale(1.02); }
+    .map-bubble {
+      width: 54px; height: 54px; border-radius: 18px; overflow: hidden; border: 3px solid white; box-shadow: 0 14px 24px rgba(66,20,99,.24);
+      background: var(--glossy); padding: 3px;
+    }
+    .map-bubble img { width: 100%; height: 100%; object-fit: cover; border-radius: 14px; }
+    .map-tag {
+      margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; background: rgba(255,255,255,.92); border: 1px solid var(--line);
+      box-shadow: var(--shadow-xs); border-radius: 999px; padding: 4px 8px; font-size: 11px; font-weight: 700;
+    }
+    .map-user-dot { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #4ba4ff; border: 4px solid rgba(255,255,255,.88); box-shadow: 0 0 0 8px rgba(75,164,255,.15); left: 46%; top: 42%; z-index: 2; }
+    .map-position-btn {
+      position: absolute; right: 16px; bottom: 112px; z-index: 2;
+      padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.9); border: 1px solid var(--line);
+      font-size: 12px; font-weight: 700; box-shadow: var(--shadow-xs);
+      backdrop-filter: blur(10px);
+    }
+    .bottom-sheet {
+      position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 3;
+      border-radius: 30px; background: rgba(255,255,255,.94); border: 1px solid rgba(255,255,255,.92);
+      box-shadow: 0 24px 44px rgba(37, 19, 57, .16); overflow: hidden; backdrop-filter: blur(22px);
+      height: var(--sheet-h, 292px); min-height: 56px; max-height: calc(100% - 18px);
+      transition: height .34s cubic-bezier(.22,.9,.24,1), transform .34s cubic-bezier(.22,.9,.24,1), box-shadow .25s ease;
+      touch-action: none;
+    }
+    .sheet-handle {
+      width: 52px; height: 5px; border-radius: 999px; background: #d1c8da; margin: 12px auto 10px; display:block;
+    }
+    .sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 0 16px 12px; }
+    .sheet-header h3 { font-size: 1.08rem; font-weight: 800; }
+    .sheet-link { color: var(--violet); font-weight: 700; font-size: 13px; }
+    .sheet-body { padding: 0 12px 14px; overflow: auto; height: calc(100% - 72px); }
+    .sheet-state-0 { --sheet-h: 72px; }
+    .sheet-state-1 { --sheet-h: 168px; }
+    .sheet-state-2 { --sheet-h: 292px; }
+    .sheet-state-3 { --sheet-h: 458px; }
+    .bottom-sheet.dragging { transition: none; }
 
-        .google-btn { width: 100%; padding: 14px; border-radius: 50px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); font-size: 0.9rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; transition: all 0.2s; color: var(--noir); }
-        .google-btn:hover { border-color: var(--violet-medium); background: var(--violet-soft); }
-        .google-btn svg { width: 18px; height: 18px; }
+    .pro-card {
+      display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center;
+      padding: 12px; border-radius: 22px; background: var(--surface-soft); border: 1px solid var(--line); margin-bottom: 10px;
+    }
+    .pro-avatar { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; }
+    .pro-main { min-width: 0; }
+    .pro-name { font-size: 15px; font-weight: 800; }
+    .pro-meta, .pro-secondary { font-size: 12px; color: #6b6274; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pro-rating { font-size: 12px; margin-top: 6px; color: #6b6274; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .avail {
+      display: inline-flex; align-items: center; gap: 5px; padding: 6px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; background: var(--green); color: var(--green-ink);
+    }
+    .book-btn { margin-top: 10px; min-width: 88px; height: 38px; padding: 0 14px; border-radius: 999px; color: white; background: var(--glossy); font-size: 13px; font-weight: 700; box-shadow: 0 8px 18px rgba(92, 30, 148, .2); }
 
-        .auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
-        .auth-divider span { font-size: 0.78rem; color: var(--noir); opacity: 0.35; white-space: nowrap; }
-        .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: rgba(212,184,232,0.3); }
+    /* Detail */
+    .hero-media { position: relative; overflow: hidden; border-radius: 32px; height: 260px; box-shadow: var(--shadow-md); }
+    .hero-media > img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-gallery {
+      position: absolute; right: 14px; top: 14px; display: grid; gap: 8px;
+    }
+    .hero-gallery img { width: 68px; height: 68px; object-fit: cover; border-radius: 18px; border: 2px solid rgba(255,255,255,.92); box-shadow: var(--shadow-xs); }
+    .detail-card { margin-top: -26px; position: relative; z-index: 2; padding: 20px 18px 112px; }
+    .detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .detail-head h1 { font-size: 1.82rem; font-weight: 800; letter-spacing: -.05em; }
+    .detail-meta { margin-top: 8px; display: flex; flex-wrap: wrap; gap: 8px; font-size: 13px; color: #665d70; }
+    .tabs { display: flex; gap: 16px; margin-top: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); overflow: auto; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { font-size: 14px; font-weight: 700; color: var(--muted); position: relative; white-space: nowrap; }
+    .tab.active { color: var(--ink); }
+    .tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -15px; height: 3px; border-radius: 999px; background: var(--violet); }
+    .service-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--line);
+    }
+    .service-row:last-child { border-bottom: 0; }
+    .service-row h4 { font-size: 15px; font-weight: 800; }
+    .service-row p { font-size: 12px; color: #6d6577; margin-top: 4px; }
+    .service-price { text-align: right; }
+    .service-price strong { display: block; font-size: 18px; }
+    .sticky-cta {
+      position: absolute; left: 18px; right: 18px; bottom: calc(var(--bottom-nav-h) + 12px);
+      background: rgba(255,255,255,.88); padding: 10px; border-radius: 28px; border: 1px solid rgba(255,255,255,.9); box-shadow: var(--shadow-md); backdrop-filter: blur(18px);
+    }
 
-        .auth-switch { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--noir); opacity: 0.5; }
-        .auth-switch a { color: var(--violet-deep); font-weight: 600; opacity: 1; cursor: pointer; }
+    /* Auth */
+    .auth-shell { padding-top: 72px; }
+    .auth-panel { padding: 22px 18px; }
+    .auth-logo { width: 82px; height: 82px; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 10px 20px rgba(124, 56, 188, .2)); }
+    .auth-title { font-size: 2rem; font-weight: 800; letter-spacing: -.05em; }
+    .auth-sub { font-size: 14px; line-height: 1.5; color: var(--muted); margin-top: 10px; }
+    .field { margin-top: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: #665d70; margin-bottom: 8px; }
+    .field input, .field select {
+      width: 100%; height: 52px; border-radius: 16px; border: 1px solid var(--line-2); background: rgba(255,255,255,.92);
+      padding: 0 16px; outline: none; box-shadow: var(--shadow-xs);
+    }
+    .inline-note { font-size: 12px; color: var(--muted); margin-top: 12px; text-align: center; }
+    .switch-link { color: var(--violet); font-weight: 700; }
 
-        /* ==================== CLIENT INTERFACE ==================== */
-        #clientHome { background: var(--violet-pale); padding-bottom: 90px; }
+    /* Pro dashboard */
+    .pro-header-card { padding: 20px; }
+    .pro-header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .pro-avatar-lg { width: 60px; height: 60px; border-radius: 22px; object-fit: cover; }
+    .online-chip { background: var(--green); color: var(--green-ink); padding: 8px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
+    .stat-card { padding: 16px; }
+    .stat-card strong { font-size: 1.5rem; font-weight: 800; display: block; }
+    .stat-card span { color: var(--muted); font-size: 12px; margin-top: 6px; display: block; }
+    .agenda-item, .chat-preview { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); }
+    .agenda-item:last-child, .chat-preview:last-child { border-bottom: 0; }
 
-        .client-header { display: flex; align-items: center; justify-content: space-between; padding: 56px 18px 14px; position: sticky; top: 0; z-index: 10; background: rgba(243,236,248,0.95); backdrop-filter: blur(16px); }
-        .client-header-left { display: flex; align-items: center; gap: 10px; }
-        .client-header-left .ch-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 800; }
-        .client-header-left .ch-title span { font-weight: 400; }
-        .client-profile-btn { width: 38px; height: 38px; border-radius: 50%; background: var(--violet-light); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; position: relative; }
-        .client-profile-btn svg { width: 18px; height: 18px; stroke: var(--noir); }
+    /* List screens */
+    .list-card { padding: 18px; }
+    .list-item { display: flex; gap: 12px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+    .list-item:last-child { border-bottom: 0; }
+    .list-item img { width: 56px; height: 56px; border-radius: 18px; object-fit: cover; }
+    .list-item strong { font-size: 15px; font-weight: 800; }
+    .list-item p { font-size: 12px; color: #6d6577; margin-top: 5px; }
+    .tiny-btn { padding: 10px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; background: var(--violet-soft); color: var(--violet); }
 
-        /* Profile dropdown */
-        .profile-dropdown { display: none; position: absolute; top: 48px; right: 0; background: var(--blanc); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--glass-border); min-width: 200px; z-index: 100; overflow: hidden; }
-        .profile-dropdown.open { display: block; }
-        .pd-item { display: flex; align-items: center; gap: 10px; padding: 14px 18px; font-size: 0.88rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
-        .pd-item:hover { background: var(--violet-soft); }
-        .pd-item svg { width: 16px; height: 16px; stroke: var(--violet-deep); }
-        .pd-item.danger { color: var(--red); }
-        .pd-item.danger svg { stroke: var(--red); }
-        .pd-divider { height: 1px; background: rgba(212,184,232,0.2); margin: 0 14px; }
+    /* Chat */
+    .chat-shell { padding-bottom: calc(var(--bottom-nav-h) + 90px); }
+    .chat-head {
+      position: sticky; top: 52px; z-index: 10; margin: -6px -18px 0; padding: 10px 18px 14px; backdrop-filter: blur(18px);
+      background: linear-gradient(180deg, rgba(247,243,248,.92), rgba(247,243,248,.75)); border-bottom: 1px solid rgba(255,255,255,.65);
+      display: flex; align-items: center; gap: 12px;
+    }
+    .chat-head img { width: 44px; height: 44px; border-radius: 16px; object-fit: cover; }
+    .chat-head strong { display: block; font-size: 15px; }
+    .chat-body { display: grid; gap: 12px; margin-top: 18px; }
+    .bubble {
+      max-width: 82%; padding: 14px 16px; border-radius: 22px; font-size: 14px; line-height: 1.45; box-shadow: var(--shadow-xs);
+    }
+    .bubble.in { background: rgba(255,255,255,.92); border: 1px solid var(--line); }
+    .bubble.out { background: var(--glossy); color: white; margin-left: auto; }
+    .bubble small { display: block; margin-top: 6px; font-size: 11px; opacity: .7; }
+    .chat-input {
+      position: absolute; left: 18px; right: 18px; bottom: calc(var(--bottom-nav-h) + 12px);
+      display: flex; gap: 10px; padding: 10px; border-radius: 24px; background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.95); box-shadow: var(--shadow-md); backdrop-filter: blur(18px);
+    }
+    .chat-input input { flex: 1; height: 48px; border-radius: 16px; border: 1px solid var(--line); padding: 0 16px; background: var(--surface-soft); }
+    .send-btn { width: 48px; height: 48px; border-radius: 16px; color: white; background: var(--glossy); }
 
-        /* Search */
-        .client-search { margin: 10px 18px; background: var(--blanc); border: 1px solid var(--glass-border); border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 10px; }
-        .client-search svg { width: 18px; height: 18px; stroke: var(--violet-medium); flex-shrink: 0; }
-        .client-search input { flex: 1; border: none; outline: none; background: none; font-size: 0.88rem; color: var(--noir); }
-        .client-search input::placeholder { color: var(--noir); opacity: 0.3; }
+    /* Overlay */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(20, 18, 24, .18); backdrop-filter: blur(10px); display: none; align-items: flex-end; justify-content: center; z-index: 80;
+    }
+    .overlay.open { display: flex; }
+    .overlay-panel {
+      width: min(390px, 100%); border-radius: 34px 34px 0 0; background: rgba(255,255,255,.96); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,.85);
+      padding: 12px 18px 26px; max-height: 84vh; overflow: auto;
+    }
+    .filter-grid { display: grid; gap: 14px; margin-top: 16px; }
+    .filter-group h4 { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
+    .seg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .seg, .seg-small {
+      padding: 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-soft); font-size: 13px; font-weight: 700; text-align: center;
+    }
+    .seg.active, .seg-small.active { color: white; background: var(--glossy); border-color: transparent; }
+    .seg-small { padding: 12px; }
 
-        /* Location pills */
-        .loc-pills { display: flex; gap: 8px; padding: 10px 18px; }
-        .loc-pill { flex: 1; padding: 10px 6px; border-radius: 12px; background: var(--violet-light); color: var(--noir); font-size: 0.74rem; font-weight: 600; text-align: center; cursor: pointer; transition: all 0.25s; border: 2px solid transparent; }
-        .loc-pill.active { background: var(--noir); color: var(--blanc-casse); border-color: var(--violet-light); }
+    .bottom-nav {
+      position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 30;
+      background: rgba(255,255,255,.9); border: 1px solid rgba(255,255,255,.95); border-radius: 28px;
+      box-shadow: 0 18px 34px rgba(37, 19, 57, .12), inset 0 1px 0 rgba(255,255,255,.65);
+      backdrop-filter: blur(20px);
+      padding: 8px;
+      display: none;
+    }
+    .bottom-nav.show { display: block; }
+    .nav-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .nav-item {
+      min-height: 62px; border-radius: 20px; display: grid; place-items: center; gap: 5px; color: #83788f; font-size: 11px; font-weight: 700;
+      transition: .22s ease;
+    }
+    .nav-item .nav-icon {
+      width: 22px; height: 22px; display:grid; place-items:center;
+    }
+    .nav-item svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+    .nav-item.active {
+      color: var(--violet);
+      background: linear-gradient(180deg, rgba(123, 55, 186, .11), rgba(123, 55, 186, .06));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.4);
+    }
 
-        /* Map */
-        .client-map { margin: 10px 18px; border-radius: 20px; overflow: hidden; height: 280px; background: #E8DFF0; position: relative; border: 1px solid var(--glass-border); }
-        .client-map iframe { width: 100%; height: 100%; border: none; filter: saturate(0.3) brightness(1.05) hue-rotate(240deg); }
-        .map-pins { position: absolute; inset: 0; pointer-events: none; }
-        .map-pin { position: absolute; display: flex; flex-direction: column; align-items: center; }
-        .map-pin-avatar { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--violet-deep); background: var(--violet-light); display: flex; align-items: center; justify-content: center; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(108,63,160,0.3); }
-        .map-pin-avatar.certified { border-color: var(--green); }
-        .map-pin-badge { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--blanc); }
-        .map-pin-badge svg { width: 8px; height: 8px; stroke: var(--blanc); stroke-width: 3; }
-        .map-pin-point { width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--violet-deep); margin-top: -1px; }
-        .pin1 { top: 22%; left: 28%; }
-        .pin2 { top: 38%; left: 62%; }
-        .pin3 { top: 58%; left: 22%; }
-        .my-location { position: absolute; bottom: 12px; right: 12px; background: var(--blanc); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); pointer-events: auto; cursor: pointer; border: none; }
-        .my-location svg { width: 16px; height: 16px; stroke: var(--violet-deep); }
+    .hide { display: none !important; }
+    .row-between { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-14 { margin-top: 14px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-18 { margin-top: 18px; }
+    .mt-20 { margin-top: 20px; }
+    .mt-24 { margin-top: 24px; }
+    .stack-10 > * + * { margin-top: 10px; }
+    .stack-12 > * + * { margin-top: 12px; }
+    .stack-14 > * + * { margin-top: 14px; }
+    .stack-16 > * + * { margin-top: 16px; }
+    .stack-18 > * + * { margin-top: 18px; }
 
-        /* Categories */
-        .cats-section { padding: 14px 18px 0; }
-        .cats-title { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
-        .cats-scroll { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding-bottom: 8px; }
-        .cats-scroll::-webkit-scrollbar { display: none; }
-        .cat-chip { flex-shrink: 0; display: flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 50px; background: var(--blanc); border: 1.5px solid rgba(212,184,232,0.3); font-size: 0.8rem; font-weight: 500; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .cat-chip:hover, .cat-chip.active { background: var(--violet-light); border-color: var(--violet-medium); }
-        .cat-chip .cc-emoji { font-size: 1rem; }
-
-        /* CTA Pros disponibles */
-        .pros-cta { margin: 14px 18px; padding: 14px 18px; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border-radius: 16px; color: var(--blanc); display: flex; align-items: center; justify-content: space-between; cursor: pointer; border: none; width: calc(100% - 36px); font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-        .pros-cta:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(168,85,247,0.35); }
-        .pros-cta-text { font-size: 0.92rem; font-weight: 600; }
-        .pros-cta-count { font-size: 0.78rem; opacity: 0.8; }
-        .pros-cta svg { width: 18px; height: 18px; }
-
-        /* Provider list */
-        .providers-section { padding: 10px 18px; }
-        .providers-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
-        .provider-card { padding: 14px; background: var(--blanc); border-radius: 16px; display: flex; align-items: center; gap: 12px; border: 1px solid rgba(212,184,232,0.15); transition: all 0.25s; cursor: pointer; margin-bottom: 10px; }
-        .provider-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .provider-avatar { width: 52px; height: 52px; border-radius: 14px; background: var(--violet-soft); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; position: relative; }
-        .provider-avatar .cert-badge { position: absolute; bottom: -3px; right: -3px; width: 18px; height: 18px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--blanc); }
-        .provider-avatar .cert-badge svg { width: 9px; height: 9px; stroke: var(--blanc); stroke-width: 3; }
-        .provider-info { flex: 1; min-width: 0; }
-        .provider-name { font-weight: 700; font-size: 0.92rem; color: var(--noir); display: flex; align-items: center; gap: 6px; }
-        .provider-cat { font-size: 0.76rem; color: var(--violet-deep); font-weight: 500; margin-top: 1px; }
-        .provider-meta { display: flex; align-items: center; gap: 8px; margin-top: 3px; }
-        .provider-rating { font-size: 0.73rem; font-weight: 600; color: var(--noir); display: flex; align-items: center; gap: 3px; }
-        .provider-rating .star { color: var(--gold); }
-        .provider-dist { font-size: 0.7rem; color: var(--noir); opacity: 0.4; }
-        .provider-avail { font-size: 0.68rem; color: var(--green); font-weight: 600; }
-        .provider-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
-        .provider-price { font-weight: 700; font-size: 0.92rem; color: var(--noir); }
-        .btn-reserve { padding: 6px 14px; border-radius: 8px; background: var(--violet-light); border: none; font-size: 0.72rem; font-weight: 600; color: var(--violet-deep); cursor: pointer; transition: all 0.2s; }
-        .btn-reserve:hover { background: var(--violet-medium); color: var(--blanc); }
-        .btn-fav { background: none; border: none; cursor: pointer; padding: 4px; }
-        .btn-fav svg { width: 16px; height: 16px; stroke: var(--violet-medium); fill: none; transition: all 0.2s; }
-        .btn-fav.faved svg { fill: var(--red); stroke: var(--red); }
-
-        /* ==================== PRO DASHBOARD ==================== */
-        #proDash { background: var(--violet-pale); padding-bottom: 90px; }
-        .pro-header { display: flex; align-items: center; justify-content: space-between; padding: 56px 18px 14px; background: rgba(243,236,248,0.95); backdrop-filter: blur(16px); position: sticky; top: 0; z-index: 10; }
-        .pro-header-left { display: flex; align-items: center; gap: 10px; }
-        .pro-header-left .ph-name { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
-        .pro-certified { display: inline-flex; align-items: center; gap: 4px; background: rgba(34,197,94,0.1); color: var(--green); padding: 3px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; }
-        .pro-certified svg { width: 10px; height: 10px; }
-
-        /* Online/Offline toggle */
-        .online-toggle { display: flex; align-items: center; gap: 8px; }
-        .online-label { font-size: 0.72rem; font-weight: 600; }
-        .online-label.on { color: var(--green); }
-        .online-label.off { color: var(--red); }
-        .toggle-switch { width: 48px; height: 26px; border-radius: 13px; background: #ddd; position: relative; cursor: pointer; transition: background 0.3s; }
-        .toggle-switch.on { background: var(--green); }
-        .toggle-switch .toggle-knob { width: 22px; height: 22px; border-radius: 50%; background: var(--blanc); position: absolute; top: 2px; left: 2px; transition: left 0.3s; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
-        .toggle-switch.on .toggle-knob { left: 24px; }
-
-        /* Stats */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px 18px; }
-        .stat-card { background: var(--blanc); border-radius: 16px; padding: 18px 16px; border: 1px solid rgba(212,184,232,0.15); }
-        .stat-card .stat-value { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 800; color: var(--noir); }
-        .stat-card .stat-label { font-size: 0.72rem; color: var(--noir); opacity: 0.5; margin-top: 2px; font-weight: 500; }
-        .stat-card.highlight { background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border: none; }
-        .stat-card.highlight .stat-value { color: var(--blanc); }
-        .stat-card.highlight .stat-label { color: var(--blanc); opacity: 0.7; }
-
-        /* Pro action buttons */
-        .pro-actions { display: flex; gap: 10px; padding: 0 18px 14px; }
-        .pro-action-btn { flex: 1; padding: 14px 10px; border-radius: 14px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--blanc); display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; transition: all 0.2s; }
-        .pro-action-btn:hover { border-color: var(--violet-medium); background: var(--violet-soft); }
-        .pro-action-btn svg { width: 20px; height: 20px; stroke: var(--violet-deep); }
-        .pro-action-btn span { font-size: 0.72rem; font-weight: 600; color: var(--noir); }
-
-        /* RDV list */
-        .rdv-section { padding: 0 18px; }
-        .rdv-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--noir); opacity: 0.5; margin-bottom: 10px; }
-        .rdv-card { background: var(--blanc); border-radius: 14px; padding: 14px 16px; border: 1px solid rgba(212,184,232,0.12); margin-bottom: 10px; display: flex; align-items: center; gap: 12px; }
-        .rdv-time { text-align: center; min-width: 48px; }
-        .rdv-time .rdv-hour { font-size: 0.95rem; font-weight: 700; color: var(--noir); }
-        .rdv-time .rdv-date { font-size: 0.65rem; color: var(--noir); opacity: 0.4; }
-        .rdv-info { flex: 1; }
-        .rdv-client { font-weight: 600; font-size: 0.88rem; }
-        .rdv-service { font-size: 0.75rem; color: var(--violet-deep); }
-        .rdv-price { font-weight: 700; font-size: 0.92rem; }
-        .rdv-status { font-size: 0.68rem; padding: 3px 10px; border-radius: 6px; font-weight: 600; }
-        .rdv-status.confirmed { background: rgba(34,197,94,0.1); color: var(--green); }
-        .rdv-status.pending { background: rgba(245,158,11,0.1); color: var(--gold); }
-
-        /* ==================== MESSAGING ==================== */
-        #messaging { background: var(--blanc); }
-        .msg-header { display: flex; align-items: center; gap: 12px; padding: 56px 18px 14px; background: var(--blanc); border-bottom: 1px solid rgba(212,184,232,0.15); position: sticky; top: 0; z-index: 10; }
-        .msg-header .msg-back { width: 32px; height: 32px; border-radius: 50%; background: var(--violet-soft); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; }
-        .msg-header .msg-back svg { width: 16px; height: 16px; stroke: var(--noir); }
-        .msg-header .msg-name { font-weight: 700; font-size: 0.95rem; }
-        .msg-header .msg-status { font-size: 0.72rem; color: var(--green); }
-
-        .msg-body { flex: 1; padding: 18px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .msg-bubble { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 0.88rem; line-height: 1.5; }
-        .msg-bubble.sent { align-self: flex-end; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); color: var(--blanc); border-bottom-right-radius: 4px; }
-        .msg-bubble.received { align-self: flex-start; background: var(--violet-soft); color: var(--noir); border-bottom-left-radius: 4px; }
-        .msg-time { font-size: 0.65rem; opacity: 0.5; margin-top: 4px; }
-        .msg-bubble.sent .msg-time { text-align: right; }
-
-        .msg-input-bar { display: flex; gap: 10px; padding: 12px 18px; border-top: 1px solid rgba(212,184,232,0.15); background: var(--blanc); align-items: center; }
-        .msg-input-bar input { flex: 1; padding: 12px 16px; border-radius: 50px; border: 1.5px solid rgba(212,184,232,0.3); background: var(--violet-soft); font-size: 0.88rem; outline: none; }
-        .msg-input-bar input:focus { border-color: var(--violet-neon); }
-        .msg-send-btn { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep)); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .msg-send-btn svg { width: 18px; height: 18px; stroke: var(--blanc); }
-        .msg-locked { padding: 20px; text-align: center; color: var(--noir); opacity: 0.4; font-size: 0.85rem; }
-
-        /* ==================== iOS NAV ==================== */
-        .ios-nav { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; background: rgba(243,236,248,0.88); backdrop-filter: blur(24px) saturate(180%); -webkit-backdrop-filter: blur(24px) saturate(180%); border-top: 1px solid rgba(212,184,232,0.2); padding: 6px 0 max(6px, env(safe-area-inset-bottom)); }
-        .ios-nav-inner { display: flex; justify-content: space-around; align-items: center; max-width: 430px; margin: 0 auto; padding: 4px 0; }
-        .ios-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; color: rgba(17,17,17,0.3); font-size: 0.62rem; font-weight: 500; cursor: pointer; padding: 6px 14px; background: none; border: none; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
-        .ios-nav-item:hover, .ios-nav-item.active { color: var(--violet-deep); }
-        .ios-nav-item svg { width: 22px; height: 22px; stroke-width: 1.5; }
-
-        .ios-nav.hidden { display: none; }
-
-        /* ==================== ANIMATIONS ==================== */
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.4s ease forwards; }
-
-        /* ==================== UTILITIES ==================== */
-        .hidden { display: none !important; }
-
-        .splash-content {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-        }
-    </style>
+    @media (max-width: 420px) {
+      body { padding: 0; }
+      .device { width: 100%; min-height: 100vh; border-radius: 0; }
+    }
+  </style>
 </head>
 <body>
-<div class="app-shell">
-
-    <!-- ==================== SPLASH ==================== -->
-    <div id="splash" class="screen active">
-
-
-        <!-- Contenu splash -->
-        <div class="splash-content">
-            <img src="assets/img/ubo-drop-logo.png" alt="UBO DROP" class="splash-logo">
-            <div class="splash-title">UBO DROP</div>
-            <div class="splash-steps">
-                <div class="splash-step">
-                    <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg></div>
-                    <span>Choisis<br>ton service</span>
-                </div>
-                <div class="splash-arrow">›</div>
-                <div class="splash-step">
-                    <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-                    <span>Réserve</span>
-                </div>
-                <div class="splash-arrow">›</div>
-                <div class="splash-step">
-                    <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
-                    <span>Le pro<br>arrive</span>
-                </div>
-            </div>
-            <div class="splash-ctas">
-                <button class="splash-cta cta-client" onclick="goTo('registerClient')">Client</button>
-                <button class="splash-cta cta-pro" onclick="goTo('registerPro')">Pro</button>
-            </div>
-            <div class="splash-auth">
-                <a onclick="goTo('registerClient')">Créer un compte</a>
-                <a onclick="goTo('login')">Se connecter</a>
-            </div>
-            <a href="./index.html" class="splash-back">← ubodrop.fr</a>
-        </div>
-
+  <div class="device">
+    <div class="dynamic-island"></div>
+    <div class="statusbar">
+      
+      
     </div>
 
-    <!-- ==================== REGISTER CLIENT ==================== -->
-    <div id="registerClient" class="screen auth-screen">
-        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Créer un compte</div>
-        <div class="auth-sub">Rejoins UBO DROP en quelques secondes.</div>
-        <div class="form-group"><label>Prénom</label><input class="form-input" type="text" placeholder="Ton prénom"></div>
-        <div class="form-group"><label>Nom</label><input class="form-input" type="text" placeholder="Ton nom"></div>
-        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
-        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
-        <div class="form-group"><label>Téléphone</label><input class="form-input" type="tel" placeholder="06 12 34 56 78"></div>
-        <button class="form-submit client-submit" onclick="goTo('clientHome')">Créer mon compte</button>
-        <div class="auth-divider"><span>ou</span></div>
-        <button class="google-btn" onclick="goTo('clientHome')">
-            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Continuer avec Google
+    <div class="app">
+      <section class="screen active" id="screen-home">
+        <div class="home-hero">
+          <img class="home-logo" src="assets/img/ubo-drop-logo.png" alt="UBO DROP logo">
+          <div class="brand-title">UBO <span class="brand-drop">DROP</span></div>
+                    
+
+          <div class="card steps-card">
+            <div class="steps-grid">
+              <div class="step-item">
+                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><circle cx="12" cy="10" r="2.3"/></svg></div>
+                <span>Choisis ton service</span>
+              </div>
+              <div class="step-item">
+                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="3"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div>
+                <span>Réserve</span>
+              </div>
+              <div class="step-item">
+                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 14l1.7-4.2A2 2 0 0 1 8.56 8.5h6.88a2 2 0 0 1 1.86 1.3L19 14"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1M5 18H4a1 1 0 0 1-1-1v-3"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg></div>
+                <span>Le pro arrive</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-12 mt-20">
+            <button class="secondary-btn" data-go="screen-search">Trouver un pro</button>
+            <button class="primary-btn" data-go="screen-register-pro">Devenir pro</button>
+          </div>
+
+          <div class="card proof-card">
+            <div class="proof-line">⭐ <span>4.8 — +500 clients satisfaits</span></div>
+            <div class="proof-sub">3 pros disponibles près de toi</div>
+            <div class="mini-avatars">
+              <img src="assets/img/ines-henne.jpeg" alt="Ines — Henné">
+              <img src="assets/img/milton-barber.jpeg" alt="Milton — Barber">
+              <img src="assets/img/maiwenn-ongles.jpeg" alt="Maiwenn — Prothésiste ongulaire">
+            </div>
+          </div>
+
+          <div class="mt-20">
+            <button class="primary-btn" data-go="screen-register-client">Créer un compte</button>
+          </div>
+          <div class="inline-note mt-16">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-search">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-home">‹</button>
+          <div class="title-wrap">
+            <h2>Trouver un professionnel</h2>
+            <p>Où et quand veux-tu ta prestation ?</p>
+          </div>
+          <button class="icon-btn" id="filterBtn">⚙</button>
+        </div>
+
+        <div class="map-stage" id="mapStage">
+          <div class="map-controls">
+            <div class="map-floating">
+              <div class="searchbar compact" style="flex:1;">
+                <span>⌕</span>
+                <input value="Paris 11e, 75011" aria-label="Recherche" />
+                <span style="color:#bbb2c2;">›</span>
+              </div>
+            </div>
+            <div class="place-row" id="placeRow"></div>
+          </div>
+
+          <div class="map-user-dot"></div>
+          <button class="map-position-btn">📍 Ma position</button>
+
+          <div class="map-pin" style="left:21%; top:32%;" data-open-pro="Ines">
+            <div class="map-bubble"><img src="assets/img/ines-henne.jpeg" alt="Ines"></div>
+            <div class="map-tag">⭐ 4.9</div>
+          </div>
+          <div class="map-pin" style="left:61%; top:24%;" data-open-pro="Milton">
+            <div class="map-bubble"><img src="assets/img/milton-barber.jpeg" alt="Milton"></div>
+            <div class="map-tag">⭐ 4.8</div>
+          </div>
+          <div class="map-pin" style="left:74%; top:38%;" data-open-pro="Kingbrel">
+            <div class="map-bubble"><img src="assets/img/kingbrel-barber.jpeg" alt="Kingbrel"></div>
+            <div class="map-tag">⭐ 5.0</div>
+          </div>
+          <div class="map-pin" style="left:34%; top:55%;" data-open-pro="Samuel">
+            <div class="map-bubble"><img src="assets/img/samuel-micropigmentation.webp" alt="Samuel"></div>
+            <div class="map-tag">⭐ 4.9</div>
+          </div>
+          <div class="map-pin" style="left:79%; top:56%;" data-open-pro="Maiwenn">
+            <div class="map-bubble"><img src="assets/img/maiwenn-ongles.jpeg" alt="Maiwenn"></div>
+            <div class="map-tag">⭐ 4.8</div>
+          </div>
+
+          <div class="bottom-sheet sheet-state-1" id="bottomSheet">
+            <button class="sheet-handle" id="sheetHandle" aria-label="Déplier"></button>
+            <div class="sheet-header">
+              <div>
+                <h3>Pros disponibles</h3>
+                <p class="section-sub">Sélection premium proche de toi</p>
+              </div>
+              <button class="sheet-link" id="sheetCycle">Voir tout</button>
+            </div>
+            <div class="sheet-body" id="proList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-detail">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-search">‹</button>
+          <div class="title-wrap"><h2>Fiche prestataire</h2></div>
+          <button class="icon-btn">♡</button>
+        </div>
+
+        <div class="hero-media">
+          <img id="detailHero" src="assets/img/service-coiffeuse.jpg" alt="Prestataire">
+          <div class="hero-gallery" id="detailGallery"></div>
+        </div>
+
+        <div class="card detail-card">
+          <div class="detail-head">
+            <div>
+              <h1 id="detailName">Sarah Coiffure</h1>
+              <div class="detail-meta" id="detailMeta"></div>
+              <div class="section-sub mt-12" id="detailDesc">12 ans d'expérience • Spécialiste balayage</div>
+            </div>
+            <div class="badge" id="detailPrice">à partir de 35€</div>
+          </div>
+
+          <div class="tabs">
+            <button class="tab active">Prestations</button>
+            <button class="tab">Infos</button>
+            <button class="tab">Avis</button>
+            <button class="tab">Portfolio</button>
+          </div>
+
+          <div class="stack-12 mt-14" id="detailServices"></div>
+        </div>
+
+        <div class="sticky-cta">
+          <button class="primary-btn" id="detailCta">Réserver Sarah</button>
+        </div>
+      </section>
+
+      <section class="screen auth-shell" id="screen-login">
+        <button class="icon-btn" data-go="screen-home">‹</button>
+        <div class="card auth-panel mt-16">
+          <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
+          <div class="auth-title">Se connecter</div>
+          <div class="auth-sub">Retrouve tes réservations, tes favoris et tes messages dans une interface premium cohérente avec UBO DROP.</div>
+          <div class="field"><label>Email</label><input type="email" placeholder="nom@email.com"></div>
+          <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
+          <div class="stack-12 mt-20">
+            <button class="primary-btn" id="loginClientBtn">Se connecter</button>
+            <button class="secondary-btn" id="loginProBtn">Connexion pro</button>
+          </div>
+          <div class="inline-note">Pas encore de compte ? <button class="switch-link" data-go="screen-register-client">Créer un compte</button></div>
+        </div>
+      </section>
+
+      <section class="screen auth-shell" id="screen-register-client">
+        <button class="icon-btn" data-go="screen-home">‹</button>
+        <div class="card auth-panel mt-16">
+          <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
+          <div class="auth-title">Créer un compte</div>
+          <div class="auth-sub">Rejoins UBO DROP en quelques secondes pour réserver un barber, une coiffeuse ou un pro beauté près de toi.</div>
+          <div class="field"><label>Prénom</label><input type="text" placeholder="Damien"></div>
+          <div class="field"><label>Nom</label><input type="text" placeholder="Miyouna"></div>
+          <div class="field"><label>Email</label><input type="email" placeholder="nom@email.com"></div>
+          <div class="field"><label>Téléphone</label><input type="tel" placeholder="06 00 00 00 00"></div>
+          <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
+          <div class="mt-20"><button class="primary-btn" id="registerClientBtn">Créer mon compte</button></div>
+          <div class="inline-note">Tu es un pro ? <button class="switch-link" data-go="screen-register-pro">Créer un compte professionnel</button></div>
+        </div>
+      </section>
+
+      <section class="screen auth-shell" id="screen-register-pro">
+        <button class="icon-btn" data-go="screen-home">‹</button>
+        <div class="card auth-panel mt-16">
+          <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
+          <div class="auth-title">Devenir pro</div>
+          <div class="auth-sub">Récupération de la logique dashboard pro de l’ancienne version, redesignée avec la direction artistique premium de la V3.</div>
+          <div class="field"><label>Prénom</label><input type="text" placeholder="Karim"></div>
+          <div class="field"><label>Nom</label><input type="text" placeholder="Benali"></div>
+          <div class="field"><label>Email</label><input type="email" placeholder="pro@email.com"></div>
+          <div class="field"><label>Spécialité</label><select><option>Barber</option><option>Coiffure</option><option>Ongles</option><option>Maquillage</option></select></div>
+          <div class="field"><label>Années d'expérience</label><input type="text" placeholder="8"></div>
+          <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" placeholder="000 000 000 00000"></div>
+          <div class="mt-20"><button class="primary-btn" id="registerProBtn">Créer mon compte pro</button></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-rdv">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-search">‹</button>
+          <div class="title-wrap">
+            <h2>Mes réservations</h2>
+            <p>Un parcours client plus complet et crédible.</p>
+          </div>
+        </div>
+        <div class="card list-card">
+          <div class="list-item">
+            <img src="assets/img/service-barber.jpeg" alt="Karim">
+            <div style="flex:1;">
+              <strong>Karim B.</strong>
+              <p>Fade + barbe • Aujourd’hui 14:30 • 35 €</p>
+            </div>
+            <div class="avail">Confirmé</div>
+          </div>
+          <div class="list-item">
+            <img src="assets/img/service-coiffeuse.jpg" alt="Sarah">
+            <div style="flex:1;">
+              <strong>Sarah C.</strong>
+              <p>Brushing • 29 mars 10:00 • 35 €</p>
+            </div>
+            <div class="tiny-btn">Modifier</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-favs">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-search">‹</button>
+          <div class="title-wrap">
+            <h2>Mes favoris</h2>
+            <p>Tes prestataires préférés pour réserver plus vite.</p>
+          </div>
+        </div>
+        <div class="card list-card">
+          <div class="list-item">
+            <img src="assets/img/service-manucure.jpg" alt="Nail Queen">
+            <div style="flex:1;">
+              <strong>Nail Queen</strong>
+              <p>Onglerie • Semi • Nail art • ★ 5.0</p>
+            </div>
+            <button class="tiny-btn" data-open-pro="Nail Queen">Réserver</button>
+          </div>
+          <div class="list-item">
+            <img src="assets/img/service-maquillage.jpg" alt="Maya">
+            <div style="flex:1;">
+              <strong>Maya Make Up</strong>
+              <p>Glow skin • Événementiel • ★ 4.7</p>
+            </div>
+            <button class="tiny-btn" data-open-pro="Maya Make Up">Voir</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-pro-dashboard">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-search">‹</button>
+          <div class="title-wrap">
+            <h2>Dashboard pro</h2>
+            <p>Planning, réservations, revenus et disponibilité.</p>
+          </div>
+        </div>
+
+        <div class="card pro-header-card">
+          <div class="pro-header-top">
+            <div style="display:flex; gap:12px; align-items:center;">
+              <img class="pro-avatar-lg" src="assets/img/service-barber.jpeg" alt="Karim">
+              <div>
+                <strong style="font-size:1.15rem;">Bonjour, Karim</strong>
+                <div class="section-sub">Barber certifié • Paris 11e</div>
+              </div>
+            </div>
+            <div class="online-chip">En ligne</div>
+          </div>
+          <div class="stats-grid">
+            <div class="soft-card stat-card"><strong>47</strong><span>RDV ce mois</span></div>
+            <div class="soft-card stat-card"><strong>1 240 €</strong><span>Revenus ce mois</span></div>
+            <div class="soft-card stat-card"><strong>185 €</strong><span>Aujourd’hui</span></div>
+            <div class="soft-card stat-card"><strong>4.9 ★</strong><span>Note moyenne</span></div>
+          </div>
+        </div>
+
+        <div class="card list-card mt-16">
+          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Derniers RDV</strong></div><button class="sheet-link">Planning</button></div>
+          <div class="agenda-item"><div><strong>14:30 — Lucas M.</strong><p>Fade + Barbe • Confirmé</p></div><strong>35 €</strong></div>
+          <div class="agenda-item"><div><strong>16:00 — Thomas R.</strong><p>Coupe complète • Confirmé</p></div><strong>25 €</strong></div>
+          <div class="agenda-item"><div><strong>18:00 — Youssef K.</strong><p>Barbe premium • En attente</p></div><strong>20 €</strong></div>
+        </div>
+
+        <div class="card list-card mt-16">
+          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Messagerie</strong></div><button class="sheet-link" data-go="screen-pro-messages">Ouvrir</button></div>
+          <div class="chat-preview"><div><strong>Lucas M.</strong><p>J’ai bien reçu votre réservation pour 14h30.</p></div><span class="muted">14:07</span></div>
+          <div class="chat-preview"><div><strong>Thomas R.</strong><p>Je confirme la prestation chez le pro.</p></div><span class="muted">12:30</span></div>
+        </div>
+      </section>
+
+      <section class="screen" id="screen-pro-messages">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
+          <div class="title-wrap">
+            <h2>Messages</h2>
+            <p>Uniquement les clients ayant payé la prestation.</p>
+          </div>
+        </div>
+        <div class="card list-card">
+          <div class="list-item" data-go="screen-chat">
+            <img src="assets/img/service-barber.jpeg" alt="Lucas">
+            <div style="flex:1;">
+              <strong>Lucas M.</strong>
+              <p>Fade + barbe • 35 € payé • En ligne</p>
+            </div>
+            <span class="muted">14:07</span>
+          </div>
+          <div class="list-item" data-go="screen-chat">
+            <img src="assets/img/service-coiffeuse.jpg" alt="Thomas">
+            <div style="flex:1;">
+              <strong>Thomas R.</strong>
+              <p>Coupe complète • 25 € payé</p>
+            </div>
+            <span class="muted">12:30</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen chat-shell" id="screen-chat">
+        <div class="chat-head">
+          <button class="icon-btn" data-go="screen-pro-messages">‹</button>
+          <img src="assets/img/service-barber.jpeg" alt="Karim">
+          <div style="flex:1;">
+            <strong>Karim B.</strong>
+            <span class="muted" style="font-size:12px;">En ligne</span>
+          </div>
+          <button class="icon-btn">⋯</button>
+        </div>
+
+        <div class="chat-body">
+          <div class="bubble in">Bonjour ! J’ai bien reçu votre réservation pour un fade à 14h30. Je serai chez vous à l’heure.<small>14:02</small></div>
+          <div class="bubble out">Super merci ! Est-ce que vous pouvez aussi faire la barbe ?<small>14:05</small></div>
+          <div class="bubble in">Bien sûr, je rajoute ça. Le total sera 35€ au lieu de 25€.<small>14:06</small></div>
+          <div class="bubble out">Parfait, à tout à l’heure.<small>14:07</small></div>
+        </div>
+
+        <div class="chat-input">
+          <input type="text" placeholder="Écrire un message...">
+          <button class="send-btn">➤</button>
+        </div>
+      </section>
+
+      <nav class="bottom-nav" id="bottomNav">
+        <div class="nav-grid" id="navGrid"></div>
+      </nav>
+    </div>
+  </div>
+
+  <div class="overlay" id="filterOverlay">
+    <div class="overlay-panel">
+      <div class="sheet-handle"></div>
+      <div class="row-between mt-12">
+        <div>
+          <div class="section-title">Filtres</div>
+          <div class="section-sub">La logique catégories est déplacée ici pour libérer l’écran principal.</div>
+        </div>
+        <button class="sheet-link" id="resetFilters">Réinitialiser</button>
+      </div>
+
+      <div class="filter-grid">
+        <div class="filter-group">
+          <h4>Lieu de la prestation</h4>
+          <div class="seg-grid" id="filterPlaceGrid"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Catégories</h4>
+          <div class="pill-row" id="filterCategoryRow"></div>
+        </div>
+        <div class="filter-group">
+          <h4>Quand ?</h4>
+          <div class="seg-grid">
+            <button class="seg active">Maintenant</button>
+            <button class="seg">Plus tard</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Date &amp; heure</h4>
+          <div class="seg-grid">
+            <button class="seg-small">Aujourd’hui</button>
+            <button class="seg-small">14:00</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Rayon</h4>
+          <div class="seg-grid">
+            <button class="seg-small active">5 km</button>
+            <button class="seg-small">15 km</button>
+          </div>
+        </div>
+        <div class="filter-group">
+          <h4>Budget indicatif</h4>
+          <div class="seg-grid">
+            <button class="seg-small">€</button>
+            <button class="seg-small active">€€</button>
+            <button class="seg-small">€€€</button>
+            <button class="seg-small">€€€€</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-24"><button class="primary-btn" id="applyFilters">Voir les résultats — 127 professionnels</button></div>
+    </div>
+  </div>
+
+  <script>
+    const categories = [
+      { key: 'coiffure', label: 'Coiffure' },
+      { key: 'ongles', label: 'Ongles' },
+      { key: 'tatouage', label: 'Tatouage' },
+      { key: 'maquillage', label: 'Maquillage' },
+      { key: 'massage', label: 'Massage' },
+      { key: 'tresses', label: 'Tresses' },
+      { key: 'barbier', label: 'Barbier' }
+    ];
+    const placeOptions = ['À domicile', 'Chez le pro', 'En salon'];
+
+    const proData = {
+      coiffure: [
+        {
+          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barber • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barber moderne • coupe précise à domicile',
+          services: [
+            { name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
+            { name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+        }
+      ],
+      ongles: [
+        {
+          name: 'Maiwenn', image: 'assets/img/maiwenn-ongles.jpeg', secondary: 'Prothésiste ongulaire • Semi • Nail art', rating: '4.8', reviews: '118 avis', distance: '2.1 km', location: 'Paris 3e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Prothésiste ongulaire premium • élégance et précision',
+          services: [
+            { name: 'Pose semi-permanent', meta: '45 min • À domicile', price: '35€', tags: [] },
+            { name: 'Renfort gel', meta: '1h10 • Chez le pro', price: '49€', tags: ['Populaire'] },
+            { name: 'Nail art premium', meta: '1h20 • À domicile / Chez le pro', price: '62€', tags: [] }
+          ],
+          gallery: ['assets/img/maiwenn-ongles.jpeg', 'assets/img/ines-henne.jpeg', 'assets/img/milton-barber.jpeg']
+        }
+      ],
+      tatouage: [
+        {
+          name: 'Ines', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs main • Événementiel', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Henné raffiné • motifs élégants et précis',
+          services: [
+            { name: 'Henné mains', meta: '45 min • À domicile', price: '30€', tags: [] },
+            { name: 'Henné événementiel', meta: '1h15 • À domicile', price: '55€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/maiwenn-ongles.jpeg', 'assets/img/milton-barber.jpeg']
+        }
+      ],
+      maquillage: [
+        {
+          name: 'Samuel', image: 'assets/img/samuel-micropigmentation.webp', secondary: 'Micro pigmentation • Expertise scalp', rating: '4.9', reviews: '76 avis', distance: '3.4 km', location: 'Paris 16e', availability: 'Disponible', price: '€€€', fromPrice: '95€', description: 'Micro pigmentation premium • expertise et précision',
+          services: [
+            { name: 'Diagnostic SMP', meta: '30 min • Chez le pro', price: '95€', tags: [] },
+            { name: 'Séance micro pigmentation', meta: '2h • Chez le pro', price: '220€', tags: ['Expert'] }
+          ],
+          gallery: ['assets/img/samuel-micropigmentation.webp', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+        }
+      ],
+      massage: [
+        {
+          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barber • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barber premium • ambiance haut de gamme',
+          services: [
+            { name: 'Coupe premium', meta: '40 min • Chez le pro', price: '35€', tags: [] },
+            { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/samuel-micropigmentation.webp']
+        }
+      ],
+      tresses: [
+        {
+          name: 'Ines', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs main • Événementiel', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Henné raffiné • motifs élégants et précis',
+          services: [
+            { name: 'Henné mains', meta: '45 min • À domicile', price: '30€', tags: [] },
+            { name: 'Henné événementiel', meta: '1h15 • À domicile', price: '55€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/maiwenn-ongles.jpeg', 'assets/img/milton-barber.jpeg']
+        }
+      ],
+      barbier: [
+        {
+          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barber • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barber moderne • coupe précise à domicile',
+          services: [
+            { name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
+            { name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+        },
+        {
+          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barber • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barber premium • ambiance haut de gamme',
+          services: [
+            { name: 'Coupe premium', meta: '40 min • Chez le pro', price: '35€', tags: [] },
+            { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/samuel-micropigmentation.webp']
+        }
+      ]
+    };
+
+    const flatPros = Object.values(proData).flat().filter((pro, index, arr) => arr.findIndex(item => item.name === pro.name) === index);
+    const state = { category: 'coiffure', place: 'À domicile', userMode: 'guest', sheetState: 1 };
+
+    const navIcons = {
+      search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>',
+      map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l-4 2V6l4-2 6 2 4-2v14l-4 2-6-2Z"></path><path d="M9 4v14M15 6v14"></path></svg>',
+      heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-6.5-4.35-8.5-8C1.8 8.5 3.5 5 7.2 5c1.95 0 3.08.93 4.8 2.72C13.72 5.93 14.85 5 16.8 5 20.5 5 22.2 8.5 20.5 12c-2 3.65-8.5 8-8.5 8Z"></path></svg>',
+      calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M8 3.5v4M16 3.5v4M3.5 9.5h17"></path></svg>',
+      user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.2"></circle><path d="M5 19c1.5-3 4.2-4.5 7-4.5s5.5 1.5 7 4.5"></path></svg>',
+      dashboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5A8 8 0 0 1 20 13.5"></path><path d="M12 13l4-4"></path><path d="M6 18h12"></path></svg>',
+      messages: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h9A2.5 2.5 0 0 1 19 7.5v6A2.5 2.5 0 0 1 16.5 16h-6l-3.5 3V16.2A2.3 2.3 0 0 1 5 14z"></path></svg>',
+      chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 6.5h15v9h-8l-4.5 3v-3h-2.5z"></path></svg>',
+      home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5"></path><path d="M6.5 9.5V20h11V9.5"></path></svg>'
+    };
+
+    const screenToNavClient = [
+      { id: 'screen-search', label: 'Carte', icon: navIcons.map },
+      { id: 'screen-rdv', label: 'RDV', icon: navIcons.calendar },
+      { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
+      { id: 'screen-login', label: 'Compte', icon: navIcons.user }
+    ];
+    const screenToNavPro = [
+      { id: 'screen-pro-dashboard', label: 'Dashboard', icon: navIcons.dashboard },
+      { id: 'screen-pro-messages', label: 'Messages', icon: navIcons.messages },
+      { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
+      { id: 'screen-home', label: 'Accueil', icon: navIcons.home }
+    ];
+
+    function renderPlaceChips() {
+      const row = document.getElementById('placeRow');
+      const filterGrid = document.getElementById('filterPlaceGrid');
+      row.innerHTML = '';
+      filterGrid.innerHTML = '';
+      placeOptions.forEach(place => {
+        const chip = document.createElement('button');
+        chip.className = 'place-chip' + (state.place === place ? ' active' : '');
+        chip.textContent = place;
+        chip.onclick = () => { state.place = place; renderPlaceChips(); renderPros(); };
+        row.appendChild(chip);
+
+        const seg = document.createElement('button');
+        seg.className = 'seg' + (state.place === place ? ' active' : '');
+        seg.textContent = place;
+        seg.onclick = () => { state.place = place; renderPlaceChips(); };
+        filterGrid.appendChild(seg);
+      });
+    }
+
+    function renderFilterCategories() {
+      const row = document.getElementById('filterCategoryRow');
+      row.innerHTML = '';
+      categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'pill' + (state.category === cat.key ? ' active' : '');
+        btn.textContent = cat.label;
+        btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
+        row.appendChild(btn);
+      });
+    }
+
+    function getVisiblePros() {
+      const selected = proData[state.category] || [];
+      if (selected.length >= 5) return selected.slice(0, 5);
+      const others = flatPros.filter(p => !selected.includes(p));
+      return [...selected, ...others].slice(0, 5);
+    }
+
+    function renderPros() {
+      const list = document.getElementById('proList');
+      list.innerHTML = '';
+      getVisiblePros().forEach(pro => {
+        const card = document.createElement('div');
+        card.className = 'pro-card';
+        card.innerHTML = `
+          <img class="pro-avatar" src="${pro.image}" alt="${pro.name}">
+          <div class="pro-main">
+            <div class="pro-name">${pro.name}</div>
+            <div class="pro-secondary">${pro.secondary}</div>
+            <div class="pro-rating">⭐ ${pro.rating} <span>(${pro.reviews})</span> <span>• ${pro.distance}</span></div>
+            <div class="pro-meta">${state.place} • ${pro.location}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="avail">${pro.availability}</div>
+            <div class="pro-meta" style="margin-top:8px;">${pro.price}</div>
+            <button class="book-btn" data-open-pro="${pro.name}">Réserver</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+      bindOpenPro();
+    }
+
+    function findPro(name) {
+      return flatPros.find(p => p.name === name) || flatPros[0];
+    }
+
+    function openPro(name) {
+      const pro = findPro(name);
+      document.getElementById('detailHero').src = pro.gallery[0];
+      document.getElementById('detailName').textContent = pro.name;
+      document.getElementById('detailDesc').textContent = pro.description;
+      document.getElementById('detailPrice').textContent = `à partir de ${pro.fromPrice}`;
+      document.getElementById('detailCta').textContent = `Réserver ${pro.name.split(' ')[0]}`;
+      document.getElementById('detailMeta').innerHTML = `
+        <span>⭐ ${pro.rating} (${pro.reviews})</span>
+        <span>• ${pro.distance}</span>
+        <span>• ${pro.location}</span>
+      `;
+      const gallery = document.getElementById('detailGallery');
+      gallery.innerHTML = pro.gallery.slice(1).map(src => `<img src="${src}" alt="Galerie ${pro.name}">`).join('');
+      const services = document.getElementById('detailServices');
+      services.innerHTML = pro.services.map(service => `
+        <div class="service-row">
+          <div>
+            <h4>${service.name}</h4>
+            <p>${service.meta}${service.tags.length ? ' • ' + service.tags.join(', ') : ''}</p>
+          </div>
+          <div class="service-price"><strong>${service.price}</strong><button class="tiny-btn">Choisir</button></div>
+        </div>
+      `).join('');
+      goTo('screen-detail');
+    }
+
+    function bindOpenPro() {
+      document.querySelectorAll('[data-open-pro]').forEach(el => {
+        el.onclick = () => openPro(el.getAttribute('data-open-pro'));
+      });
+    }
+
+    function renderNav(screenId) {
+      const nav = document.getElementById('bottomNav');
+      const grid = document.getElementById('navGrid');
+      const authScreens = ['screen-home','screen-login','screen-register-client','screen-register-pro'];
+      if (authScreens.includes(screenId)) { nav.classList.remove('show'); return; }
+      nav.classList.add('show');
+      const items = state.userMode === 'pro' ? screenToNavPro : screenToNavClient;
+      grid.innerHTML = items.map(item => `
+        <button class="nav-item ${item.id === screenId ? 'active' : ''}" data-go="${item.id}">
+          <span class="nav-icon">${item.icon}</span>
+          <span>${item.label}</span>
         </button>
-        <div class="auth-switch">Déjà un compte ? <a onclick="goTo('login')">Se connecter</a></div>
-    </div>
-
-    <!-- ==================== REGISTER PRO ==================== -->
-    <div id="registerPro" class="screen auth-screen">
-        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Devenir Pro</div>
-        <div class="auth-sub">Rejoins la communauté de professionnels UBO DROP.</div>
-        <div class="form-group"><label>Prénom</label><input class="form-input" type="text" placeholder="Ton prénom"></div>
-        <div class="form-group"><label>Nom</label><input class="form-input" type="text" placeholder="Ton nom"></div>
-        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
-        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
-        <div class="form-group"><label>Années d'expérience</label><input class="form-input" type="number" placeholder="Ex : 5" min="0"></div>
-        <div class="form-group"><label>SIRET <span class="form-optional">(optionnel — active le badge certifié)</span></label><input class="form-input" type="text" placeholder="123 456 789 00012"></div>
-        <button class="form-submit pro-submit" onclick="goTo('proDash')">Créer mon compte Pro</button>
-        <div class="auth-switch">Déjà inscrit ? <a onclick="goTo('login')">Se connecter</a></div>
-    </div>
-
-    <!-- ==================== LOGIN ==================== -->
-    <div id="login" class="screen auth-screen">
-        <div class="auth-back" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Se connecter</div>
-        <div class="auth-sub">Content de te revoir.</div>
-        <div class="form-group"><label>Email</label><input class="form-input" type="email" placeholder="email@exemple.com"></div>
-        <div class="form-group"><label>Mot de passe</label><input class="form-input" type="password" placeholder="••••••••"></div>
-        <button class="form-submit client-submit" onclick="goTo('clientHome')">Se connecter</button>
-        <div class="auth-divider"><span>ou</span></div>
-        <button class="google-btn" onclick="goTo('clientHome')">
-            <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-            Continuer avec Google
-        </button>
-        <div class="auth-switch">Pas encore de compte ? <a onclick="goTo('registerClient')">S'inscrire</a></div>
-        <div class="auth-switch" style="margin-top:8px;">Tu es un pro ? <a onclick="goTo('registerPro')">Inscription Pro</a></div>
-    </div>
-
-    <!-- ==================== CLIENT HOME ==================== -->
-    <div id="clientHome" class="screen">
-        <div class="client-header">
-            <div class="client-header-left">
-                <div class="ch-title"><strong>Trouver</strong> <span>un professionnel</span></div>
-            </div>
-            <div style="position:relative;">
-                <button class="client-profile-btn" onclick="toggleDropdown()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                </button>
-                <div class="profile-dropdown" id="profileDropdown">
-                    <div class="pd-item" onclick="goTo('clientRdv')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Mes RDV</div>
-                    <div class="pd-item" onclick="goTo('clientFavs')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>Favoris</div>
-                    <div class="pd-divider"></div>
-                    <div class="pd-item danger" onclick="goTo('splash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Déconnexion</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="client-search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" placeholder="Adresse, quartier, code postal…">
-        </div>
-
-        <div class="loc-pills">
-            <div class="loc-pill active" onclick="setLocPill(this)">À domicile</div>
-            <div class="loc-pill" onclick="setLocPill(this)">Chez le pro</div>
-            <div class="loc-pill" onclick="setLocPill(this)">En salon</div>
-        </div>
-
-        <!-- Map -->
-        <div class="client-map">
-            <iframe src="https://www.openstreetmap.org/export/embed.html?bbox=2.25,48.82,2.42,48.90&layer=mapnik" loading="lazy"></iframe>
-            <div class="map-pins">
-                <div class="map-pin pin1">
-                    <div class="map-pin-avatar certified">✂️<div class="map-pin-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-                    <div class="map-pin-point"></div>
-                </div>
-                <div class="map-pin pin2">
-                    <div class="map-pin-avatar">💅</div>
-                    <div class="map-pin-point"></div>
-                </div>
-                <div class="map-pin pin3">
-                    <div class="map-pin-avatar certified">💇<div class="map-pin-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-                    <div class="map-pin-point"></div>
-                </div>
-            </div>
-            <button class="my-location"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg></button>
-        </div>
-
-        <!-- Categories -->
-        <div class="cats-section">
-            <div class="cats-title">Catégories</div>
-            <div class="cats-scroll">
-                <div class="cat-chip active" onclick="setCat(this)"><span class="cc-emoji">✂️</span>Barber</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💇</span>Coiffeuse</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💅</span>Ongles</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">👁️</span>Cils</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🌿</span>Henné</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💄</span>Maquillage</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🌸</span>Esthétique</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🖋️</span>Tatoueur</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🎯</span>SMP</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">💆</span>Massage</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🦷</span>Dentaire</div>
-                <div class="cat-chip" onclick="setCat(this)"><span class="cc-emoji">🔗</span>Perceur</div>
-            </div>
-        </div>
-
-        <!-- CTA Voir les pros -->
-        <button class="pros-cta" onclick="document.querySelector('.providers-section').scrollIntoView({behavior:'smooth'})">
-            <div><div class="pros-cta-text">Voir les pros disponibles</div><div class="pros-cta-count">12 professionnels autour de vous</div></div>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-        </button>
-
-        <!-- Providers list -->
-        <div class="providers-section">
-            <div class="providers-label">Pros disponibles</div>
-
-            <div class="provider-card" onclick="goTo('messaging')">
-                <div class="provider-avatar">✂️<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-                <div class="provider-info">
-                    <div class="provider-name">Karim B.</div>
-                    <div class="provider-cat">Barber · Fade spécialiste</div>
-                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.9</span><span class="provider-dist">1.2 km</span><span class="provider-avail">Disponible</span></div>
-                </div>
-                <div class="provider-actions">
-                    <div class="provider-price">25 €</div>
-                    <button class="btn-reserve">Réserver</button>
-                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                </div>
-            </div>
-
-            <div class="provider-card">
-                <div class="provider-avatar">💅<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-                <div class="provider-info">
-                    <div class="provider-name">Amina L.</div>
-                    <div class="provider-cat">Ongles · Nail art · Semi</div>
-                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 5.0</span><span class="provider-dist">0.8 km</span><span class="provider-avail">Disponible</span></div>
-                </div>
-                <div class="provider-actions">
-                    <div class="provider-price">35 €</div>
-                    <button class="btn-reserve">Réserver</button>
-                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                </div>
-            </div>
-
-            <div class="provider-card">
-                <div class="provider-avatar">🌿</div>
-                <div class="provider-info">
-                    <div class="provider-name">Fatima D.</div>
-                    <div class="provider-cat">Henné · Traditions · Mariages</div>
-                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.8</span><span class="provider-dist">2.1 km</span><span class="provider-avail">Disponible</span></div>
-                </div>
-                <div class="provider-actions">
-                    <div class="provider-price">40 €</div>
-                    <button class="btn-reserve">Réserver</button>
-                    <button class="btn-fav faved" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                </div>
-            </div>
-
-            <div class="provider-card">
-                <div class="provider-avatar">💇<div class="cert-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
-                <div class="provider-info">
-                    <div class="provider-name">Sarah C.</div>
-                    <div class="provider-cat">Coiffeuse · Balayage · Brushing</div>
-                    <div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.9</span><span class="provider-dist">1.8 km</span><span class="provider-avail">Disponible</span></div>
-                </div>
-                <div class="provider-actions">
-                    <div class="provider-price">55 €</div>
-                    <button class="btn-reserve">Réserver</button>
-                    <button class="btn-fav" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== CLIENT RDV ==================== -->
-    <div id="clientRdv" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
-        <div class="auth-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Mes RDV</div>
-        <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">14:30</div><div class="rdv-date">27 mars</div></div><div class="rdv-info"><div class="rdv-client">Karim B.</div><div class="rdv-service">Barber · Fade</div></div><div class="rdv-price">25 €</div><span class="rdv-status confirmed">Confirmé</span></div>
-        <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">10:00</div><div class="rdv-date">29 mars</div></div><div class="rdv-info"><div class="rdv-client">Sarah C.</div><div class="rdv-service">Brushing</div></div><div class="rdv-price">35 €</div><span class="rdv-status pending">En attente</span></div>
-    </div>
-
-    <!-- ==================== CLIENT FAVORIS ==================== -->
-    <div id="clientFavs" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
-        <div class="auth-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Mes favoris</div>
-        <div class="auth-sub">Tes pros préférés pour réserver plus vite.</div>
-        <div class="provider-card">
-            <div class="provider-avatar">🌿</div>
-            <div class="provider-info"><div class="provider-name">Fatima D.</div><div class="provider-cat">Henné · Traditions</div><div class="provider-meta"><span class="provider-rating"><span class="star">★</span> 4.8</span></div></div>
-            <div class="provider-actions"><button class="btn-reserve">Réserver</button><button class="btn-fav faved" onclick="event.stopPropagation();this.classList.toggle('faved')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button></div>
-        </div>
-    </div>
-
-    <!-- ==================== PRO DASHBOARD ==================== -->
-    <div id="proDash" class="screen">
-        <div class="pro-header">
-            <div class="pro-header-left">
-                <div class="ph-name">Bonjour, Karim</div>
-                <div class="pro-certified"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Certifié</div>
-            </div>
-            <div class="online-toggle">
-                <span class="online-label on" id="onlineLabel">En ligne</span>
-                <div class="toggle-switch on" id="toggleSwitch" onclick="toggleOnline()"><div class="toggle-knob"></div></div>
-            </div>
-        </div>
-
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">47</div><div class="stat-label">RDV ce mois</div></div>
-            <div class="stat-card highlight"><div class="stat-value">1 240 €</div><div class="stat-label">Revenus ce mois</div></div>
-            <div class="stat-card"><div class="stat-value">185 €</div><div class="stat-label">Revenus aujourd'hui</div></div>
-            <div class="stat-card"><div class="stat-value">4.9 ★</div><div class="stat-label">Note moyenne</div></div>
-        </div>
-
-        <!-- Quick actions -->
-        <div class="pro-actions">
-            <div class="pro-action-btn" onclick="goTo('proMessages')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                <span>Messages</span>
-            </div>
-            <div class="pro-action-btn">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>Promotion</span>
-            </div>
-            <div class="pro-action-btn" onclick="goTo('splash')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                <span>Déconnexion</span>
-            </div>
-        </div>
-
-        <!-- Derniers RDV -->
-        <div class="rdv-section">
-            <div class="rdv-label">Derniers RDV</div>
-            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">14:30</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Lucas M.</div><div class="rdv-service">Fade + Barbe</div></div><div class="rdv-price">35 €</div><span class="rdv-status confirmed">Confirmé</span></div>
-            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">16:00</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Thomas R.</div><div class="rdv-service">Coupe complète</div></div><div class="rdv-price">25 €</div><span class="rdv-status confirmed">Confirmé</span></div>
-            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">18:00</div><div class="rdv-date">Auj.</div></div><div class="rdv-info"><div class="rdv-client">Youssef A.</div><div class="rdv-service">Dégradé</div></div><div class="rdv-price">20 €</div><span class="rdv-status pending">En attente</span></div>
-            <div class="rdv-card"><div class="rdv-time"><div class="rdv-hour">10:00</div><div class="rdv-date">Hier</div></div><div class="rdv-info"><div class="rdv-client">Maxime D.</div><div class="rdv-service">Fade + Design</div></div><div class="rdv-price">40 €</div><span class="rdv-status confirmed">Terminé</span></div>
-        </div>
-        <div style="text-align:center;padding:24px 18px;"><a href="./index.html" style="font-size:0.78rem;color:var(--violet-medium);opacity:0.5;">← ubodrop.fr</a></div>
-    </div>
-
-    <!-- ==================== MESSAGING ==================== -->
-    <div id="messaging" class="screen">
-        <div class="msg-header">
-            <button class="msg-back" onclick="goTo('clientHome')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-            <div><div class="msg-name">Karim B.</div><div class="msg-status">En ligne</div></div>
-        </div>
-        <div class="msg-body">
-            <div class="msg-bubble received">Bonjour ! J'ai bien reçu votre réservation pour un fade à 14h30. Je serai chez vous à l'heure.<div class="msg-time">14:02</div></div>
-            <div class="msg-bubble sent">Super merci ! Est-ce que vous pouvez aussi faire la barbe ?<div class="msg-time">14:05</div></div>
-            <div class="msg-bubble received">Bien sûr, je rajoute ça. Le total sera 35€ au lieu de 25€, ça vous va ?<div class="msg-time">14:06</div></div>
-            <div class="msg-bubble sent">Parfait, à tout à l'heure !<div class="msg-time">14:07</div></div>
-        </div>
-        <div class="msg-input-bar">
-            <input type="text" placeholder="Écrire un message…">
-            <button class="msg-send-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
-        </div>
-    </div>
-
-    <!-- ==================== PRO MESSAGES LIST ==================== -->
-    <div id="proMessages" class="screen" style="background:var(--violet-pale);padding:60px 18px 100px;">
-        <div class="auth-back" onclick="goTo('proDash')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></div>
-        <div class="auth-title">Messages</div>
-        <div class="auth-sub">Uniquement les clients ayant payé la prestation.</div>
-        <div class="provider-card" onclick="goTo('messaging')">
-            <div class="provider-avatar" style="font-size:1rem;">👤</div>
-            <div class="provider-info"><div class="provider-name">Lucas M.</div><div class="provider-cat">Fade + Barbe · 35€ payé</div><div class="provider-meta"><span class="provider-avail">En ligne</span></div></div>
-            <div style="font-size:0.75rem;color:var(--violet-medium);">14:07</div>
-        </div>
-        <div class="provider-card" onclick="goTo('messaging')">
-            <div class="provider-avatar" style="font-size:1rem;">👤</div>
-            <div class="provider-info"><div class="provider-name">Thomas R.</div><div class="provider-cat">Coupe complète · 25€ payé</div><div class="provider-meta"><span class="provider-dist">Il y a 2h</span></div></div>
-            <div style="font-size:0.75rem;color:var(--violet-medium);">12:30</div>
-        </div>
-    </div>
-
-</div><!-- /app-shell -->
-
-<!-- iOS Nav -->
-<nav class="ios-nav" id="appNav">
-    <div class="ios-nav-inner">
-        <button class="ios-nav-item active" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Accueil</span></button>
-        <button class="ios-nav-item" data-screen="clientFavs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Favoris</span></button>
-        <button class="ios-nav-item" data-screen="clientRdv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>RDV</span></button>
-    </div>
-</nav>
-
-<script>
-    const noNavScreens = ['splash', 'registerClient', 'registerPro', 'login'];
+      `).join('');
+      bindGo();
+    }
 
     function goTo(screenId) {
-        // Close dropdown
-        const dd = document.getElementById('profileDropdown');
-        if (dd) dd.classList.remove('open');
-
-        // Switch screens
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        const target = document.getElementById(screenId);
-        if (target) { target.classList.add('active'); window.scrollTo(0, 0); }
-
-        // Nav visibility
-        const nav = document.getElementById('appNav');
-        if (noNavScreens.includes(screenId)) {
-            nav.classList.add('hidden');
-        } else {
-            nav.classList.remove('hidden');
-            // Update active nav item
-            nav.querySelectorAll('.ios-nav-item').forEach(btn => btn.classList.remove('active'));
-            nav.querySelectorAll(`.ios-nav-item[data-screen="${screenId}"]`).forEach(btn => btn.classList.add('active'));
-        }
-
-        // Switch nav for pro dashboard
-        if (screenId === 'proDash' || screenId === 'proMessages') {
-            nav.innerHTML = `<div class="ios-nav-inner">
-                <button class="ios-nav-item active" data-screen="proDash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Dashboard</span></button>
-                <button class="ios-nav-item" data-screen="proMessages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Messages</span></button>
-            </div>`;
-            attachNavListeners();
-        } else if (!noNavScreens.includes(screenId)) {
-            nav.innerHTML = `<div class="ios-nav-inner">
-                <button class="ios-nav-item" data-screen="clientHome"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg><span>Accueil</span></button>
-                <button class="ios-nav-item" data-screen="clientFavs"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg><span>Favoris</span></button>
-                <button class="ios-nav-item" data-screen="clientRdv"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>RDV</span></button>
-            </div>`;
-            attachNavListeners();
-            nav.querySelectorAll(`.ios-nav-item[data-screen="${screenId}"]`).forEach(btn => btn.classList.add('active'));
-        }
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(screenId)?.classList.add('active');
+      renderNav(screenId);
     }
 
-    function attachNavListeners() {
-        document.querySelectorAll('.ios-nav-item[data-screen]').forEach(btn => {
-            btn.addEventListener('click', () => goTo(btn.dataset.screen));
-        });
+    function bindGo() {
+      document.querySelectorAll('[data-go]').forEach(btn => {
+        btn.onclick = () => goTo(btn.getAttribute('data-go'));
+      });
     }
 
-    // Init nav listeners
-    attachNavListeners();
-
-    // Profile dropdown
-    function toggleDropdown() {
-        document.getElementById('profileDropdown').classList.toggle('open');
+    function toggleFilter(open) {
+      document.getElementById('filterOverlay').classList.toggle('open', open);
     }
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.client-profile-btn') && !e.target.closest('.profile-dropdown')) {
-            const dd = document.getElementById('profileDropdown');
-            if (dd) dd.classList.remove('open');
-        }
+
+    function setSheetState(nextState) {
+      const maxState = 3;
+      state.sheetState = Math.max(0, Math.min(maxState, nextState));
+      const sheet = document.getElementById('bottomSheet');
+      sheet.classList.remove('sheet-state-0', 'sheet-state-1', 'sheet-state-2', 'sheet-state-3');
+      sheet.classList.add(`sheet-state-${state.sheetState}`);
+      const cycleLabel = document.getElementById('sheetCycle');
+      if (cycleLabel) {
+        cycleLabel.textContent = ['Ouvrir', 'Monter', 'Développer', 'Réduire'][state.sheetState];
+      }
+    }
+
+    document.getElementById('filterBtn').onclick = () => toggleFilter(true);
+    document.getElementById('applyFilters').onclick = () => toggleFilter(false);
+    document.getElementById('resetFilters').onclick = () => {
+      state.category = 'coiffure';
+      state.place = 'À domicile';
+      renderFilterCategories();
+      renderPlaceChips();
+      renderPros();
+    };
+    document.getElementById('filterOverlay').addEventListener('click', e => {
+      if (e.target.id === 'filterOverlay') toggleFilter(false);
     });
 
-    // Location pills
-    function setLocPill(el) {
-        el.parentElement.querySelectorAll('.loc-pill').forEach(p => p.classList.remove('active'));
-        el.classList.add('active');
-    }
+    document.getElementById('sheetHandle').onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
+    document.getElementById('sheetCycle').onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
 
-    // Category chips
-    function setCat(el) {
-        el.parentElement.querySelectorAll('.cat-chip').forEach(c => c.classList.remove('active'));
-        el.classList.add('active');
-    }
+    (function initBottomSheetDrag() {
+      const sheet = document.getElementById('bottomSheet');
+      const handle = document.getElementById('sheetHandle');
+      const header = sheet.querySelector('.sheet-header');
+      const dragTargets = [handle, header];
+      const stateHeights = [72, 168, 292, 458];
+      let startY = 0;
+      let startH = 0;
+      let dragging = false;
 
-    // Pro online toggle
-    function toggleOnline() {
-        const sw = document.getElementById('toggleSwitch');
-        const label = document.getElementById('onlineLabel');
-        sw.classList.toggle('on');
-        if (sw.classList.contains('on')) {
-            label.textContent = 'En ligne';
-            label.className = 'online-label on';
-        } else {
-            label.textContent = 'Hors ligne';
-            label.className = 'online-label off';
-        }
-    }
+      const getY = (e) => ('touches' in e ? e.touches[0].clientY : e.clientY);
 
-    // Hash navigation from index.html
-    if (window.location.hash) {
-        const hash = window.location.hash.replace('#', '');
-        if (document.getElementById(hash)) goTo(hash);
-    }
+      const start = (e) => {
+        dragging = true;
+        startY = getY(e);
+        startH = sheet.getBoundingClientRect().height;
+        sheet.classList.add('dragging');
+        e.preventDefault();
+      };
+      const move = (e) => {
+        if (!dragging) return;
+        const delta = startY - getY(e);
+        const next = Math.max(56, Math.min(458, startH + delta));
+        sheet.style.height = next + 'px';
+      };
+      const end = () => {
+        if (!dragging) return;
+        dragging = false;
+        sheet.classList.remove('dragging');
+        const current = sheet.getBoundingClientRect().height;
+        let nearest = 0;
+        let nearestDiff = Infinity;
+        stateHeights.forEach((h, idx) => {
+          const diff = Math.abs(current - h);
+          if (diff < nearestDiff) { nearestDiff = diff; nearest = idx; }
+        });
+        sheet.style.height = '';
+        setSheetState(nearest);
+      };
 
-    // Hide nav on splash
-    document.getElementById('appNav').classList.add('hidden');
-</script>
+      dragTargets.forEach(target => {
+        target.addEventListener('mousedown', start);
+        target.addEventListener('touchstart', start, { passive: false });
+      });
+      window.addEventListener('mousemove', move, { passive: true });
+      window.addEventListener('touchmove', move, { passive: true });
+      window.addEventListener('mouseup', end);
+      window.addEventListener('touchend', end);
+      window.addEventListener('touchcancel', end);
+    })();
+
+    document.getElementById('loginClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-search'); };
+    document.getElementById('loginProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
+    document.getElementById('registerClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-search'); };
+    document.getElementById('registerProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
+
+    renderPlaceChips();
+    renderFilterCategories();
+    renderPros();
+    bindGo();
+    bindOpenPro();
+    setSheetState(1);
+    renderNav('screen-home');
+  </script>
 </body>
 </html>

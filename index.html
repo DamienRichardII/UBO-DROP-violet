@@ -226,41 +226,23 @@
             text-align: center; padding: 0 24px; margin-top: 42px;
             max-width: 720px;
         }
-        .hero-welcome {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            margin-bottom: 18px;
-            border-radius: 999px;
-            background: rgba(255,255,255,0.55);
-            border: 1px solid rgba(180, 142, 208, 0.25);
-            color: var(--violet-deep);
-            font-size: 0.82rem;
-            font-weight: 600;
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
         .hero-title {
-            font-family: 'Playfair Display', serif;
-            font-size: clamp(2.8rem, 8vw, 4.9rem);
-            font-weight: 900; color: var(--noir);
-            letter-spacing: 0.12em; line-height: 0.98;
-            margin-bottom: 18px; text-transform: uppercase;
+            font-family: Calibri, 'Trebuchet MS', 'Segoe UI', sans-serif;
+            font-size: clamp(2.4rem, 5vw, 4.5rem);
+            font-weight: 700;
+            color: var(--noir);
+            letter-spacing: 0;
+            line-height: 1.08;
+            margin-bottom: 30px;
+            text-transform: none;
+            white-space: nowrap;
         }
         .hero-title span {
-            background: linear-gradient(135deg, var(--violet-light), var(--violet-neon));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero-subtitle {
-            font-size: clamp(0.98rem, 2.5vw, 1.14rem);
-            color: var(--noir); font-weight: 400;
-            max-width: 480px; margin: 0 auto 34px;
-            opacity: 0.76; line-height: 1.72;
+            color: var(--noir);
+            background: none;
+            -webkit-background-clip: border-box;
+            -webkit-text-fill-color: currentColor;
+            background-clip: border-box;
         }
         .hero-cta {
             padding: 16px 36px; border-radius: 50px;
@@ -580,9 +562,7 @@
             .providers-banner { padding: 12px 0; }
             .banner-item { padding: 6px 18px; font-size: 0.82rem; }
             .hero-content { margin-top: 36px; padding: 0 18px; }
-            .hero-welcome { margin-bottom: 14px; font-size: 0.75rem; }
-            .hero-title { font-size: clamp(2.45rem, 13vw, 3.4rem); letter-spacing: 0.08em; margin-bottom: 16px; }
-            .hero-subtitle { max-width: 330px; margin-bottom: 26px; }
+            .hero-title { font-size: clamp(2rem, 7.2vw, 3.2rem); letter-spacing: 0; margin-bottom: 26px; white-space: nowrap; }
             .btn-open-app { padding: 10px 16px; font-size: 0.78rem; }
             .hero-cta { padding: 15px 28px; }
             .hero-bands { display: flex; gap: 0; width: 100%; left: 0; transform: none; }
@@ -616,9 +596,7 @@
             .header-logo span { font-size: 1rem; letter-spacing: 0.06em; }
             .btn-open-app { padding: 9px 14px; font-size: 0.74rem; }
             .hero-content { margin-top: 30px; }
-            .hero-welcome { padding: 7px 14px; }
-            .hero-title { font-size: 2.25rem; letter-spacing: 0.07em; }
-            .hero-subtitle { font-size: 0.95rem; line-height: 1.65; }
+            .hero-title { font-size: clamp(1.5rem, 6.4vw, 2.25rem); letter-spacing: 0; white-space: nowrap; }
             .phone-mockup { width: 150px; }
             .service-card { width: 240px; height: 320px; }
         }
@@ -650,9 +628,7 @@
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-welcome">Bienvenue chez UBO DROP</div>
-            <h1 class="hero-title">UBO <span>DROP</span></h1>
-            <p class="hero-subtitle">Réservez un barber, une coiffeuse ou un professionnel beauté premium à domicile, chez le pro ou en salon.</p>
+            <h1 class="hero-title">Bienvenue chez UBO <span>DROP</span></h1>
             <a href="./app.html" class="hero-cta">
                 Découvrir l'app
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>

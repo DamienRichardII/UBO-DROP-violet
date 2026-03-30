@@ -129,6 +129,15 @@
       line-height: .96;
       letter-spacing: -.04em;
     }
+    .home-brand-title {
+      font-family: Calibri, "Trebuchet MS", "Segoe UI", sans-serif;
+      font-size: 3.1rem;
+      line-height: .96;
+      letter-spacing: -.02em;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .home-brand-title .brand-drop { color: var(--ink); }
     .brand-drop { color: var(--violet-2); }
     .muted { color: var(--muted); }
     .badge {
@@ -195,6 +204,79 @@
     .primary-btn, .secondary-btn {
       width: 100%; min-height: 56px; border-radius: 999px; font-size: 17px; font-weight: 700; transition: .25s ease;
     }
+    .home-cta-match {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(108, 63, 160, 0.12);
+      box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
+      transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+    }
+    .home-cta-match::before {
+      content: "";
+      position: absolute;
+      inset: 1px;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255,255,255,0.46), rgba(255,255,255,0));
+      pointer-events: none;
+      z-index: -1;
+    }
+    .home-cta-match::after {
+      content: "";
+      position: absolute;
+      top: -120%;
+      left: -30%;
+      width: 42%;
+      height: 300%;
+      background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 48%, transparent 100%);
+      transform: rotate(18deg);
+      opacity: 0;
+      transition: transform 0.6s ease, opacity 0.35s ease;
+      pointer-events: none;
+    }
+    .home-cta-match:hover {
+      transform: translateY(-1px);
+    }
+    .home-cta-match:hover::after {
+      opacity: 1;
+      transform: translateX(220%) rotate(18deg);
+    }
+    #screen-home button[data-go="screen-register-pro"],
+    #screen-home button[data-go="screen-register-client"] {
+      background: linear-gradient(135deg, #eadcf5 0%, #dcc4ee 45%, #cfafe8 100%) !important;
+      color: var(--ink) !important;
+      border: 1px solid rgba(108, 63, 160, 0.12) !important;
+      box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75) !important;
+    }
+    #screen-home button[data-go="screen-register-pro"]:hover,
+    #screen-home button[data-go="screen-register-client"]:hover,
+    #screen-home button[data-go="screen-register-pro"]:focus,
+    #screen-home button[data-go="screen-register-client"]:focus,
+    #screen-home button[data-go="screen-register-pro"]:focus-visible,
+    #screen-home button[data-go="screen-register-client"]:focus-visible {
+      background: linear-gradient(135deg, #B48ED0 0%, #A855F7 55%, #6C3FA0 100%) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 14px 32px rgba(108, 63, 160, 0.24), 0 0 28px rgba(168, 85, 247, 0.22) !important;
+      border-color: rgba(108, 63, 160, 0.16) !important;
+      outline: none !important;
+    }
+    .home-cta-match-dark {
+      color: #fff;
+      background: linear-gradient(135deg, #B48ED0 0%, #A855F7 55%, #6C3FA0 100%);
+      box-shadow: 0 14px 28px rgba(92, 30, 148, .24), inset 0 1px 0 rgba(255,255,255,.22);
+      border: 1px solid rgba(255,255,255,.1);
+    }
+    .home-cta-match-dark:hover {
+      background: linear-gradient(135deg, #B48ED0 0%, #A855F7 55%, #6C3FA0 100%);
+      color: #fff;
+      box-shadow: 0 16px 34px rgba(92, 30, 148, .28), 0 0 28px rgba(168, 85, 247, 0.2);
+    }
     .primary-btn {
       color: white;
       background: var(--glossy);
@@ -214,7 +296,7 @@
       padding-top: 12px;
     }
     .home-logo {
-      width: 104px; height: 104px; object-fit: contain; margin: 0 auto 14px;
+      width: 204px; height: 204px; object-fit: contain; margin: 0 auto 20px;
       filter: drop-shadow(0 12px 24px rgba(124, 56, 188, .25));
     }
     .home-subbrand { display: none; }
@@ -233,10 +315,10 @@
     .step-item { display: flex; flex-direction: column; align-items: center; gap: 9px; font-size: 11.5px; font-weight: 700; color: #5d5566; text-align: center; }
     .step-icon {
       width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center;
-      background: linear-gradient(180deg, rgba(255,255,255,.95), rgba(247,241,250,.9));
-      border: 1px solid rgba(117, 92, 147, .12);
+      background: linear-gradient(180deg, rgba(255,255,255,.98), rgba(245,245,245,.95));
+      border: 1px solid rgba(17, 17, 17, .08);
       box-shadow: 0 8px 18px rgba(40, 21, 61, .05);
-      color: #5e267f;
+      color: #111111;
     }
     .step-icon svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
     .proof-card { margin-top: 16px; padding: 16px 18px; text-align: center; }
@@ -509,7 +591,7 @@
       <section class="screen active" id="screen-home">
         <div class="home-hero">
           <img class="home-logo" src="assets/img/ubo-drop-logo.png" alt="UBO DROP logo">
-          <div class="brand-title">UBO <span class="brand-drop">DROP</span></div>
+          <div class="brand-title home-brand-title">UBO <span class="brand-drop">DROP</span></div>
                     
 
           <div class="card steps-card">
@@ -531,7 +613,7 @@
 
           <div class="stack-12 mt-20">
             <button class="secondary-btn" data-go="screen-search">Trouver un pro</button>
-            <button class="primary-btn" data-go="screen-register-pro">Devenir pro</button>
+            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-pro">Devenir pro</button>
           </div>
 
           <div class="card proof-card">
@@ -545,7 +627,7 @@
           </div>
 
           <div class="mt-20">
-            <button class="primary-btn" data-go="screen-register-client">Créer un compte</button>
+            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client">Créer un compte</button>
           </div>
           <div class="inline-note mt-16">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
         </div>

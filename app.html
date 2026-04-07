@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UBO DROP — App premium V3</title>
+  <title>UBODROP — App premium V3</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #f6f1f5;
@@ -45,7 +45,7 @@
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { min-height: 100%; }
     body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: "Montserrat", sans-serif;
       background:
         radial-gradient(circle at top, rgba(188,136,238,.18), transparent 26%),
         linear-gradient(180deg, #faf6f8 0%, #f2edf2 100%);
@@ -124,16 +124,17 @@
     }
 
     .brand-title {
-      font-family: "Playfair Display", serif;
-      font-size: 3.1rem;
+      font-family: "Montserrat", sans-serif;
+      font-size: 3rem;
       line-height: .96;
       letter-spacing: -.04em;
+      font-weight: 700;
     }
     .home-brand-title {
-      font-family: Calibri, "Trebuchet MS", "Segoe UI", sans-serif;
-      font-size: 3.1rem;
+      font-family: "Montserrat", sans-serif;
+      font-size: 3rem;
       line-height: .96;
-      letter-spacing: -.02em;
+      letter-spacing: -.04em;
       font-weight: 700;
       color: var(--ink);
     }
@@ -216,7 +217,7 @@
       border: 1px solid rgba(108, 63, 160, 0.12);
       box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
       transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
-      font-family: Inter, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+      font-family: "Montserrat", sans-serif;
     }
     .home-cta-match::before {
       content: "";
@@ -333,6 +334,12 @@
     .screen-topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
     .screen-topbar .title-wrap { flex: 1; }
     .screen-topbar h2 { font-size: 1.38rem; font-weight: 800; letter-spacing: -.04em; }
+    .screen-topbar h2,
+    .auth-title,
+    .detail-head h1,
+    .bottom-nav .nav-item,
+    .primary-btn,
+    .secondary-btn { font-family: "Montserrat", sans-serif; }
     .screen-topbar p { margin-top: 4px; font-size: 13px; color: var(--muted); }
 
     /* Search screen */
@@ -601,8 +608,8 @@
     <div class="app">
       <section class="screen active" id="screen-home">
         <div class="home-hero">
-          <img class="home-logo" src="assets/img/ubo-drop-logo.png" alt="UBO DROP logo">
-          <div class="brand-title home-brand-title">UBO <span class="brand-drop">DROP</span></div>
+          <img class="home-logo" src="assets/img/ubo-drop-logo.png" alt="UBODROP logo">
+          <div class="brand-title home-brand-title">UBODROP</div>
                     
 
           <div class="card steps-card">
@@ -746,7 +753,7 @@
         <div class="card auth-panel mt-16">
           <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
           <div class="auth-title">Se connecter</div>
-          <div class="auth-sub">Retrouve tes réservations, tes favoris et tes messages dans une interface premium cohérente avec UBO DROP.</div>
+          <div class="auth-sub">Retrouve tes réservations, tes favoris et tes messages dans une interface premium cohérente avec UBODROP.</div>
           <div class="field"><label>Email</label><input type="email" placeholder="nom@email.com"></div>
           <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
           <div class="stack-12 mt-20">
@@ -762,7 +769,7 @@
         <div class="card auth-panel mt-16">
           <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
           <div class="auth-title">Créer un compte</div>
-          <div class="auth-sub">Rejoins UBO DROP en quelques secondes pour réserver un barber, une coiffeuse ou un pro beauté près de toi.</div>
+          <div class="auth-sub">Rejoins UBODROP en quelques secondes pour réserver un barber, une coiffeuse ou un pro beauté près de toi.</div>
           <div class="field"><label>Prénom</label><input type="text" placeholder="Damien"></div>
           <div class="field"><label>Nom</label><input type="text" placeholder="Miyouna"></div>
           <div class="field"><label>Email</label><input type="email" placeholder="nom@email.com"></div>

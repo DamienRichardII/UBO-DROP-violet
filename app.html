@@ -463,6 +463,17 @@
     .auth-panel { padding: 22px 18px; }
     .auth-logo { width: 82px; height: 82px; object-fit: contain; margin-bottom: 16px; filter: drop-shadow(0 10px 20px rgba(124, 56, 188, .2)); }
     .auth-title { font-size: 2rem; font-weight: 800; letter-spacing: -.05em; }
+    .account-header { display:flex; gap:14px; align-items:center; }
+    .account-avatar { width:62px; height:62px; border-radius:20px; object-fit:cover; box-shadow:0 14px 34px rgba(50,20,72,.18); }
+    .account-name { font-size:1.15rem; font-weight:800; color:var(--ink); }
+    .account-role { color:var(--muted); font-size:.95rem; margin-top:4px; }
+    .settings-grid { display:grid; gap:14px; margin-top:16px; }
+    .setting-block { padding:16px 18px; border-radius:22px; background:rgba(255,255,255,.82); border:1px solid rgba(255,255,255,.72); box-shadow:var(--shadow-soft); }
+    .setting-block h4 { margin:0 0 10px; font-size:1rem; color:var(--ink); }
+    .setting-list { display:grid; gap:10px; }
+    .setting-row { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:.94rem; color:var(--muted); }
+    .setting-row strong { color:var(--ink); font-size:.96rem; }
+    .setting-chip { padding:8px 12px; border-radius:999px; background:rgba(124,76,255,.12); color:var(--violet); font-weight:700; font-size:.8rem; }
     .auth-sub { font-size: 14px; line-height: 1.5; color: var(--muted); margin-top: 10px; }
     .field { margin-top: 14px; }
     .field label { display: block; font-size: 12px; font-weight: 700; color: #665d70; margin-bottom: 8px; }
@@ -620,9 +631,9 @@
             <div class="proof-line">⭐ <span>4.8 — +500 clients satisfaits</span></div>
             <div class="proof-sub">3 pros disponibles près de toi</div>
             <div class="mini-avatars">
-              <img src="assets/img/ines-henne.jpeg" alt="Ines — Henné">
-              <img src="assets/img/milton-barber.jpeg" alt="Milton — Barber">
-              <img src="assets/img/maiwenn-ongles.jpeg" alt="Maiwenn — Prothésiste ongulaire">
+              <img src="assets/img/pro-estheticienne.jpg" alt="Nora — Esthétique">
+              <img src="assets/img/milton-barber.jpeg" alt="Milton — Barbier">
+              <img src="assets/img/pro-manucure.jpg" alt="Luna — Manucure">
             </div>
           </div>
 
@@ -658,8 +669,8 @@
           <div class="map-user-dot"></div>
           <button class="map-position-btn">📍 Ma position</button>
 
-          <div class="map-pin" style="left:21%; top:32%;" data-open-pro="Ines">
-            <div class="map-bubble"><img src="assets/img/ines-henne.jpeg" alt="Ines"></div>
+          <div class="map-pin" style="left:21%; top:32%;" data-open-pro="Nora Skin">
+            <div class="map-bubble"><img src="assets/img/pro-estheticienne.jpg" alt="Nora Skin"></div>
             <div class="map-tag">⭐ 4.9</div>
           </div>
           <div class="map-pin" style="left:61%; top:24%;" data-open-pro="Milton">
@@ -670,12 +681,12 @@
             <div class="map-bubble"><img src="assets/img/kingbrel-barber.jpeg" alt="Kingbrel"></div>
             <div class="map-tag">⭐ 5.0</div>
           </div>
-          <div class="map-pin" style="left:34%; top:55%;" data-open-pro="Samuel">
-            <div class="map-bubble"><img src="assets/img/samuel-micropigmentation.webp" alt="Samuel"></div>
+          <div class="map-pin" style="left:34%; top:55%;" data-open-pro="Maya Make Up">
+            <div class="map-bubble"><img src="assets/img/pro-maquillage.jpg" alt="Maya Make Up"></div>
             <div class="map-tag">⭐ 4.9</div>
           </div>
-          <div class="map-pin" style="left:79%; top:56%;" data-open-pro="Maiwenn">
-            <div class="map-bubble"><img src="assets/img/maiwenn-ongles.jpeg" alt="Maiwenn"></div>
+          <div class="map-pin" style="left:79%; top:56%;" data-open-pro="Luna Nails">
+            <div class="map-bubble"><img src="assets/img/pro-manucure.jpg" alt="Luna Nails"></div>
             <div class="map-tag">⭐ 4.8</div>
           </div>
 
@@ -818,10 +829,10 @@
           <div class="list-item">
             <img src="assets/img/service-manucure.jpg" alt="Nail Queen">
             <div style="flex:1;">
-              <strong>Nail Queen</strong>
-              <p>Onglerie • Semi • Nail art • ★ 5.0</p>
+              <strong>Luna Nails</strong>
+              <p>Onglerie • Semi • Nail art • ★ 4.8</p>
             </div>
-            <button class="tiny-btn" data-open-pro="Nail Queen">Réserver</button>
+            <button class="tiny-btn" data-open-pro="Luna Nails">Réserver</button>
           </div>
           <div class="list-item">
             <img src="assets/img/service-maquillage.jpg" alt="Maya">
@@ -830,6 +841,63 @@
               <p>Glow skin • Événementiel • ★ 4.7</p>
             </div>
             <button class="tiny-btn" data-open-pro="Maya Make Up">Voir</button>
+          </div>
+        </div>
+      </section>
+
+
+      <section class="screen" id="screen-account">
+        <div class="screen-topbar">
+          <button class="icon-btn" data-go="screen-search">‹</button>
+          <div class="title-wrap">
+            <h2>Compte & réglages</h2>
+            <p>Toutes les informations utiles regroupées sur une seule page.</p>
+          </div>
+        </div>
+
+        <div class="card list-card">
+          <div class="account-header">
+            <img class="account-avatar" src="assets/img/service-maquillage.jpg" alt="Profil client">
+            <div style="flex:1;">
+              <div class="account-name">Damien M.</div>
+              <div class="account-role">Compte client premium • Paris 11e</div>
+            </div>
+            <span class="setting-chip">Vérifié</span>
+          </div>
+        </div>
+
+        <div class="settings-grid">
+          <div class="setting-block">
+            <h4>Informations personnelles</h4>
+            <div class="setting-list">
+              <div class="setting-row"><span><strong>Nom</strong><br>Damien Miyouna</span><span class="muted">Modifier</span></div>
+              <div class="setting-row"><span><strong>Email</strong><br>damien@email.com</span><span class="muted">Modifier</span></div>
+              <div class="setting-row"><span><strong>Téléphone</strong><br>06 00 00 00 00</span><span class="muted">Modifier</span></div>
+            </div>
+          </div>
+
+          <div class="setting-block">
+            <h4>Adresse & lieu de prestation</h4>
+            <div class="setting-list">
+              <div class="setting-row"><span><strong>Adresse principale</strong><br>Paris 11e</span><span class="setting-chip">À domicile</span></div>
+              <div class="setting-row"><span><strong>Mode favori</strong><br>Chez le pro ou à domicile</span><span class="muted">Choisir</span></div>
+            </div>
+          </div>
+
+          <div class="setting-block">
+            <h4>Préférences</h4>
+            <div class="setting-list">
+              <div class="setting-row"><span><strong>Services favoris</strong><br>Coiffure, manucure, maquillage</span><span class="muted">Gérer</span></div>
+              <div class="setting-row"><span><strong>Notifications</strong><br>Rappels de réservation activés</span><span class="setting-chip">Actif</span></div>
+            </div>
+          </div>
+
+          <div class="setting-block">
+            <h4>Paiement & sécurité</h4>
+            <div class="setting-list">
+              <div class="setting-row"><span><strong>Moyen de paiement</strong><br>Visa •••• 2048</span><span class="muted">Modifier</span></div>
+              <div class="setting-row"><span><strong>Connexion</strong><br>Face ID + mot de passe</span><span class="muted">Sécurisé</span></div>
+            </div>
           </div>
         </div>
       </section>
@@ -994,6 +1062,7 @@
     const categories = [
       { key: 'coiffure', label: 'Coiffure' },
       { key: 'ongles', label: 'Ongles' },
+      { key: 'esthetique', label: 'Esthétique' },
       { key: 'tatouage', label: 'Tatouage' },
       { key: 'maquillage', label: 'Maquillage' },
       { key: 'massage', label: 'Massage' },
@@ -1005,81 +1074,90 @@
     const proData = {
       coiffure: [
         {
-          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barber • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barber moderne • coupe précise à domicile',
+          name: 'Sofia Hair', image: 'assets/img/pro-coiffeuse.jpg', secondary: 'Coiffure • Brushing • Soin & coupe', rating: '4.9', reviews: '92 avis', distance: '2.4 km', location: 'Paris 8e', availability: 'Disponible', price: '€€', fromPrice: '35€', description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
           services: [
-            { name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
-            { name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
+            { name: 'Brushing signature', meta: '45 min • En salon', price: '35€', tags: ['Populaire'] },
+            { name: 'Coupe + soin', meta: '1h10 • À domicile', price: '58€', tags: [] }
           ],
-          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+          gallery: ['assets/img/pro-coiffeuse.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-tresses.jpg']
         }
       ],
       ongles: [
         {
-          name: 'Maiwenn', image: 'assets/img/maiwenn-ongles.jpeg', secondary: 'Prothésiste ongulaire • Semi • Nail art', rating: '4.8', reviews: '118 avis', distance: '2.1 km', location: 'Paris 3e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Prothésiste ongulaire premium • élégance et précision',
+          name: 'Luna Nails', image: 'assets/img/pro-manucure.jpg', secondary: 'Manucure • Gel • Nail art', rating: '4.8', reviews: '118 avis', distance: '2.1 km', location: 'Paris 3e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Manucure premium • finitions nettes et design élégant',
           services: [
             { name: 'Pose semi-permanent', meta: '45 min • À domicile', price: '35€', tags: [] },
-            { name: 'Renfort gel', meta: '1h10 • Chez le pro', price: '49€', tags: ['Populaire'] },
-            { name: 'Nail art premium', meta: '1h20 • À domicile / Chez le pro', price: '62€', tags: [] }
+            { name: 'Nail art signature', meta: '1h15 • Chez le pro', price: '54€', tags: ['Populaire'] }
           ],
-          gallery: ['assets/img/maiwenn-ongles.jpeg', 'assets/img/ines-henne.jpeg', 'assets/img/milton-barber.jpeg']
+          gallery: ['assets/img/pro-manucure.jpg', 'assets/img/service-manucure.jpg', 'assets/img/pro-maquillage.jpg']
+        }
+      ],
+      esthetique: [
+        {
+          name: 'Nora Skin', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Esthéticienne • Soin visage • Éclat peau', rating: '4.9', reviews: '74 avis', distance: '1.7 km', location: 'Paris 15e', availability: 'Disponible', price: '€€', fromPrice: '42€', description: 'Esthéticienne experte • soin visage, nettoyage profond et éclat',
+          services: [
+            { name: 'Soin visage complet', meta: '50 min • À domicile', price: '42€', tags: ['Glow'] },
+            { name: 'Nettoyage profond', meta: '1h10 • Chez le pro', price: '58€', tags: [] }
+          ],
+          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-maquillage.jpg']
         }
       ],
       tatouage: [
         {
-          name: 'Ines', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs main • Événementiel', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Henné raffiné • motifs élégants et précis',
+          name: 'Eli Ink', image: 'assets/img/pro-tatoueur.jpg', secondary: 'Tatoueur • Fine line • Pièces personnalisées', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€€', fromPrice: '80€', description: 'Tatoueur précis • lignes fines et rendez-vous en studio',
           services: [
-            { name: 'Henné mains', meta: '45 min • À domicile', price: '30€', tags: [] },
-            { name: 'Henné événementiel', meta: '1h15 • À domicile', price: '55€', tags: ['Populaire'] }
+            { name: 'Mini tattoo', meta: '45 min • Chez le pro', price: '80€', tags: [] },
+            { name: 'Projet personnalisé', meta: '1h30 • Chez le pro', price: '150€', tags: ['Populaire'] }
           ],
-          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/maiwenn-ongles.jpeg', 'assets/img/milton-barber.jpeg']
+          gallery: ['assets/img/pro-tatoueur.jpg', 'assets/img/service-tatoueur.jpg', 'assets/img/pro-tatoueur.jpg']
         }
       ],
       maquillage: [
         {
-          name: 'Samuel', image: 'assets/img/samuel-micropigmentation.webp', secondary: 'Micro pigmentation • Expertise scalp', rating: '4.9', reviews: '76 avis', distance: '3.4 km', location: 'Paris 16e', availability: 'Disponible', price: '€€€', fromPrice: '95€', description: 'Micro pigmentation premium • expertise et précision',
+          name: 'Maya Make Up', image: 'assets/img/pro-maquillage.jpg', secondary: 'Maquillage • Glow skin • Événementiel', rating: '4.9', reviews: '76 avis', distance: '3.4 km', location: 'Paris 16e', availability: 'Disponible', price: '€€€', fromPrice: '65€', description: 'Maquilleuse premium • teint lumineux et finitions photo-ready',
           services: [
-            { name: 'Diagnostic SMP', meta: '30 min • Chez le pro', price: '95€', tags: [] },
-            { name: 'Séance micro pigmentation', meta: '2h • Chez le pro', price: '220€', tags: ['Expert'] }
+            { name: 'Make-up jour', meta: '45 min • À domicile', price: '65€', tags: [] },
+            { name: 'Make-up soirée', meta: '1h • À domicile / Chez le pro', price: '90€', tags: ['Expert'] }
           ],
-          gallery: ['assets/img/samuel-micropigmentation.webp', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+          gallery: ['assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg', 'assets/img/pro-estheticienne.jpg']
         }
       ],
       massage: [
         {
-          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barber • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barber premium • ambiance haut de gamme',
+          name: 'Yanis Relax', image: 'assets/img/pro-massage.jpg', secondary: 'Massage • Relaxant • Récupération', rating: '4.8', reviews: '52 avis', distance: '2.6 km', location: 'Paris 17e', availability: 'Disponible', price: '€€€', fromPrice: '70€', description: 'Massage bien-être • détente profonde et récupération musculaire',
           services: [
-            { name: 'Coupe premium', meta: '40 min • Chez le pro', price: '35€', tags: [] },
-            { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
+            { name: 'Massage relaxant', meta: '60 min • À domicile', price: '70€', tags: ['Populaire'] },
+            { name: 'Massage deep tissue', meta: '75 min • À domicile', price: '95€', tags: [] }
           ],
-          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/samuel-micropigmentation.webp']
+          gallery: ['assets/img/pro-massage.jpg', 'assets/img/service-massage.jpg', 'assets/img/pro-massage.jpg']
         }
       ],
       tresses: [
         {
-          name: 'Ines', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs main • Événementiel', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Henné raffiné • motifs élégants et précis',
+          name: 'Sofia Braids', image: 'assets/img/pro-tresses.jpg', secondary: 'Tresses • Coiffure protectrice • Baby hair', rating: '4.8', reviews: '67 avis', distance: '2.9 km', location: 'Paris 18e', availability: 'Disponible', price: '€€€', fromPrice: '55€', description: 'Spécialiste tresses • rendu propre, rapide et soigné',
           services: [
-            { name: 'Henné mains', meta: '45 min • À domicile', price: '30€', tags: [] },
-            { name: 'Henné événementiel', meta: '1h15 • À domicile', price: '55€', tags: ['Populaire'] }
+            { name: 'Tresses plaquées', meta: '1h • À domicile', price: '55€', tags: [] },
+            { name: 'Tresses freestyle', meta: '1h30 • À domicile / Chez le pro', price: '85€', tags: ['Populaire'] }
           ],
-          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/maiwenn-ongles.jpeg', 'assets/img/milton-barber.jpeg']
+          gallery: ['assets/img/pro-tresses.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-coiffeuse.jpg']
         }
       ],
       barbier: [
         {
-          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barber • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barber moderne • coupe précise à domicile',
+          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barbier • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barbier moderne • coupe précise et barbe nette à domicile',
           services: [
             { name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
             { name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
           ],
-          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/ines-henne.jpeg']
+          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/service-barber.jpeg']
         },
         {
-          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barber • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barber premium • ambiance haut de gamme',
+          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barbier • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barbier premium • ambiance haut de gamme et coupe signature',
           services: [
             { name: 'Coupe premium', meta: '40 min • Chez le pro', price: '35€', tags: [] },
             { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
           ],
-          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/samuel-micropigmentation.webp']
+          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/service-barber.jpeg']
         }
       ]
     };
@@ -1103,7 +1181,7 @@
       { id: 'screen-search', label: 'Carte', icon: navIcons.map },
       { id: 'screen-rdv', label: 'RDV', icon: navIcons.calendar },
       { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
-      { id: 'screen-login', label: 'Compte', icon: navIcons.user }
+      { id: 'screen-account', label: 'Compte', icon: navIcons.user }
     ];
     const screenToNavPro = [
       { id: 'screen-pro-dashboard', label: 'Dashboard', icon: navIcons.dashboard },
@@ -1324,9 +1402,9 @@
       window.addEventListener('touchcancel', end);
     })();
 
-    document.getElementById('loginClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-search'); };
+    document.getElementById('loginClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-account'); };
     document.getElementById('loginProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
-    document.getElementById('registerClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-search'); };
+    document.getElementById('registerClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-account'); };
     document.getElementById('registerProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
 
     renderPlaceChips();

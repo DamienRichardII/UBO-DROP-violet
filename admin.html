@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>UBODROP — Administration</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/jpeg" href="assets/logo-ubodrop.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/admin.css">
+</head>
+<body>
+
+<!-- ================================================================
+     LOGIN SCREEN
+     ================================================================ -->
+<div id="loginScreen">
+  <div class="login-bg">
+    <div class="login-bg-band"></div>
+    <div class="login-bg-band"></div>
+    <div class="login-bg-band"></div>
+  </div>
+
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="assets/logo-ubodrop.jpeg" alt="UBODROP logo">
+      <span>UBODROP</span>
+    </div>
+    <div class="login-badge">
+      <p>Espace Administrateur</p>
+    </div>
+
+    <form class="login-form" id="loginForm" autocomplete="off">
+      <div class="form-group">
+        <label for="loginUsername">Identifiant</label>
+        <div class="input-wrap">
+          <input type="text" id="loginUsername" placeholder="Votre identifiant" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="loginPassword">Mot de passe</label>
+        <div class="input-wrap">
+          <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" class="toggle-pw" id="toggleLoginPw" aria-label="Afficher/masquer">
+            <span id="eyeIconLogin">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <div class="login-error hidden" id="loginError">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        Identifiants incorrects. Veuillez réessayer.
+      </div>
+
+      <button type="submit" class="btn-login">Accéder au dashboard</button>
+    </form>
+  </div>
+</div>
+
+
+<!-- ================================================================
+     DASHBOARD
+     ================================================================ -->
+<div id="dashboard" class="hidden">
+
+  <!-- TOPBAR -->
+  <header class="admin-topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">
+        <img src="assets/logo-ubodrop.jpeg" alt="UBODROP">
+        <span>UBODROP</span>
+      </div>
+      <div class="topbar-divider"></div>
+      <span class="topbar-title">Dashboard Administrateur</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-admin">
+        <div class="topbar-admin-dot"></div>
+        <span class="admin-name" id="topbarAdminName"></span>
+      </div>
+      <button class="btn-logout" id="btnLogout">Déconnexion</button>
+    </div>
+  </header>
+
+  <!-- BODY -->
+  <div class="admin-body">
+
+    <!-- SIDENAV -->
+    <nav class="admin-sidenav">
+      <span class="sidenav-label">Dashboard</span>
+      <button class="sidenav-item active" data-section="kpi">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/>
+          <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
+        </svg>
+        KPI & Statistiques
+      </button>
+
+      <span class="sidenav-label" style="margin-top:8px">Gestion</span>
+      <button class="sidenav-item" data-section="certifications">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+          <polyline points="9 11 11 13 15 9"/>
+        </svg>
+        Certifications Pro
+      </button>
+
+      <span class="sidenav-label" style="margin-top:8px">Paramètres</span>
+      <button class="sidenav-item" data-section="banking">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <line x1="2" y1="10" x2="22" y2="10"/>
+        </svg>
+        Compte bancaire
+      </button>
+      <button class="sidenav-item" data-section="security">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Sécurité
+      </button>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+      <!-- ============================================================
+           SECTION KPI
+           ============================================================ -->
+      <section class="admin-section active" id="section-kpi">
+        <div class="section-header">
+          <span class="section-badge">Dashboard</span>
+          <h1 class="section-title-text">Vue d'ensemble</h1>
+          <p class="section-subtitle">Toutes vos métriques en temps réel.</p>
+        </div>
+
+        <div class="last-update-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          Dernière mise à jour : 10 avr. 2025 à 15h04
+        </div>
+
+        <!-- KPI : Activité en ligne -->
+        <p class="kpi-group-title">Activité en ligne</p>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiUsersOnline">—</div>
+            <div class="kpi-card-label">Utilisateurs en ligne</div>
+            <span class="kpi-trend up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+              En direct
+            </span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><polyline points="16 11 18 13 22 9"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiProsOnline">—</div>
+            <div class="kpi-card-label">Professionnels en ligne</div>
+            <span class="kpi-trend up">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+              En direct
+            </span>
+          </div>
+        </div>
+
+        <!-- KPI : Volume global -->
+        <p class="kpi-group-title">Volume global</p>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiUsersTotal">—</div>
+            <div class="kpi-card-label">Utilisateurs inscrits</div>
+            <span class="kpi-trend neutral">Total cumulé</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiProsTotal">—</div>
+            <div class="kpi-card-label">Professionnels inscrits</div>
+            <span class="kpi-trend neutral">Total cumulé</span>
+          </div>
+        </div>
+
+        <!-- KPI : Période -->
+        <div class="kpi-tabs">
+          <button class="kpi-tab-btn active" data-period="day">Aujourd'hui</button>
+          <button class="kpi-tab-btn" data-period="week">Cette semaine</button>
+          <button class="kpi-tab-btn" data-period="month">Ce mois</button>
+        </div>
+
+        <!-- Commandes -->
+        <p class="kpi-group-title">Commandes · <span class="kpi-period-label">Aujourd'hui</span></p>
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiOrders">—</div>
+            <div class="kpi-card-label">Commandes passées</div>
+            <span id="kpiOrdersTrend" class="kpi-trend up">—</span>
+          </div>
+        </div>
+
+        <!-- Revenus -->
+        <p class="kpi-group-title">Revenus & commissions · <span class="kpi-period-label">Aujourd'hui</span></p>
+        <div class="kpi-grid kpi-grid-3">
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiRevenue">—</div>
+            <div class="kpi-card-label">Commissions générées</div>
+            <span id="kpiRevenueTrend" class="kpi-trend up">—</span>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-card-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+              </svg>
+            </div>
+            <div class="kpi-card-value" id="kpiCA">—</div>
+            <div class="kpi-card-label">Chiffre d'affaires total</div>
+            <span id="kpiCATrend" class="kpi-trend up">—</span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- ============================================================
+           SECTION CERTIFICATIONS
+           ============================================================ -->
+      <section class="admin-section" id="section-certifications">
+        <div class="section-header">
+          <span class="section-badge">Gestion</span>
+          <h1 class="section-title-text">Certifications Pro</h1>
+          <p class="section-subtitle">Valider ou refuser les demandes de certification des professionnels.</p>
+        </div>
+
+        <div class="cert-toolbar">
+          <div class="search-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" id="certSearch" placeholder="Rechercher un pro…">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="all">Tous</button>
+            <button class="filter-btn" data-filter="pending">En attente</button>
+            <button class="filter-btn" data-filter="approved">Validés</button>
+            <button class="filter-btn" data-filter="refused">Refusés</button>
+          </div>
+        </div>
+
+        <div class="cert-list" id="certList">
+          <!-- Skeleton initial -->
+          <div class="skeleton skeleton-kpi"></div>
+          <div class="skeleton skeleton-kpi" style="height:80px;margin-top:12px"></div>
+          <div class="skeleton skeleton-kpi" style="height:80px;margin-top:12px"></div>
+        </div>
+      </section>
+
+
+      <!-- ============================================================
+           SECTION BANKING
+           ============================================================ -->
+      <section class="admin-section" id="section-banking">
+        <div class="section-header">
+          <span class="section-badge">Paramètres</span>
+          <h1 class="section-title-text">Compte bancaire</h1>
+          <p class="section-subtitle">Gérez votre compte Revolut et vos coordonnées bancaires.</p>
+        </div>
+
+        <div class="banking-grid">
+
+          <!-- Carte état du compte -->
+          <div class="bank-card">
+            <div class="bank-card-glow"></div>
+            <div class="bank-status-row">
+              <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.9rem;">Revolut Business</span>
+              <span class="bank-status-badge connected" id="bankStatus">
+                <span class="bank-status-dot"></span> Connecté
+              </span>
+            </div>
+
+            <div style="margin-bottom:6px;font-size:0.78rem;opacity:0.5;font-weight:500;">Titulaire</div>
+            <div style="font-weight:700;margin-bottom:18px;font-size:0.95rem;" id="bankHolder">—</div>
+
+            <div style="margin-bottom:6px;font-size:0.78rem;opacity:0.5;font-weight:500;">IBAN</div>
+            <div class="bank-iban-row">
+              <span id="bankIBAN">—</span>
+              <button class="bank-copy-btn" id="btnCopyIBAN" aria-label="Copier IBAN">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+              </button>
+            </div>
+
+            <div class="bank-info-row">
+              <span>BIC : AGRIFRPP</span>
+              <span id="bankLastUpdate">—</span>
+            </div>
+
+            <button class="btn-bank" id="btnBankConnect">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>
+              </svg>
+              Modifier le compte
+            </button>
+          </div>
+
+          <!-- Carte connexion Revolut -->
+          <div class="bank-card">
+            <div class="bank-card-glow"></div>
+            <div style="margin-bottom:20px;">
+              <span style="font-family:'Montserrat',sans-serif;font-weight:700;font-size:0.9rem;">Connexion Revolut</span>
+              <p style="font-size:0.82rem;opacity:0.5;margin-top:4px;">Reliez votre compte Revolut Business pour recevoir vos commissions automatiquement.</p>
+            </div>
+
+            <div class="revolut-connect-section">
+              <div class="revolut-logo-badge">
+                <span style="display:flex;align-items:center;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                  </svg>
+                </span>
+                <span>Revolut Business</span>
+              </div>
+              <p style="font-size:0.8rem;opacity:0.5;">
+                Authentification OAuth sécurisée.<br>
+                Vos données ne sont jamais stockées.
+              </p>
+              <!-- TODO BACKEND : Brancher l'OAuth Revolut Business API ici -->
+              <button class="btn-bank" onclick="bankModule.toggleConnect()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+                Gérer la connexion Revolut
+              </button>
+              <span class="bank-last-update">⚠️ Simulé en frontend — brancher l'API Revolut OAuth en production</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+
+      <!-- ============================================================
+           SECTION SÉCURITÉ
+           ============================================================ -->
+      <section class="admin-section" id="section-security">
+        <div class="section-header">
+          <span class="section-badge">Sécurité</span>
+          <h1 class="section-title-text">Paramètres administrateur</h1>
+          <p class="section-subtitle">Gérez vos accès et la sécurité de votre compte.</p>
+        </div>
+
+        <!-- Changer mot de passe -->
+        <div class="settings-card">
+          <div class="settings-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            Changer le mot de passe
+          </div>
+
+          <!-- TODO BACKEND : POST /admin/password → bcrypt + JWT -->
+          <form class="settings-form" id="pwForm" autocomplete="off">
+            <div class="settings-group">
+              <label for="pwCurrent">Mot de passe actuel</label>
+              <div class="settings-input-wrap">
+                <input type="password" id="pwCurrent" placeholder="••••••••">
+                <button type="button" class="toggle-pw toggle-pw-settings" data-target="pwCurrent" aria-label="Afficher">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="settings-group">
+              <label for="pwNew">Nouveau mot de passe</label>
+              <div class="settings-input-wrap">
+                <input type="password" id="pwNew" placeholder="Minimum 6 caractères">
+                <button type="button" class="toggle-pw toggle-pw-settings" data-target="pwNew" aria-label="Afficher">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="settings-group">
+              <label for="pwConfirm">Confirmer le nouveau mot de passe</label>
+              <div class="settings-input-wrap">
+                <input type="password" id="pwConfirm" placeholder="Répéter le mot de passe">
+                <button type="button" class="toggle-pw toggle-pw-settings" data-target="pwConfirm" aria-label="Afficher">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="settings-msg hidden" id="pwMsg"></div>
+
+            <button type="submit" class="btn-settings">Mettre à jour</button>
+          </form>
+        </div>
+
+        <!-- Infos session -->
+        <div class="settings-card" style="margin-top:20px;">
+          <div class="settings-card-title">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Session en cours
+          </div>
+          <div style="font-size:0.87rem;display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(212,184,232,0.2);">
+              <span style="opacity:0.5;">Connecté en tant que</span>
+              <strong id="sessionUsername">—</strong>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(212,184,232,0.2);">
+              <span style="opacity:0.5;">Type de session</span>
+              <span>Frontend (sessionStorage)</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;padding:8px 0;">
+              <span style="opacity:0.5;">Statut</span>
+              <span style="color:#15803D;font-weight:600;display:flex;align-items:center;gap:6px;">
+                <span style="width:7px;height:7px;background:#22C55E;border-radius:50%;display:inline-block;box-shadow:0 0 6px rgba(34,197,94,0.6);"></span>
+                Active
+              </span>
+            </div>
+          </div>
+          <div style="margin-top:18px;padding:12px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;font-size:0.78rem;color:#B45309;line-height:1.6;">
+            ⚠️ <strong>Note sécurité :</strong> En production, remplacer ce système par une authentification backend avec JWT, hash bcrypt et session sécurisée côté serveur.
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MOBILE NAV -->
+  <nav class="mobile-nav">
+    <button class="mobile-nav-item active" data-section="kpi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/>
+        <rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>
+      </svg>
+      KPI
+    </button>
+    <button class="mobile-nav-item" data-section="certifications">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+        <polyline points="9 11 11 13 15 9"/>
+      </svg>
+      Certifs
+    </button>
+    <button class="mobile-nav-item" data-section="banking">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/>
+      </svg>
+      Banque
+    </button>
+    <button class="mobile-nav-item" data-section="security">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+      </svg>
+      Sécurité
+    </button>
+  </nav>
+
+</div><!-- /#dashboard -->
+
+
+<!-- MODAL CERTIF DETAIL -->
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-title" id="modalTitle">Détail de la demande</span>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast"></div>
+
+
+<script src="assets/js/admin.js"></script>
+<script>
+  // Synchroniser l'username dans la section sécurité
+  document.addEventListener('DOMContentLoaded', () => {
+    const orig = uiModule.showDashboard.bind(uiModule);
+    uiModule.showDashboard = function() {
+      orig();
+      document.getElementById('sessionUsername').textContent = adminState.adminUsername;
+    };
+  });
+</script>
+</body>
+</html>

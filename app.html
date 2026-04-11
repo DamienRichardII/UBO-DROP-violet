@@ -79,17 +79,6 @@
       pointer-events: none;
       z-index: 0;
     }
-    .dynamic-island {
-      position: absolute;
-      top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 118px;
-      height: 30px;
-      border-radius: 999px;
-      background: #0d0d0f;
-      z-index: 50;
-    }
 
     .statusbar {
       position: absolute;
@@ -170,7 +159,7 @@
     }
     .section-title { font-size: 1.28rem; font-weight: 800; letter-spacing: -.03em; }
     .section-sub { font-size: .93rem; line-height: 1.5; color: var(--muted); }
-    .pill-row { display: flex; gap: 8px; overflow: auto; scrollbar-width: none; }
+    .pill-row { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; scrollbar-width: none; }
     .pill-row::-webkit-scrollbar { display: none; }
     .pill {
       white-space: nowrap;
@@ -541,17 +530,24 @@
     }
     .overlay.open { display: flex; }
     .overlay-panel {
-      width: min(390px, 100%); border-radius: 34px 34px 0 0; background: rgba(255,255,255,.96); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,.85);
-      padding: 12px 18px 26px; max-height: 84vh; overflow: auto;
+      width: min(390px, calc(100vw - 20px)); border-radius: 34px 34px 0 0; background: rgba(255,255,255,.96); box-shadow: var(--shadow-lg); border: 1px solid rgba(255,255,255,.85);
+      padding: 16px 18px calc(26px + env(safe-area-inset-bottom)); max-height: min(84vh, calc(100dvh - 24px)); overflow: auto; overflow-x: hidden;
     }
-    .filter-grid { display: grid; gap: 14px; margin-top: 16px; }
-    .filter-group h4 { font-size: 14px; font-weight: 800; margin-bottom: 10px; }
-    .seg-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .filter-grid { display: grid; gap: 18px; margin-top: 18px; }
+    .filter-group { display: grid; gap: 12px; }
+    .filter-group h4 { font-size: 14px; font-weight: 800; margin: 0; }
+    .seg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    .seg-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .seg-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .seg, .seg-small {
-      padding: 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-soft); font-size: 13px; font-weight: 700; text-align: center;
+      width: 100%; min-height: 54px; display: inline-flex; align-items: center; justify-content: center; padding: 14px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-soft); font-size: 13px; font-weight: 700; text-align: center; line-height: 1.2;
     }
     .seg.active, .seg-small.active { color: white; background: var(--glossy); border-color: transparent; }
-    .seg-small { padding: 12px; }
+    .seg-small { min-height: 52px; padding: 12px; }
+    @media (max-width: 420px) {
+      .overlay-panel { width: calc(100vw - 14px); padding-inline: 14px; }
+      .seg-grid--3, .seg-grid--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
 
     .bottom-nav {
       position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 30;
@@ -591,15 +587,55 @@
     .stack-16 > * + * { margin-top: 16px; }
     .stack-18 > * + * { margin-top: 18px; }
 
-    @media (max-width: 420px) {
-      body { padding: 0; }
-      .device { width: 100%; min-height: 100vh; border-radius: 0; }
+    @media (max-width: 768px) {
+      html, body {
+        width: 100%;
+        min-height: 100dvh;
+        background: var(--bg);
+      }
+      body {
+        display: block;
+        padding: 0;
+      }
+      .device {
+        width: 100vw;
+        min-height: 100dvh;
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+      .statusbar {
+        display: none;
+      }
+      .app,
+      .screen {
+        min-height: 100dvh;
+      }
+      .screen {
+        padding-top: calc(env(safe-area-inset-top) + 20px);
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom) + 14px);
+      }
+      .overlay-panel {
+        width: 100vw;
+        max-height: 100dvh;
+        border-radius: 28px 28px 0 0;
+        padding-left: 16px;
+        padding-right: 16px;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom));
+      }
+      .bottom-nav {
+        left: 10px;
+        right: 10px;
+        bottom: calc(8px + env(safe-area-inset-bottom));
+      }
     }
   </style>
 </head>
 <body>
   <div class="device">
-    <div class="dynamic-island"></div>
     <div class="statusbar">
       
       
@@ -1023,25 +1059,11 @@
       <div class="filter-grid">
         <div class="filter-group">
           <h4>Lieu de la prestation</h4>
-          <div class="seg-grid" id="filterPlaceGrid"></div>
+          <div class="seg-grid seg-grid--3" id="filterPlaceGrid"></div>
         </div>
         <div class="filter-group">
           <h4>Catégories</h4>
           <div class="pill-row" id="filterCategoryRow"></div>
-        </div>
-        <div class="filter-group">
-          <h4>Quand ?</h4>
-          <div class="seg-grid">
-            <button class="seg active">Maintenant</button>
-            <button class="seg">Plus tard</button>
-          </div>
-        </div>
-        <div class="filter-group">
-          <h4>Date &amp; heure</h4>
-          <div class="seg-grid">
-            <button class="seg-small">Aujourd’hui</button>
-            <button class="seg-small">14:00</button>
-          </div>
         </div>
         <div class="filter-group">
           <h4>Rayon</h4>
@@ -1052,7 +1074,7 @@
         </div>
         <div class="filter-group">
           <h4>Budget indicatif</h4>
-          <div class="seg-grid">
+          <div class="seg-grid seg-grid--4">
             <button class="seg-small">€</button>
             <button class="seg-small active">€€</button>
             <button class="seg-small">€€€</button>
@@ -1067,21 +1089,21 @@
 
   <script>
     const categories = [
-      { key: 'coiffure', label: 'Coiffure' },
-      { key: 'ongles', label: 'Ongles' },
-      { key: 'esthetique', label: 'Esthétique' },
-      { key: 'tatouage', label: 'Tatouage' },
+      { key: 'barbier', label: 'Barber' },
+      { key: 'coiffure', label: 'Coiffeuse' },
+      { key: 'ongles', label: 'Manucure' },
+      { key: 'henne', label: 'Henné' },
       { key: 'maquillage', label: 'Maquillage' },
-      { key: 'massage', label: 'Massage' },
-      { key: 'tresses', label: 'Tresses' },
-      { key: 'barbier', label: 'Barbier' }
+      { key: 'esthetique', label: 'Esthéticienne' },
+      { key: 'tatouage', label: 'Tatoueur' },
+      { key: 'massage', label: 'Massage' }
     ];
     const placeOptions = ['À domicile', 'Chez le pro', 'En salon'];
 
     const proData = {
       coiffure: [
         {
-          name: 'Sofia Hair', image: 'assets/img/pro-coiffeuse.jpg', secondary: 'Coiffure • Brushing • Soin & coupe', rating: '4.9', reviews: '92 avis', distance: '2.4 km', location: 'Paris 8e', availability: 'Disponible', price: '€€', fromPrice: '35€', description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
+          name: 'Sofia Hair', image: 'assets/img/pro-coiffeuse.jpg', secondary: 'Coiffeuse • Brushing • Soin & coupe', rating: '4.9', reviews: '92 avis', distance: '2.4 km', location: 'Paris 8e', availability: 'Disponible', price: '€€', fromPrice: '35€', description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
           services: [
             { name: 'Brushing signature', meta: '45 min • En salon', price: '35€', tags: ['Populaire'] },
             { name: 'Coupe + soin', meta: '1h10 • À domicile', price: '58€', tags: [] }
@@ -1165,6 +1187,56 @@
             { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
           ],
           gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/service-barber.jpeg']
+        }
+      ],
+      henne: [
+        {
+          name: 'Ines Henné', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs fins • Événementiel', rating: '4.9', reviews: '58 avis', distance: '3.1 km', location: 'Paris 20e', availability: 'Disponible', price: '€€', fromPrice: '40€', description: 'Artiste henné • dessins précis et finitions élégantes à domicile',
+          services: [
+            { name: 'Henné mains', meta: '45 min • À domicile', price: '40€', tags: [] },
+            { name: 'Henné mariée', meta: '1h30 • À domicile', price: '95€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/service-henne.jpeg', 'assets/img/pro-maquillage.jpg']
+        }
+      ],
+      perceur: [
+        {
+          name: 'Nora Piercing', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Perceur • Oreille • Styling', rating: '4.7', reviews: '41 avis', distance: '2.8 km', location: 'Paris 9e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Perceuse professionnelle • gestes propres et conseils de cicatrisation',
+          services: [
+            { name: 'Lobe styling', meta: '20 min • Chez le pro', price: '30€', tags: [] },
+            { name: 'Cartilage', meta: '30 min • Chez le pro', price: '45€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-manucure.jpg']
+        }
+      ],
+      blanchiment: [
+        {
+          name: 'Smile Studio', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Blanchiment Dentaire • Éclat • Sourire', rating: '4.8', reviews: '49 avis', distance: '2.5 km', location: 'Paris 7e', availability: 'Disponible', price: '€€€', fromPrice: '79€', description: 'Blanchiment dentaire esthétique • séance encadrée et résultat naturel',
+          services: [
+            { name: 'Séance découverte', meta: '35 min • Chez le pro', price: '79€', tags: [] },
+            { name: 'Séance éclat+', meta: '50 min • Chez le pro', price: '109€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-maquillage.jpg']
+        }
+      ],
+      masso: [
+        {
+          name: 'Amine Therapy', image: 'assets/img/pro-massage.jpg', secondary: 'Masso-Thérapeute • Détente • Récupération', rating: '4.9', reviews: '61 avis', distance: '3.3 km', location: 'Paris 14e', availability: 'Disponible', price: '€€€', fromPrice: '85€', description: 'Masso-thérapeute • protocoles ciblés pour détente et récupération',
+          services: [
+            { name: 'Drainage ciblé', meta: '60 min • À domicile', price: '85€', tags: [] },
+            { name: 'Massage thérapeutique', meta: '75 min • À domicile', price: '110€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/pro-massage.jpg', 'assets/img/service-massage.jpg', 'assets/img/pro-estheticienne.jpg']
+        }
+      ],
+      micropigmentation: [
+        {
+          name: 'Samuel Pigment', image: 'assets/img/samuel-micropigmentation.webp', secondary: 'Micro-Pigmentation • Finition nette • Correction', rating: '4.9', reviews: '54 avis', distance: '4.1 km', location: 'Paris 6e', availability: 'Disponible', price: '€€€€', fromPrice: '120€', description: 'Expert micro-pigmentation • ligne précise et résultat naturel',
+          services: [
+            { name: 'Ligne frontale', meta: '1h • Chez le pro', price: '120€', tags: [] },
+            { name: 'Retouche premium', meta: '1h20 • Chez le pro', price: '165€', tags: ['Populaire'] }
+          ],
+          gallery: ['assets/img/samuel-micropigmentation.webp', 'assets/img/hero-scalpcare.webp', 'assets/img/pro-coiffeuse.jpg']
         }
       ]
     };

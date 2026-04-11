@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UBODROP</title>
-    <meta name="description" content="UBODROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
+    <title>UBO DROP</title>
+    <meta name="description" content="UBO DROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
     <link rel="icon" type="image/jpeg" href="/assets/logo-ubodrop.jpeg">
     <link rel="apple-touch-icon" href="/assets/logo-ubodrop.jpeg">
 
-    <meta property="og:title" content="UBODROP">
+    <meta property="og:title" content="UBO DROP">
     <meta property="og:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ubo-drop-violet.vercel.app/">
     <meta property="og:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
 
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="UBODROP">
+    <meta name="twitter:title" content="UBO DROP">
     <meta name="twitter:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
     <meta name="twitter:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --violet-deep: #6C3FA0;
@@ -76,8 +76,8 @@
             background: transparent;
         }
         .header-logo span {
-            font-family: 'Montserrat', sans-serif; font-weight: 700;
-            font-size: 1.08rem; color: var(--noir); letter-spacing: 0.06em;
+            font-family: 'Playfair Display', serif; font-weight: 800;
+            font-size: 1.15rem; color: var(--noir); letter-spacing: 1px;
         }
         .btn-open-app,
         .hero-cta {
@@ -90,7 +90,7 @@
             border: 1px solid rgba(108, 63, 160, 0.12);
             box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
             transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'DM Sans', sans-serif;
         }
         .btn-open-app::before,
         .hero-cta::before {
@@ -223,26 +223,19 @@
         }
         .hero-content {
             position: relative; z-index: 3;
-            text-align: center; padding: 0 24px; margin: 42px auto 0;
+            text-align: center; padding: 0 24px; margin-top: 42px;
             max-width: 720px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
         .hero-title {
-            font-family: 'Montserrat', sans-serif;
+            font-family: Calibri, 'Trebuchet MS', 'Segoe UI', sans-serif;
             font-size: clamp(2.4rem, 5vw, 4.5rem);
-            font-weight: 600;
+            font-weight: 700;
             color: var(--noir);
             letter-spacing: 0;
             line-height: 1.08;
-            margin: 0 auto 30px;
+            margin-bottom: 30px;
             text-transform: none;
             white-space: nowrap;
-            max-width: none;
-            display: inline-block;
-            position: relative;
-            left: -110px;
         }
         .hero-title span {
             color: var(--noir);
@@ -271,7 +264,7 @@
             border: 1px solid rgba(180, 142, 208, 0.4);
         }
         .section-title {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: clamp(1.8rem, 5vw, 2.6rem);
             font-weight: 800; color: var(--noir);
             margin-bottom: 12px; line-height: 1.2;
@@ -281,7 +274,7 @@
             max-width: 550px; margin-bottom: 48px; line-height: 1.7;
         }
 
-        /* ===== UBODROP C'EST QUOI ===== */
+        /* ===== UBO DROP C'EST QUOI ===== */
         .concept-section {
             padding: 100px 20px;
             background: linear-gradient(180deg, var(--violet-pale) 0%, var(--violet-soft) 50%, var(--violet-pale) 100%);
@@ -320,7 +313,11 @@
             border: 1px solid rgba(168, 85, 247, 0.2);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1rem;
+            color: var(--noir);
+        }
+        .concept-features li .feat-icon svg {
+            width: 18px; height: 18px;
+            stroke: currentColor;
         }
 
         /* Phone Mockups */
@@ -507,7 +504,7 @@
             background: rgba(255,255,255,0.08); border-radius: 50%;
         }
         .cta-box h2 {
-            font-family: 'Montserrat', sans-serif;
+            font-family: 'Playfair Display', serif;
             font-size: clamp(1.6rem, 4vw, 2.2rem);
             font-weight: 800; color: var(--blanc);
             margin-bottom: 16px; position: relative;
@@ -538,9 +535,9 @@
             padding: 48px 20px 40px; text-align: center;
         }
         .footer-logo {
-            font-family: 'Montserrat', sans-serif;
-            font-size: 1.35rem; font-weight: 700;
-            letter-spacing: 0.08em; margin-bottom: 12px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; font-weight: 800;
+            letter-spacing: 2px; margin-bottom: 12px;
         }
         .footer p { font-size: 0.85rem; opacity: 0.4; }
         .footer-links { display: flex; gap: 24px; justify-content: center; margin-top: 20px; }
@@ -569,7 +566,7 @@
             .providers-banner { padding: 12px 0; }
             .banner-item { padding: 6px 18px; font-size: 0.82rem; }
             .hero-content { margin-top: 36px; padding: 0 18px; }
-            .hero-title { font-size: clamp(2rem, 7vw, 3.2rem); letter-spacing: 0; margin-bottom: 26px; white-space: nowrap; max-width: none; left: 0; text-align: center; }
+            .hero-title { font-size: clamp(2rem, 7.2vw, 3.2rem); letter-spacing: 0; margin-bottom: 26px; white-space: nowrap; }
             .btn-open-app { padding: 10px 16px; font-size: 0.78rem; }
             .hero-cta { padding: 15px 28px; }
             .hero-bands { display: flex; gap: 0; width: 100%; left: 0; transform: none; }
@@ -603,7 +600,7 @@
             .header-logo span { font-size: 1rem; letter-spacing: 0.06em; }
             .btn-open-app { padding: 9px 14px; font-size: 0.74rem; }
             .hero-content { margin-top: 30px; }
-            .hero-title { font-size: clamp(1.3rem, 5.8vw, 2.25rem); letter-spacing: 0; white-space: nowrap; max-width: none; left: 0; text-align: center; }
+            .hero-title { font-size: clamp(1.5rem, 6.4vw, 2.25rem); letter-spacing: 0; white-space: nowrap; }
             .phone-mockup { width: 150px; }
             .service-card { width: 240px; height: 320px; }
         }
@@ -615,8 +612,8 @@
     <header class="header">
         <div class="header-top">
             <a href="index.html" class="header-logo">
-                <img src="assets/img/ubo-drop-logo.png" alt="UBODROP">
-                <span>UBODROP</span>
+                <img src="assets/img/ubo-drop-logo.png" alt="UBO DROP">
+                <span>UBO DROP</span>
             </a>
             <a href="./app.html" class="btn-open-app">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
@@ -635,7 +632,7 @@
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <h1 class="hero-title">Bienvenue chez UBODROP</h1>
+            <h1 class="hero-title">Bienvenue chez UBO <span>DROP</span></h1>
             <a href="./app.html" class="hero-cta">
                 Découvrir l'app
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -693,6 +690,67 @@
         </div>
     </div>
 
+    <!-- UBO DROP C'EST QUOI ? -->
+    <section class="concept-section">
+        <div class="concept-inner">
+            <div class="concept-top">
+                <span class="section-label">Le concept</span>
+                <h2 class="section-title">UBO DROP, c'est quoi ?</h2>
+            </div>
+            <div class="concept-grid">
+                <div class="concept-text">
+                    <h3>Avec <span>UBO Drop</span>, réserve facilement un service beauté parmi une large sélection de métiers.</h3>
+                    <p>Coiffeurs, barbiers, nail artists, maquilleurs, tatoueurs, et bien plus encore : tous les profils essentiels de la beauté sont réunis dans une seule application, pensée pour t’aider à comparer et choisir rapidement.</p>
+                    <p>Choisis le mode qui te convient, selon ton besoin du moment et les professionnels disponibles autour de toi.</p>
+                    <ul class="concept-features">
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 10.5 12 3l9 7.5"></path>
+                                    <path d="M5 9.5V21h14V9.5"></path>
+                                    <path d="M9 21v-6h6v6"></path>
+                                </svg>
+                            </span>
+                            <span><strong>À domicile</strong> : le professionnel se déplace chez toi.</span>
+                        </li>
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 7V5a4 4 0 1 1 8 0v2"></path>
+                                    <path d="M6 7h12v12H6z"></path>
+                                    <path d="M10 12h4"></path>
+                                </svg>
+                            </span>
+                            <span><strong>Chez le professionnel</strong> : directement dans son espace de travail.</span>
+                        </li>
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 10h16"></path>
+                                    <path d="M6 10V6h12v4"></path>
+                                    <path d="M7 10v8"></path>
+                                    <path d="M17 10v8"></path>
+                                    <path d="M7 18h10"></path>
+                                </svg>
+                            </span>
+                            <span><strong>En salon</strong> : pour une prestation sur place.</span>
+                        </li>
+                    </ul>
+                    <p>UBO Drop te permet de comparer, choisir et réserver en toute simplicité, avec des professionnels disponibles autour de toi en temps réel.</p>
+                </div>
+                <div class="phones-showcase">
+                    <div class="phone-glow"></div>
+                    <div class="phone-mockup">
+                        <img src="assets/img/phone-screens.jpeg" alt="UBO DROP - Recherche de professionnels">
+                    </div>
+                    <div class="phone-mockup">
+                        <img src="assets/img/phone-home.jpeg" alt="UBO DROP - Accueil application">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- NOS SERVICES — CAROUSEL -->
     <section class="services-section">
         <div class="services-header">
@@ -704,68 +762,68 @@
             <div class="services-track" id="servicesTrack">
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-barber.jpeg" alt="Barber">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>Barber</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">✂️</span>Barber</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-coiffeuse.jpg" alt="Coiffeuse">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💇</span>Coiffeuse</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-manucure.jpg" alt="Manucure">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l2 7H5L7 3z"/><path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9"/><line x1="9" y1="14" x2="9" y2="18"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="15" y1="14" x2="15" y2="18"/></svg></span>Manucure</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💅</span>Manucure</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-henne.jpeg" alt="Henné">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 7c0-2.5 2-4.5 7-4.5S19 4.5 19 7c0 5-3.5 8.5-7 9.5"/><path d="M5 7c0 4 2 7 7 8"/></svg></span>Henné</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌿</span>Henné</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-maquillage.jpg" alt="Maquillage">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💄</span>Maquillage</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-estheticienne.jpg" alt="Esthéticienne">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Esthéticienne</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌸</span>Esthéticienne</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-tatoueur.jpg" alt="Tatoueur">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🖋️</span>Tatoueur</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-massage.jpg" alt="Masso-Thérapeute">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14c0-4.4 3.6-8 8-8s8 3.6 8 8"/><path d="M4 14h2a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h.5"/><path d="M20 14h-2a2 2 0 0 0-2 2v1a2 2 0 0 1-2 2H14"/></svg></span>Massage</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💆</span>Massage</div></div>
                 </a>
                 <!-- Duplicate set for infinite scroll -->
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-barber.jpeg" alt="Barber">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></span>Barber</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">✂️</span>Barber</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-coiffeuse.jpg" alt="Coiffeuse">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💇</span>Coiffeuse</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-manucure.jpg" alt="Manucure">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h10l2 7H5L7 3z"/><path d="M5 10v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9"/><line x1="9" y1="14" x2="9" y2="18"/><line x1="12" y1="13" x2="12" y2="18"/><line x1="15" y1="14" x2="15" y2="18"/></svg></span>Manucure</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💅</span>Manucure</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-henne.jpeg" alt="Henné">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12"/><path d="M5 7c0-2.5 2-4.5 7-4.5S19 4.5 19 7c0 5-3.5 8.5-7 9.5"/><path d="M5 7c0 4 2 7 7 8"/></svg></span>Henné</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌿</span>Henné</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-maquillage.jpg" alt="Maquillage">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💄</span>Maquillage</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-estheticienne.jpg" alt="Esthéticienne">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>Esthéticienne</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌸</span>Esthéticienne</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-tatoueur.jpg" alt="Tatoueur">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🖋️</span>Tatoueur</div></div>
                 </a>
                 <a href="./app.html" class="service-card">
                     <img src="assets/img/service-massage.jpg" alt="Masso-Thérapeute">
-                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14c0-4.4 3.6-8 8-8s8 3.6 8 8"/><path d="M4 14h2a2 2 0 0 1 2 2v1a2 2 0 0 0 2 2h.5"/><path d="M20 14h-2a2 2 0 0 0-2 2v1a2 2 0 0 1-2 2H14"/></svg></span>Massage</div></div>
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💆</span>Massage</div></div>
                 </a>
             </div>
         </div>
@@ -797,7 +855,7 @@
 
     <!-- AVANTAGES -->
     <section class="section">
-        <span class="section-label">Pourquoi UBODROP</span>
+        <span class="section-label">Pourquoi UBO DROP</span>
         <h2 class="section-title">La plateforme de confiance</h2>
         <p class="section-desc">Des professionnels vérifiés, une expérience fluide, un service premium.</p>
         <div class="advantages-grid">
@@ -829,7 +887,7 @@
     <section class="cta-section">
         <div class="cta-box">
             <h2>Prêt à réserver ?</h2>
-            <p>Rejoignez des milliers d'utilisateurs qui font confiance à UBODROP.</p>
+            <p>Rejoignez des milliers d'utilisateurs qui font confiance à UBO DROP.</p>
             <a href="./app.html" class="btn-cta-white">
                 Ouvrir l'application
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -839,8 +897,8 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <div class="footer-logo">UBODROP</div>
-        <p>&copy; 2026 UBODROP. Tous droits réservés.</p>
+        <div class="footer-logo">UBO DROP</div>
+        <p>&copy; 2026 UBO DROP. Tous droits réservés.</p>
         <div class="footer-links">
             <a href="#">Mentions légales</a>
             <a href="#">CGU</a>

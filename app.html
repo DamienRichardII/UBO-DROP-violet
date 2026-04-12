@@ -1090,1113 +1090,1241 @@
   
 <script src="assets/js/config.js"></script>
 <script>
-    const fallbackCategories = [
-      { key: 'barbier', label: 'Barber' },
-      { key: 'coiffure', label: 'Coiffeuse' },
-      { key: 'ongles', label: 'Manucure' },
-      { key: 'henne', label: 'Henné' },
-      { key: 'maquillage', label: 'Maquillage' },
-      { key: 'esthetique', label: 'Esthéticienne' },
-      { key: 'tatouage', label: 'Tatoueur' },
-      { key: 'massage', label: 'Massage' }
-    ];
+  const GOOGLE_MAPS_API_KEY = window.GOOGLE_MAPS_API_KEY || "";
+  const APP_SESSION_KEY = "ubodrop_app_session";
 
-    const placeOptions = ['À domicile', 'Chez le pro', 'En salon'];
+  const categoriesFallback = [
+    { key: "barbier", label: "Barber" },
+    { key: "coiffure", label: "Coiffeuse" },
+    { key: "ongles", label: "Manucure" },
+    { key: "henne", label: "Henné" },
+    { key: "maquillage", label: "Maquillage" },
+    { key: "esthetique", label: "Esthéticienne" },
+    { key: "tatouage", label: "Tatoueur" },
+    { key: "massage", label: "Massage" }
+  ];
 
-    const fallbackPros = [
-      {
-        id: 'fallback-sofia',
-        category: 'coiffure',
-        name: 'Sofia Hair',
-        image: 'assets/img/pro-coiffeuse.jpg',
-        secondary: 'Coiffeuse • Brushing • Soin & coupe',
-        rating: '4.9',
-        reviews: '92 avis',
-        distance: '2.4 km',
-        location: 'Paris 8e',
-        availability: 'Disponible',
-        price: '€€',
-        fromPrice: '35€',
-        description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
-        services: [
-          { id: 'fallback-sofia-1', name: 'Brushing signature', meta: '45 min • En salon', price: '35€', tags: ['Populaire'] },
-          { id: 'fallback-sofia-2', name: 'Coupe + soin', meta: '1h10 • À domicile', price: '58€', tags: [] }
-        ],
-        gallery: ['assets/img/pro-coiffeuse.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-tresses.jpg']
-      },
-      {
-        id: 'fallback-milton',
-        category: 'barbier',
-        name: 'Milton',
-        image: 'assets/img/milton-barber.jpeg',
-        secondary: 'Barbier • Coupe homme • Barbe',
-        rating: '4.8',
-        reviews: '89 avis',
-        distance: '2.3 km',
-        location: 'Paris 12e',
-        availability: 'Disponible',
-        price: '€€',
-        fromPrice: '29€',
-        description: 'Barbier moderne • coupe précise et barbe nette à domicile',
-        services: [
-          { id: 'fallback-milton-1', name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
-          { id: 'fallback-milton-2', name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
-        ],
-        gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/service-barber.jpeg']
-      },
-      {
-        id: 'fallback-luna',
-        category: 'ongles',
-        name: 'Luna Nails',
-        image: 'assets/img/pro-manucure.jpg',
-        secondary: 'Manucure • Gel • Nail art',
-        rating: '4.8',
-        reviews: '118 avis',
-        distance: '2.1 km',
-        location: 'Paris 3e',
-        availability: 'Disponible',
-        price: '€€€',
-        fromPrice: '35€',
-        description: 'Manucure premium • finitions nettes et design élégant',
-        services: [
-          { id: 'fallback-luna-1', name: 'Pose semi-permanent', meta: '45 min • À domicile', price: '35€', tags: [] },
-          { id: 'fallback-luna-2', name: 'Nail art signature', meta: '1h15 • Chez le pro', price: '54€', tags: ['Populaire'] }
-        ],
-        gallery: ['assets/img/pro-manucure.jpg', 'assets/img/service-manucure.jpg', 'assets/img/pro-maquillage.jpg']
-      },
-      {
-        id: 'fallback-maya',
-        category: 'maquillage',
-        name: 'Maya Make Up',
-        image: 'assets/img/pro-maquillage.jpg',
-        secondary: 'Maquillage • Glow skin • Événementiel',
-        rating: '4.9',
-        reviews: '76 avis',
-        distance: '3.4 km',
-        location: 'Paris 16e',
-        availability: 'Disponible',
-        price: '€€€',
-        fromPrice: '65€',
-        description: 'Maquilleuse premium • teint lumineux et finitions photo-ready',
-        services: [
-          { id: 'fallback-maya-1', name: 'Make-up jour', meta: '45 min • À domicile', price: '65€', tags: [] },
-          { id: 'fallback-maya-2', name: 'Make-up soirée', meta: '1h • À domicile / Chez le pro', price: '90€', tags: ['Expert'] }
-        ],
-        gallery: ['assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg', 'assets/img/pro-estheticienne.jpg']
-      },
-      {
-        id: 'fallback-nora',
-        category: 'esthetique',
-        name: 'Nora Skin',
-        image: 'assets/img/pro-estheticienne.jpg',
-        secondary: 'Esthéticienne • Soin visage • Éclat peau',
-        rating: '4.9',
-        reviews: '74 avis',
-        distance: '1.7 km',
-        location: 'Paris 15e',
-        availability: 'Disponible',
-        price: '€€',
-        fromPrice: '42€',
-        description: 'Esthéticienne experte • soin visage, nettoyage profond et éclat',
-        services: [
-          { id: 'fallback-nora-1', name: 'Soin visage complet', meta: '50 min • À domicile', price: '42€', tags: ['Glow'] },
-          { id: 'fallback-nora-2', name: 'Nettoyage profond', meta: '1h10 • Chez le pro', price: '58€', tags: [] }
-        ],
-        gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg']
+  const placeOptions = ["À domicile", "Chez le pro", "En salon"];
+
+  const emptyState = {
+    pros: {
+      title: "Aucun professionnel disponible",
+      text: "Les premiers prestataires arrivent bientôt sur UBODROP. Reviens plus tard ou crée déjà ton compte."
+    },
+    bookings: {
+      title: "Aucune réservation",
+      text: "Tes rendez-vous apparaîtront ici dès ta première réservation."
+    },
+    favorites: {
+      title: "Aucun favori",
+      text: "Ajoute des prestataires à tes favoris dès qu'ils seront disponibles."
+    },
+    messages: {
+      title: "Aucune conversation",
+      text: "Tes échanges avec les professionnels apparaîtront ici."
+    },
+    accountGuest: {
+      title: "Compte invité",
+      text: "Connecte-toi ou crée un compte pour retrouver tes réservations, messages et notifications."
+    },
+    proDashboard: {
+      title: "Espace pro indisponible",
+      text: "Aucun professionnel réel n'est encore connecté à la plateforme."
+    }
+  };
+
+  const state = {
+    category: "coiffure",
+    place: "À domicile",
+    userMode: "guest",
+    sheetState: 1,
+    categories: [...categoriesFallback],
+    pros: [],
+    selectedPro: null,
+    authUser: null,
+    session: null,
+    conversations: [],
+    currentConversationId: null,
+    bookings: [],
+    notifications: [],
+    mapsLoaded: false,
+    map: null,
+    mapMarkers: [],
+    autocomplete: null,
+    userMarker: null,
+    searchLocation: { lat: 48.8566, lng: 2.3522, label: "Paris" }
+  };
+
+  const navIcons = {
+    map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l-4 2V6l4-2 6 2 4-2v14l-4 2-6-2Z"></path><path d="M9 4v14M15 6v14"></path></svg>',
+    calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M8 3.5v4M16 3.5v4M3.5 9.5h17"></path></svg>',
+    user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.2"></circle><path d="M5 19c1.5-3 4.2-4.5 7-4.5s5.5 1.5 7 4.5"></path></svg>',
+    dashboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5A8 8 0 0 1 20 13.5"></path><path d="M12 13l4-4"></path><path d="M6 18h12"></path></svg>',
+    messages: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h9A2.5 2.5 0 0 1 19 7.5v6A2.5 2.5 0 0 1 16.5 16h-6l-3.5 3V16.2A2.3 2.3 0 0 1 5 14z"></path></svg>',
+    chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 6.5h15v9h-8l-4.5 3v-3h-2.5z"></path></svg>',
+    home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5"></path><path d="M6.5 9.5V20h11V9.5"></path></svg>'
+  };
+
+  const screenToNavClient = [
+    { id: "screen-search", label: "Carte", icon: navIcons.map },
+    { id: "screen-rdv", label: "RDV", icon: navIcons.calendar },
+    { id: "screen-chat", label: "Chat", icon: navIcons.chat },
+    { id: "screen-account", label: "Compte", icon: navIcons.user }
+  ];
+
+  const screenToNavPro = [
+    { id: "screen-pro-dashboard", label: "Dashboard", icon: navIcons.dashboard },
+    { id: "screen-pro-messages", label: "Messages", icon: navIcons.messages },
+    { id: "screen-chat", label: "Chat", icon: navIcons.chat },
+    { id: "screen-home", label: "Accueil", icon: navIcons.home }
+  ];
+
+  const appApi = {
+    getToken() {
+      try {
+        const raw = localStorage.getItem(APP_SESSION_KEY);
+        if (!raw) return "";
+        return JSON.parse(raw)?.accessToken || "";
+      } catch {
+        return "";
       }
-    ];
+    },
 
-    const APP_SESSION_KEY = 'ubodrop_app_session';
-
-    const state = {
-      category: 'coiffure',
-      place: 'À domicile',
-      userMode: 'guest',
-      sheetState: 1,
-      categories: [...fallbackCategories],
-      pros: [...fallbackPros],
-      selectedPro: fallbackPros[0],
-      selectedService: null,
-      authUser: null,
-      session: null,
-      conversations: [],
-      currentConversationId: null,
-      bookings: [],
-      notifications: []
-    };
-
-    const appApi = {
-      getToken() {
-        try {
-          const raw = localStorage.getItem(APP_SESSION_KEY);
-          if (!raw) return '';
-          const session = JSON.parse(raw);
-          return session?.accessToken || '';
-        } catch {
-          return '';
-        }
-      },
-      getSession() {
-        try {
-          const raw = localStorage.getItem(APP_SESSION_KEY);
-          return raw ? JSON.parse(raw) : null;
-        } catch {
-          return null;
-        }
-      },
-      saveSession(data) {
-        localStorage.setItem(APP_SESSION_KEY, JSON.stringify(data));
-      },
-      clearSession() {
-        localStorage.removeItem(APP_SESSION_KEY);
-      },
-      async request(path, options = {}) {
-        const token = this.getToken();
-        const response = await fetch(`${API_URL}/api/v1${path}`, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...(options.headers || {})
-          }
-        });
-
-        let data = null;
-        const contentType = response.headers.get('content-type') || '';
-
-        try {
-          if (contentType.includes('application/json')) {
-            data = await response.json();
-          } else {
-            data = await response.text();
-          }
-        } catch (_) {
-          data = null;
-        }
-
-        if (!response.ok) {
-          const message = Array.isArray(data?.message)
-            ? data.message.join(' | ')
-            : data?.message || (typeof data === 'string' ? data : `Erreur API (${response.status})`);
-          throw new Error(message);
-        }
-        return data;
-      },
-      login(email, password) {
-        return this.request('/auth/login', {
-          method: 'POST',
-          body: JSON.stringify({ email, password })
-        });
-      },
-      me() { return this.request('/auth/me'); },
-      registerClient(email, password) {
-        return this.request('/auth/register/client', {
-          method: 'POST',
-          body: JSON.stringify({ email, password })
-        });
-      },
-      registerProfessional(email, password) {
-        return this.request('/auth/register/professional', {
-          method: 'POST',
-          body: JSON.stringify({ email, password })
-        });
-      },
-      categories() { return this.request('/categories'); },
-      searchProfessionals() { return this.request('/search/professionals'); },
-      publicProfessional(id) { return this.request(`/profiles/pro/public/${id}`); },
-      myBookings() { return this.request('/bookings/me'); },
-      bookingHistory() { return this.request('/bookings/history'); },
-      conversations() { return this.request('/messaging/conversations/me'); },
-      createConversation(payload) {
-        return this.request('/messaging/conversations', {
-          method: 'POST',
-          body: JSON.stringify(payload)
-        });
-      },
-      messages(conversationId) { return this.request(`/messaging/conversations/${conversationId}/messages`); },
-      sendMessage(conversationId, content) {
-        return this.request(`/messaging/conversations/${conversationId}/messages`, {
-          method: 'POST',
-          body: JSON.stringify({ content })
-        });
-      },
-      notifications() { return this.request('/notifications/me'); }
-    };
-
-    const navIcons = {
-      search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>',
-      map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l-4 2V6l4-2 6 2 4-2v14l-4 2-6-2Z"></path><path d="M9 4v14M15 6v14"></path></svg>',
-      calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M8 3.5v4M16 3.5v4M3.5 9.5h17"></path></svg>',
-      user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.2"></circle><path d="M5 19c1.5-3 4.2-4.5 7-4.5s5.5 1.5 7 4.5"></path></svg>',
-      dashboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5A8 8 0 0 1 20 13.5"></path><path d="M12 13l4-4"></path><path d="M6 18h12"></path></svg>',
-      messages: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7.5A2.5 2.5 0 0 1 7.5 5h9A2.5 2.5 0 0 1 19 7.5v6A2.5 2.5 0 0 1 16.5 16h-6l-3.5 3V16.2A2.3 2.3 0 0 1 5 14z"></path></svg>',
-      chat: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 6.5h15v9h-8l-4.5 3v-3h-2.5z"></path></svg>',
-      home: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5"></path><path d="M6.5 9.5V20h11V9.5"></path></svg>'
-    };
-
-    const screenToNavClient = [
-      { id: 'screen-search', label: 'Carte', icon: navIcons.map },
-      { id: 'screen-rdv', label: 'RDV', icon: navIcons.calendar },
-      { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
-      { id: 'screen-account', label: 'Compte', icon: navIcons.user }
-    ];
-
-    const screenToNavPro = [
-      { id: 'screen-pro-dashboard', label: 'Dashboard', icon: navIcons.dashboard },
-      { id: 'screen-pro-messages', label: 'Messages', icon: navIcons.messages },
-      { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
-      { id: 'screen-home', label: 'Accueil', icon: navIcons.home }
-    ];
-
-    function notify(message) { window.alert(message); }
-
-    function extractArray(data) {
-      if (Array.isArray(data)) return data;
-      if (Array.isArray(data?.items)) return data.items;
-      if (Array.isArray(data?.data)) return data.data;
-      if (Array.isArray(data?.results)) return data.results;
-      if (Array.isArray(data?.rows)) return data.rows;
-      return [];
-    }
-
-    function euro(value) {
-      const n = Number(value);
-      return Number.isFinite(n) ? `${n}€` : (value || '—');
-    }
-
-    function truncate(text, max = 90) {
-      const s = String(text || '');
-      return s.length > max ? `${s.slice(0, max - 1)}…` : s;
-    }
-
-    function initials(text) {
-      return String(text || '').split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || 'U';
-    }
-
-    function assetForCategory(key) {
-      const map = {
-        barbier: 'assets/img/milton-barber.jpeg',
-        coiffure: 'assets/img/pro-coiffeuse.jpg',
-        ongles: 'assets/img/pro-manucure.jpg',
-        henne: 'assets/img/pro-maquillage.jpg',
-        maquillage: 'assets/img/pro-maquillage.jpg',
-        esthetique: 'assets/img/pro-estheticienne.jpg',
-        tatouage: 'assets/img/kingbrel-barber.jpeg',
-        massage: 'assets/img/pro-estheticienne.jpg'
-      };
-      return map[key] || 'assets/img/pro-estheticienne.jpg';
-    }
-
-    function categoryKeyFromText(value) {
-      const text = String(value || '').toLowerCase();
-      if (text.includes('barb')) return 'barbier';
-      if (text.includes('coiff')) return 'coiffure';
-      if (text.includes('ong') || text.includes('nail') || text.includes('manuc')) return 'ongles';
-      if (text.includes('henn')) return 'henne';
-      if (text.includes('maqu')) return 'maquillage';
-      if (text.includes('esth') || text.includes('skin') || text.includes('soin')) return 'esthetique';
-      if (text.includes('tat')) return 'tatouage';
-      if (text.includes('mass')) return 'massage';
-      return 'coiffure';
-    }
-
-    function mapRoleToMode(user) {
-      const roles = user?.roles || user?.user?.roles || [];
-      if (Array.isArray(roles) && roles.some((role) => String(role).toUpperCase() === 'PROFESSIONAL')) return 'pro';
-      return 'client';
-    }
-
-    function normalizeCategories(data) {
-      const arr = extractArray(data);
-      if (!arr.length) return [...fallbackCategories];
-      return arr.map((item) => {
-        const key = categoryKeyFromText(item?.name || item?.label);
-        return {
-          key,
-          label: item?.label || item?.name || key,
-          raw: item
-        };
-      }).filter((item, index, list) => list.findIndex((c) => c.key === item.key) === index);
-    }
-
-    function normalizeService(service, index = 0) {
-      return {
-        id: service?.id || `service-${index}`,
-        name: service?.name || service?.label || `Prestation ${index + 1}`,
-        meta: [
-          service?.durationMinutes ? `${service.durationMinutes} min` : service?.meta,
-          service?.executionMode
-        ].filter(Boolean).join(' • ') || 'Prestation disponible',
-        price: euro(service?.priceAmount ?? service?.price),
-        tags: []
-      };
-    }
-
-    function normalizePros(data) {
-      const arr = extractArray(data);
-      if (!arr.length) return [...fallbackPros];
-
-      return arr.map((item, index) => {
-        const categorySource =
-          item?.category?.name ||
-          item?.primaryCategory?.name ||
-          item?.specialty ||
-          item?.serviceCategory ||
-          item?.profession ||
-          item?.services?.[0]?.category?.name ||
-          item?.services?.[0]?.name ||
-          'coiffure';
-
-        const key = categoryKeyFromText(categorySource);
-        const name =
-          item?.displayName ||
-          item?.businessName ||
-          item?.name ||
-          [item?.firstName, item?.lastName].filter(Boolean).join(' ').trim() ||
-          item?.user?.email ||
-          `Professionnel ${index + 1}`;
-
-        const services = Array.isArray(item?.services) && item.services.length
-          ? item.services.map(normalizeService)
-          : [{
-              id: `${item?.id || index}-default`,
-              name: fallbackCategories.find((c) => c.key === key)?.label || 'Prestation',
-              meta: item?.executionMode || 'Prestation disponible',
-              price: euro(item?.fromPriceAmount ?? item?.priceAmount ?? item?.price ?? 35),
-              tags: []
-            }];
-
-        const image =
-          item?.avatarUrl ||
-          item?.imageUrl ||
-          item?.profileImageUrl ||
-          item?.profileImage ||
-          item?.coverImage ||
-          assetForCategory(key);
-
-        const city = item?.city || item?.addressCity || item?.locationCity || item?.address?.city || 'Paris';
-        const ratingValue = item?.averageRating ?? item?.rating ?? 4.8;
-        const reviewsCount = item?.reviewsCount ?? item?.reviewCount ?? 0;
-
-        return {
-          id: item?.id || item?.profileId || item?.userId || `pro-${index}`,
-          category: key,
-          name,
-          image,
-          secondary: item?.headline || item?.bioShort || `${fallbackCategories.find((c) => c.key === key)?.label || 'Professionnel'} • UBODROP`,
-          rating: Number(ratingValue).toFixed(1),
-          reviews: `${reviewsCount} avis`,
-          distance: item?.distanceKm ? `${item.distanceKm} km` : 'près de toi',
-          location: city,
-          availability: item?.isAvailable === false ? 'Indisponible' : 'Disponible',
-          price: item?.priceTier || '€€',
-          fromPrice: euro(item?.fromPriceAmount ?? item?.priceAmount ?? item?.price ?? services[0]?.price ?? 35),
-          description: item?.bio || item?.description || 'Professionnel vérifié disponible sur UBODROP.',
-          services,
-          gallery: [image, ...(Array.isArray(item?.gallery) ? item.gallery : []), assetForCategory(key)].slice(0, 3),
-          raw: item
-        };
-      });
-    }
-
-    function formatAuthUser(user) {
-      const email = user?.email || user?.user?.email || 'email@ubodrop.com';
-      const roles = user?.roles || user?.user?.roles || [];
-      return {
-        email,
-        roles,
-        displayName: email.split('@')[0],
-        roleLabel: roles.some((r) => String(r).toUpperCase() === 'PROFESSIONAL') ? 'Compte professionnel' : 'Compte client'
-      };
-    }
-
-    function bindGo() {
-      document.querySelectorAll('[data-go]').forEach((btn) => {
-        btn.onclick = () => goTo(btn.getAttribute('data-go'));
-      });
-    }
-
-    function renderNav(screenId) {
-      const nav = document.getElementById('bottomNav');
-      const grid = document.getElementById('navGrid');
-      const authScreens = ['screen-home', 'screen-login', 'screen-register-client', 'screen-register-pro'];
-
-      if (authScreens.includes(screenId)) {
-        nav.classList.remove('show');
-        return;
+    getSession() {
+      try {
+        const raw = localStorage.getItem(APP_SESSION_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
       }
+    },
 
-      nav.classList.add('show');
-      const items = state.userMode === 'pro' ? screenToNavPro : screenToNavClient;
-      grid.innerHTML = items.map((item) => `
-        <button class="nav-item ${item.id === screenId ? 'active' : ''}" data-go="${item.id}">
-          <span class="nav-icon">${item.icon}</span>
-          <span>${item.label}</span>
-        </button>
-      `).join('');
-      bindGo();
-    }
+    saveSession(data) {
+      localStorage.setItem(APP_SESSION_KEY, JSON.stringify(data));
+    },
 
-    function goTo(screenId) {
-      document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
-      document.getElementById(screenId)?.classList.add('active');
-      renderNav(screenId);
-    }
+    clearSession() {
+      localStorage.removeItem(APP_SESSION_KEY);
+    },
 
-    function toggleFilter(open) {
-      document.getElementById('filterOverlay').classList.toggle('open', open);
-    }
-
-    function setSheetState(nextState) {
-      const maxState = 3;
-      state.sheetState = Math.max(0, Math.min(maxState, nextState));
-      const sheet = document.getElementById('bottomSheet');
-      sheet.classList.remove('sheet-state-0', 'sheet-state-1', 'sheet-state-2', 'sheet-state-3');
-      sheet.classList.add(`sheet-state-${state.sheetState}`);
-      const cycleLabel = document.getElementById('sheetCycle');
-      if (cycleLabel) cycleLabel.textContent = ['Ouvrir', 'Monter', 'Développer', 'Réduire'][state.sheetState];
-    }
-
-    function renderPlaceChips() {
-      const row = document.getElementById('placeRow');
-      const filterGrid = document.getElementById('filterPlaceGrid');
-      row.innerHTML = '';
-      filterGrid.innerHTML = '';
-
-      placeOptions.forEach((place) => {
-        const chip = document.createElement('button');
-        chip.className = 'place-chip' + (state.place === place ? ' active' : '');
-        chip.textContent = place;
-        chip.onclick = () => {
-          state.place = place;
-          renderPlaceChips();
-          renderPros();
-        };
-        row.appendChild(chip);
-
-        const seg = document.createElement('button');
-        seg.className = 'seg' + (state.place === place ? ' active' : '');
-        seg.textContent = place;
-        seg.onclick = () => {
-          state.place = place;
-          renderPlaceChips();
-        };
-        filterGrid.appendChild(seg);
-      });
-    }
-
-    function renderFilterCategories() {
-      const row = document.getElementById('filterCategoryRow');
-      row.innerHTML = '';
-
-      state.categories.forEach((cat) => {
-        const btn = document.createElement('button');
-        btn.className = 'pill' + (state.category === cat.key ? ' active' : '');
-        btn.textContent = cat.label;
-        btn.onclick = () => {
-          state.category = cat.key;
-          renderFilterCategories();
-          renderPros();
-        };
-        row.appendChild(btn);
-      });
-    }
-
-    function getVisiblePros() {
-      const selected = state.pros.filter((pro) => pro.category === state.category);
-      const source = selected.length ? selected : state.pros;
-      return source.slice(0, 5);
-    }
-
-    function renderPros() {
-      const list = document.getElementById('proList');
-      list.innerHTML = '';
-
-      getVisiblePros().forEach((pro) => {
-        const card = document.createElement('div');
-        card.className = 'pro-card';
-        card.innerHTML = `
-          <img class="pro-avatar" src="${pro.image}" alt="${pro.name}">
-          <div class="pro-main">
-            <div class="pro-name">${pro.name}</div>
-            <div class="pro-secondary">${truncate(pro.secondary, 48)}</div>
-            <div class="pro-rating">⭐ ${pro.rating} <span>(${pro.reviews})</span> <span>• ${pro.distance}</span></div>
-            <div class="pro-meta">${state.place} • ${pro.location}</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="avail">${pro.availability}</div>
-            <div class="pro-meta" style="margin-top:8px;">${pro.fromPrice}</div>
-            <button class="book-btn" data-open-pro="${pro.id}">Réserver</button>
-          </div>
-        `;
-        list.appendChild(card);
+    async request(path, options = {}) {
+      const token = this.getToken();
+      const response = await fetch(`${API_URL}/api/v1${path}`, {
+        ...options,
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          ...(options.headers || {})
+        }
       });
 
-      bindOpenPro();
-    }
-
-    function findPro(idOrName) {
-      return state.pros.find((p) => p.id === idOrName || p.name === idOrName) || state.pros[0];
-    }
-
-    async function openPro(idOrName) {
-      let pro = findPro(idOrName);
+      const contentType = response.headers.get("content-type") || "";
+      let data = null;
 
       try {
-        if (pro?.id && !String(pro.id).startsWith('fallback-')) {
-          const detail = await appApi.publicProfessional(pro.id);
-          const detailedPros = normalizePros([detail]);
-          if (detailedPros.length) pro = { ...pro, ...detailedPros[0] };
-        }
-      } catch (_) {}
+        data = contentType.includes("application/json") ? await response.json() : await response.text();
+      } catch (_) {
+        data = null;
+      }
 
-      state.selectedPro = pro;
-      document.getElementById('detailHero').src = pro.gallery[0];
-      document.getElementById('detailName').textContent = pro.name;
-      document.getElementById('detailDesc').textContent = pro.description;
-      document.getElementById('detailPrice').textContent = `à partir de ${pro.fromPrice}`;
-      document.getElementById('detailCta').textContent = state.userMode === 'guest' ? 'Se connecter pour réserver' : `Réserver ${pro.name.split(' ')[0]}`;
-      document.getElementById('detailMeta').innerHTML = `
-        <span>⭐ ${pro.rating} (${pro.reviews})</span>
-        <span>• ${pro.distance}</span>
-        <span>• ${pro.location}</span>
-      `;
+      if (!response.ok) {
+        const message = Array.isArray(data?.message)
+          ? data.message.join(" | ")
+          : data?.message || (typeof data === "string" ? data : `Erreur API (${response.status})`);
+        throw new Error(message);
+      }
 
-      const gallery = document.getElementById('detailGallery');
-      gallery.innerHTML = pro.gallery.slice(1).map((src) => `<img src="${src}" alt="Galerie ${pro.name}">`).join('');
+      return data;
+    },
 
-      const services = document.getElementById('detailServices');
-      services.innerHTML = pro.services.map((service) => `
+    login(email, password) {
+      return this.request("/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+    },
+
+    me() {
+      return this.request("/auth/me");
+    },
+
+    registerClient(email, password) {
+      return this.request("/auth/register/client", {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+    },
+
+    registerProfessional(email, password) {
+      return this.request("/auth/register/professional", {
+        method: "POST",
+        body: JSON.stringify({ email, password })
+      });
+    },
+
+    categories() {
+      return this.request("/categories");
+    },
+
+    searchProfessionals() {
+      return this.request("/search/professionals");
+    },
+
+    publicProfessional(id) {
+      return this.request(`/profiles/pro/public/${id}`);
+    },
+
+    myBookings() {
+      return this.request("/bookings/me");
+    },
+
+    bookingHistory() {
+      return this.request("/bookings/history");
+    },
+
+    conversations() {
+      return this.request("/messaging/conversations/me");
+    },
+
+    messages(conversationId) {
+      return this.request(`/messaging/conversations/${conversationId}/messages`);
+    },
+
+    sendMessage(conversationId, content) {
+      return this.request(`/messaging/conversations/${conversationId}/messages`, {
+        method: "POST",
+        body: JSON.stringify({ content })
+      });
+    },
+
+    notifications() {
+      return this.request("/notifications/me");
+    }
+  };
+
+  function notify(message) {
+    window.alert(message);
+  }
+
+  function extractArray(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.results)) return data.results;
+    if (Array.isArray(data?.rows)) return data.rows;
+    return [];
+  }
+
+  function euro(value) {
+    const n = Number(value);
+    return Number.isFinite(n) ? `${n}€` : (value || "—");
+  }
+
+  function truncate(text, max = 90) {
+    const s = String(text || "");
+    return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+  }
+
+  function categoryKeyFromText(value) {
+    const text = String(value || "").toLowerCase();
+    if (text.includes("barb")) return "barbier";
+    if (text.includes("coiff")) return "coiffure";
+    if (text.includes("ong") || text.includes("nail") || text.includes("manuc")) return "ongles";
+    if (text.includes("henn")) return "henne";
+    if (text.includes("maqu")) return "maquillage";
+    if (text.includes("esth") || text.includes("skin") || text.includes("soin")) return "esthetique";
+    if (text.includes("tat")) return "tatouage";
+    if (text.includes("mass")) return "massage";
+    return "coiffure";
+  }
+
+  function mapRoleToMode(user) {
+    const roles = user?.roles || user?.user?.roles || [];
+    return Array.isArray(roles) && roles.some((role) => String(role).toUpperCase() === "PROFESSIONAL") ? "pro" : "client";
+  }
+
+  function formatAuthUser(user) {
+    const email = user?.email || user?.user?.email || "";
+    const roles = user?.roles || user?.user?.roles || [];
+    return {
+      email,
+      roles,
+      displayName: email ? email.split("@")[0] : "Invité",
+      roleLabel: roles.some((r) => String(r).toUpperCase() === "PROFESSIONAL") ? "Compte professionnel" : "Compte client"
+    };
+  }
+
+  function normalizeCategories(data) {
+    const arr = extractArray(data);
+    if (!arr.length) return [...categoriesFallback];
+    return arr.map((item) => {
+      const key = categoryKeyFromText(item?.name || item?.label);
+      return {
+        key,
+        label: item?.label || item?.name || key,
+        raw: item
+      };
+    }).filter((item, index, list) => list.findIndex((c) => c.key === item.key) === index);
+  }
+
+  function normalizeService(service, index = 0) {
+    return {
+      id: service?.id || `service-${index}`,
+      name: service?.name || service?.label || `Prestation ${index + 1}`,
+      meta: [
+        service?.durationMinutes ? `${service.durationMinutes} min` : service?.meta,
+        service?.executionMode
+      ].filter(Boolean).join(" • ") || "Prestation disponible",
+      price: euro(service?.priceAmount ?? service?.price),
+      tags: []
+    };
+  }
+
+  function normalizePros(data) {
+    return extractArray(data).map((item, index) => {
+      const categorySource =
+        item?.category?.name ||
+        item?.primaryCategory?.name ||
+        item?.specialty ||
+        item?.serviceCategory ||
+        item?.profession ||
+        item?.services?.[0]?.category?.name ||
+        item?.services?.[0]?.name ||
+        "coiffure";
+
+      const key = categoryKeyFromText(categorySource);
+      const name =
+        item?.displayName ||
+        item?.businessName ||
+        item?.name ||
+        [item?.firstName, item?.lastName].filter(Boolean).join(" ").trim() ||
+        item?.user?.email ||
+        `Professionnel ${index + 1}`;
+
+      const services = Array.isArray(item?.services) && item.services.length
+        ? item.services.map(normalizeService)
+        : [];
+
+      return {
+        id: item?.id || item?.profileId || item?.userId || `pro-${index}`,
+        category: key,
+        name,
+        image: item?.avatarUrl || item?.imageUrl || item?.profileImageUrl || item?.profileImage || item?.coverImage || "",
+        secondary: item?.headline || item?.bioShort || "",
+        rating: item?.averageRating || item?.rating || "",
+        reviews: item?.reviewsCount ? `${item.reviewsCount} avis` : "",
+        distance: item?.distanceKm ? `${item.distanceKm} km` : "",
+        location: item?.city || item?.addressCity || item?.locationCity || item?.address?.city || "",
+        availability: item?.isAvailable === false ? "Indisponible" : "Disponible",
+        price: item?.priceTier || "",
+        fromPrice: euro(item?.fromPriceAmount ?? item?.priceAmount ?? item?.price),
+        description: item?.bio || item?.description || "",
+        services,
+        gallery: [item?.avatarUrl, item?.imageUrl, item?.coverImage].filter(Boolean),
+        lat: Number(item?.latitude ?? item?.lat),
+        lng: Number(item?.longitude ?? item?.lng),
+        raw: item
+      };
+    });
+  }
+
+  function emptyCard(title, text, actionText = "", actionGo = "") {
+    return `
+      <div class="soft-card" style="padding:18px; text-align:center;">
+        <div class="section-title" style="font-size:1.04rem;">${title}</div>
+        <div class="section-sub" style="margin-top:8px;">${text}</div>
+        ${actionText && actionGo ? `<button class="primary-btn" style="margin-top:16px;" data-go="${actionGo}">${actionText}</button>` : ""}
+      </div>
+    `;
+  }
+
+  function bindGo() {
+    document.querySelectorAll("[data-go]").forEach((btn) => {
+      btn.onclick = () => goTo(btn.getAttribute("data-go"));
+    });
+  }
+
+  function renderNav(screenId) {
+    const nav = document.getElementById("bottomNav");
+    const grid = document.getElementById("navGrid");
+    const authScreens = ["screen-home","screen-login","screen-register-client","screen-register-pro"];
+    if (authScreens.includes(screenId)) {
+      nav.classList.remove("show");
+      return;
+    }
+    nav.classList.add("show");
+    const items = state.userMode === "pro" ? screenToNavPro : screenToNavClient;
+    grid.innerHTML = items.map(item => `
+      <button class="nav-item ${item.id === screenId ? "active" : ""}" data-go="${item.id}">
+        <span class="nav-icon">${item.icon}</span>
+        <span>${item.label}</span>
+      </button>
+    `).join("");
+    bindGo();
+  }
+
+  function goTo(screenId) {
+    document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
+    document.getElementById(screenId)?.classList.add("active");
+    renderNav(screenId);
+  }
+
+  function toggleFilter(open) {
+    document.getElementById("filterOverlay").classList.toggle("open", open);
+  }
+
+  function setSheetState(nextState) {
+    const maxState = 3;
+    state.sheetState = Math.max(0, Math.min(maxState, nextState));
+    const sheet = document.getElementById("bottomSheet");
+    sheet.classList.remove("sheet-state-0", "sheet-state-1", "sheet-state-2", "sheet-state-3");
+    sheet.classList.add(`sheet-state-${state.sheetState}`);
+    const cycleLabel = document.getElementById("sheetCycle");
+    if (cycleLabel) {
+      cycleLabel.textContent = ["Ouvrir", "Monter", "Développer", "Réduire"][state.sheetState];
+    }
+  }
+
+  function renderPlaceChips() {
+    const row = document.getElementById("placeRow");
+    const filterGrid = document.getElementById("filterPlaceGrid");
+    row.innerHTML = "";
+    filterGrid.innerHTML = "";
+    placeOptions.forEach(place => {
+      const chip = document.createElement("button");
+      chip.className = "place-chip" + (state.place === place ? " active" : "");
+      chip.textContent = place;
+      chip.onclick = () => { state.place = place; renderPlaceChips(); };
+      row.appendChild(chip);
+
+      const seg = document.createElement("button");
+      seg.className = "seg" + (state.place === place ? " active" : "");
+      seg.textContent = place;
+      seg.onclick = () => { state.place = place; renderPlaceChips(); };
+      filterGrid.appendChild(seg);
+    });
+  }
+
+  function renderFilterCategories() {
+    const row = document.getElementById("filterCategoryRow");
+    row.innerHTML = "";
+    state.categories.forEach(cat => {
+      const btn = document.createElement("button");
+      btn.className = "pill" + (state.category === cat.key ? " active" : "");
+      btn.textContent = cat.label;
+      btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
+      row.appendChild(btn);
+    });
+  }
+
+  function getVisiblePros() {
+    return state.pros.filter((pro) => pro.category === state.category || !state.category);
+  }
+
+  function renderMapEmptyMessage() {
+    const stage = document.getElementById("mapStage");
+    let empty = document.getElementById("mapEmptyState");
+    if (!empty) {
+      empty = document.createElement("div");
+      empty.id = "mapEmptyState";
+      empty.style.position = "absolute";
+      empty.style.left = "16px";
+      empty.style.right = "16px";
+      empty.style.top = "120px";
+      empty.style.zIndex = "2";
+      stage.appendChild(empty);
+    }
+    if (state.pros.length) {
+      empty.innerHTML = "";
+      return;
+    }
+    empty.innerHTML = `
+      <div class="soft-card" style="padding:16px 18px; text-align:center; background:rgba(255,255,255,.94);">
+        <div class="section-title" style="font-size:1rem;">${emptyState.pros.title}</div>
+        <div class="section-sub" style="margin-top:8px;">${emptyState.pros.text}</div>
+      </div>
+    `;
+  }
+
+  function clearMapMarkers() {
+    state.mapMarkers.forEach((marker) => marker.setMap(null));
+    state.mapMarkers = [];
+  }
+
+  function renderMapMarkers() {
+    if (!state.map || !window.google?.maps) return;
+    clearMapMarkers();
+    getVisiblePros().forEach((pro) => {
+      if (!Number.isFinite(pro.lat) || !Number.isFinite(pro.lng)) return;
+      const marker = new google.maps.Marker({
+        position: { lat: pro.lat, lng: pro.lng },
+        map: state.map,
+        title: pro.name
+      });
+      marker.addListener("click", () => openPro(pro.id));
+      state.mapMarkers.push(marker);
+    });
+  }
+
+  function ensureMapCanvas() {
+    const stage = document.getElementById("mapStage");
+    stage.style.background = "#f5f1f7";
+    stage.querySelectorAll(".map-pin, .map-user-dot").forEach((node) => node.remove());
+    let canvas = document.getElementById("googleMapCanvas");
+    if (!canvas) {
+      canvas = document.createElement("div");
+      canvas.id = "googleMapCanvas";
+      canvas.style.position = "absolute";
+      canvas.style.inset = "0";
+      canvas.style.zIndex = "1";
+      stage.prepend(canvas);
+    }
+    return canvas;
+  }
+
+  function getSearchInput() {
+    return document.querySelector('#screen-search .searchbar input');
+  }
+
+  function loadGoogleMapsScript() {
+    if (window.google?.maps) return Promise.resolve();
+    if (!GOOGLE_MAPS_API_KEY) return Promise.reject(new Error("GOOGLE_MAPS_API_KEY manquante"));
+    return new Promise((resolve, reject) => {
+      const existing = document.getElementById("googleMapsScript");
+      if (existing) {
+        existing.addEventListener("load", resolve, { once: true });
+        existing.addEventListener("error", reject, { once: true });
+        return;
+      }
+      const script = document.createElement("script");
+      script.id = "googleMapsScript";
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Impossible de charger Google Maps"));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function initGoogleMap() {
+    const input = getSearchInput();
+    if (input) input.value = state.searchLocation.label;
+    try {
+      await loadGoogleMapsScript();
+      const canvas = ensureMapCanvas();
+      state.map = new google.maps.Map(canvas, {
+        center: { lat: state.searchLocation.lat, lng: state.searchLocation.lng },
+        zoom: 12,
+        disableDefaultUI: true,
+        zoomControl: true,
+        streetViewControl: false,
+        mapTypeControl: false,
+        fullscreenControl: false
+      });
+
+      if (input && !state.autocomplete) {
+        state.autocomplete = new google.maps.places.Autocomplete(input, {
+          types: ["geocode"],
+          fields: ["geometry", "formatted_address", "name"]
+        });
+        state.autocomplete.addListener("place_changed", () => {
+          const place = state.autocomplete.getPlace();
+          const location = place?.geometry?.location;
+          if (!location || !state.map) return;
+          state.searchLocation = {
+            lat: location.lat(),
+            lng: location.lng(),
+            label: place.formatted_address || place.name || input.value
+          };
+          state.map.panTo({ lat: state.searchLocation.lat, lng: state.searchLocation.lng });
+          state.map.setZoom(13);
+        });
+      }
+
+      renderMapMarkers();
+      renderMapEmptyMessage();
+      state.mapsLoaded = true;
+    } catch (error) {
+      const stage = document.getElementById("mapStage");
+      stage.style.background = "linear-gradient(180deg, rgba(247,243,248,.8), rgba(247,243,248,.5))";
+      renderMapEmptyMessage();
+      const target = document.getElementById("mapEmptyState");
+      if (target) {
+        target.innerHTML = `
+          <div class="soft-card" style="padding:16px 18px; text-align:center; background:rgba(255,255,255,.94);">
+            <div class="section-title" style="font-size:1rem;">Carte Google Maps non configurée</div>
+            <div class="section-sub" style="margin-top:8px;">Ajoute une vraie clé Google Maps dans assets/js/config.js pour activer la carte, la recherche d’adresse et la navigation.</div>
+          </div>
+        `;
+      }
+    }
+  }
+
+  function centerOnUser() {
+    if (!navigator.geolocation || !state.map) {
+      notify("La géolocalisation n'est pas disponible.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition((position) => {
+      const coords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
+      state.searchLocation = {
+        ...coords,
+        label: "Ma position"
+      };
+      state.map.panTo(coords);
+      state.map.setZoom(14);
+      if (state.userMarker) state.userMarker.setMap(null);
+      state.userMarker = new google.maps.Marker({
+        position: coords,
+        map: state.map,
+        title: "Ma position"
+      });
+      const input = getSearchInput();
+      if (input) input.value = "Ma position";
+    }, () => {
+      notify("Impossible de récupérer ta position.");
+    });
+  }
+
+  function renderPros() {
+    const list = document.getElementById("proList");
+    const visiblePros = getVisiblePros();
+    if (!visiblePros.length) {
+      list.innerHTML = emptyCard(emptyState.pros.title, emptyState.pros.text, "Créer un compte", "screen-register-client");
+      bindGo();
+      renderMapMarkers();
+      renderMapEmptyMessage();
+      return;
+    }
+
+    list.innerHTML = visiblePros.map((pro) => `
+      <div class="pro-card">
+        ${pro.image ? `<img class="pro-avatar" src="${pro.image}" alt="${pro.name}">` : `<div class="pro-avatar" style="display:grid;place-items:center;background:var(--violet-soft);font-weight:800;color:var(--violet);">${pro.name.slice(0,1).toUpperCase()}</div>`}
+        <div class="pro-main">
+          <div class="pro-name">${pro.name}</div>
+          <div class="pro-secondary">${truncate(pro.secondary, 48)}</div>
+          <div class="pro-rating">${pro.rating ? `⭐ ${pro.rating}` : ""} ${pro.reviews ? `<span>(${pro.reviews})</span>` : ""} ${pro.distance ? `<span>• ${pro.distance}</span>` : ""}</div>
+          <div class="pro-meta">${[state.place, pro.location].filter(Boolean).join(" • ")}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="avail">${pro.availability}</div>
+          <div class="pro-meta" style="margin-top:8px;">${pro.fromPrice || "—"}</div>
+          <button class="book-btn" data-open-pro="${pro.id}">Voir</button>
+        </div>
+      </div>
+    `).join("");
+
+    bindOpenPro();
+    renderMapMarkers();
+    renderMapEmptyMessage();
+  }
+
+  function bindOpenPro() {
+    document.querySelectorAll("[data-open-pro]").forEach((el) => {
+      el.onclick = () => openPro(el.getAttribute("data-open-pro"));
+    });
+  }
+
+  async function openPro(id) {
+    const pro = state.pros.find((item) => String(item.id) === String(id));
+    if (!pro) {
+      notify("Aucun professionnel réel disponible pour le moment.");
+      return;
+    }
+
+    let detailed = pro;
+    try {
+      const detail = await appApi.publicProfessional(pro.id);
+      const normalized = normalizePros([detail]);
+      if (normalized.length) detailed = { ...pro, ...normalized[0] };
+    } catch (_) {}
+
+    state.selectedPro = detailed;
+
+    document.getElementById("detailHero").src = detailed.gallery[0] || detailed.image || "assets/img/ubo-drop-logo.png";
+    document.getElementById("detailName").textContent = detailed.name;
+    document.getElementById("detailDesc").textContent = detailed.description || "Professionnel vérifié sur UBODROP.";
+    document.getElementById("detailPrice").textContent = detailed.fromPrice ? `à partir de ${detailed.fromPrice}` : "Tarif sur demande";
+    document.getElementById("detailCta").textContent = appApi.getToken() ? `Réserver ${detailed.name.split(" ")[0]}` : "Se connecter pour réserver";
+    document.getElementById("detailMeta").innerHTML = [
+      detailed.rating ? `<span>⭐ ${detailed.rating}${detailed.reviews ? ` (${detailed.reviews})` : ""}</span>` : "",
+      detailed.distance ? `<span>• ${detailed.distance}</span>` : "",
+      detailed.location ? `<span>• ${detailed.location}</span>` : ""
+    ].join(" ");
+
+    const gallery = document.getElementById("detailGallery");
+    gallery.innerHTML = (detailed.gallery || []).slice(1, 4).map((src) => `<img src="${src}" alt="Galerie ${detailed.name}">`).join("");
+
+    const services = document.getElementById("detailServices");
+    if (!detailed.services.length) {
+      services.innerHTML = emptyCard("Prestations bientôt disponibles", "Ce professionnel n'a pas encore publié ses prestations.");
+    } else {
+      services.innerHTML = detailed.services.map((service) => `
         <div class="service-row">
           <div>
             <h4>${service.name}</h4>
-            <p>${service.meta}${service.tags.length ? ' • ' + service.tags.join(', ') : ''}</p>
+            <p>${service.meta}</p>
           </div>
-          <div class="service-price"><strong>${service.price}</strong><button class="tiny-btn choose-service-btn" data-service-id="${service.id}">Choisir</button></div>
+          <div class="service-price"><strong>${service.price}</strong></div>
         </div>
-      `).join('');
-
-      document.querySelectorAll('.choose-service-btn').forEach((btn) => {
-        btn.onclick = () => {
-          const service = pro.services.find((item) => String(item.id) === btn.dataset.serviceId);
-          state.selectedService = service || pro.services[0];
-          notify(`Prestation sélectionnée : ${state.selectedService.name}`);
-        };
-      });
-
-      goTo('screen-detail');
+      `).join("");
     }
 
-    function bindOpenPro() {
-      document.querySelectorAll('[data-open-pro]').forEach((el) => {
-        el.onclick = () => openPro(el.getAttribute('data-open-pro'));
-      });
+    goTo("screen-detail");
+  }
+
+  function renderBookings() {
+    const card = document.querySelector("#screen-rdv .list-card");
+    if (!card) return;
+
+    if (!appApi.getToken()) {
+      card.innerHTML = emptyCard(emptyState.accountGuest.title, emptyState.accountGuest.text, "Se connecter", "screen-login");
+      bindGo();
+      return;
     }
 
-    function conversationTitle(conv) {
-      return conv?.title || conv?.professional?.name || conv?.client?.name || conv?.otherParticipantName || `Conversation ${String(conv?.id || '').slice(0, 6)}`;
+    if (!state.bookings.length) {
+      card.innerHTML = emptyCard(emptyState.bookings.title, emptyState.bookings.text, "Trouver un pro", "screen-search");
+      bindGo();
+      return;
     }
 
-    function normalizeConversations(data) {
-      return extractArray(data).map((conv) => ({
-        id: conv?.id || conv?.conversationId,
-        title: conversationTitle(conv),
-        lastMessage: conv?.lastMessage?.content || conv?.lastMessage || conv?.latestMessage || '',
-        lastAt: conv?.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—',
-        raw: conv
-      }));
-    }
+    card.innerHTML = state.bookings.map((booking) => `
+      <div class="list-item">
+        <img src="${state.selectedPro?.image || 'assets/img/ubo-drop-logo.png'}" alt="Réservation">
+        <div style="flex:1;">
+          <strong>${booking?.professional?.displayName || booking?.professional?.name || "Prestataire"}</strong>
+          <p>${booking?.service?.name || "Prestation"} • ${booking?.scheduledAt ? new Date(booking.scheduledAt).toLocaleString("fr-FR") : "Date à confirmer"} • ${euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount)}</p>
+        </div>
+        <div class="avail">${booking?.status || "Confirmé"}</div>
+      </div>
+    `).join("");
+  }
 
-    function renderBookings() {
-      const card = document.querySelector('#screen-rdv .list-card');
-      if (!card) return;
+  function renderFavorites() {
+    const card = document.querySelector("#screen-favs .list-card");
+    if (!card) return;
+    card.innerHTML = emptyCard(emptyState.favorites.title, emptyState.favorites.text, "Trouver un pro", "screen-search");
+    bindGo();
+  }
 
-      if (!state.bookings.length) {
-        card.innerHTML = `<div class="section-sub">Aucune réservation pour le moment. Réserve un professionnel pour retrouver tes rendez-vous ici.</div>`;
-        return;
-      }
+  function renderAccount() {
+    const authUser = formatAuthUser(state.authUser || {});
+    const accountHeader = document.querySelector("#screen-account .account-header");
+    const blocks = document.querySelectorAll("#screen-account .setting-block");
 
-      card.innerHTML = state.bookings.map((booking) => {
-        const proName = booking?.professional?.displayName || booking?.professional?.name || booking?.provider?.name || 'Prestataire';
-        const serviceName = booking?.service?.name || booking?.title || 'Prestation';
-        const when = booking?.scheduledAt ? new Date(booking.scheduledAt).toLocaleString('fr-FR') : booking?.createdAt ? new Date(booking.createdAt).toLocaleString('fr-FR') : 'Date à confirmer';
-        const price = euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount);
-        const image = state.selectedPro?.image || assetForCategory(state.category);
-        return `
-          <div class="list-item">
-            <img src="${image}" alt="${proName}">
-            <div style="flex:1;">
-              <strong>${proName}</strong>
-              <p>${serviceName} • ${when} • ${price}</p>
-            </div>
-            <div class="avail">${booking?.status || 'Confirmé'}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderAccount() {
-      const authUser = formatAuthUser(state.authUser || {});
-      const accountHeader = document.querySelector('#screen-account .account-header');
+    if (!appApi.getToken()) {
       if (accountHeader) {
         accountHeader.innerHTML = `
-          <img class="account-avatar" src="${state.selectedPro?.image || 'assets/img/service-maquillage.jpg'}" alt="Profil utilisateur">
+          <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Invité">
           <div style="flex:1;">
-            <div class="account-name">${authUser.displayName}</div>
-            <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
+            <div class="account-name">${emptyState.accountGuest.title}</div>
+            <div class="account-role">${emptyState.accountGuest.text}</div>
           </div>
-          <span class="setting-chip">${state.notifications.length ? `${state.notifications.length} notif.` : 'Connecté'}</span>
+          <span class="setting-chip">Invité</span>
         `;
       }
-
-      const blocks = document.querySelectorAll('#screen-account .setting-block');
-      if (blocks[0]) {
-        blocks[0].innerHTML = `
-          <h4>Informations personnelles</h4>
-          <div class="setting-list">
-            <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span><span class="setting-chip">API</span></div>
-            <div class="setting-row"><span><strong>Rôles</strong><br>${(authUser.roles || []).join(', ') || 'CLIENT'}</span><span class="muted">Vérifié</span></div>
-          </div>
-        `;
-      }
-      if (blocks[1]) {
-        blocks[1].innerHTML = `
-          <h4>Réservations</h4>
-          <div class="setting-list">
-            <div class="setting-row"><span><strong>Réservations actives</strong><br>${state.bookings.length}</span><span class="setting-chip">Mes RDV</span></div>
-            <div class="setting-row"><span><strong>Mode favori</strong><br>${state.place}</span><span class="muted">Préférence</span></div>
-          </div>
-        `;
-      }
-      if (blocks[2]) {
-        blocks[2].innerHTML = `
-          <h4>Préférences</h4>
-          <div class="setting-list">
-            <div class="setting-row"><span><strong>Catégorie favorite</strong><br>${state.categories.find((c) => c.key === state.category)?.label || 'Beauté'}</span><span class="muted">Recherche</span></div>
-            <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? `${state.notifications.length} nouvelle(s)` : 'Aucune nouvelle notification'}</span><span class="setting-chip">Actif</span></div>
-          </div>
-        `;
-      }
-      if (blocks[3]) {
-        blocks[3].innerHTML = `
-          <h4>Paiement & sécurité</h4>
-          <div class="setting-list">
-            <div class="setting-row"><span><strong>Session</strong><br>${appApi.getToken() ? 'Connectée' : 'Déconnectée'}</span><span class="muted">JWT</span></div>
-            <div class="setting-row"><span><strong>Connexion</strong><br>Backend UBODROP synchronisé</span><span class="muted">Sécurisé</span></div>
-          </div>
-        `;
-      }
+      blocks.forEach((block, index) => {
+        block.innerHTML = index === 0
+          ? emptyCard("Compte non connecté", "Connecte-toi pour retrouver tes informations et tes réservations.", "Se connecter", "screen-login")
+          : emptyCard("Aucune donnée", "Ces informations apparaîtront après connexion.");
+      });
+      bindGo();
+      return;
     }
 
-    function renderProDashboard() {
-      const header = document.querySelector('#screen-pro-dashboard .pro-header-top');
-      if (header && state.authUser) {
-        const authUser = formatAuthUser(state.authUser);
+    if (accountHeader) {
+      accountHeader.innerHTML = `
+        <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Profil utilisateur">
+        <div style="flex:1;">
+          <div class="account-name">${authUser.displayName}</div>
+          <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
+        </div>
+        <span class="setting-chip">${state.notifications.length ? `${state.notifications.length} notif.` : "Connecté"}</span>
+      `;
+    }
+
+    if (blocks[0]) {
+      blocks[0].innerHTML = `
+        <h4>Informations personnelles</h4>
+        <div class="setting-list">
+          <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span><span class="setting-chip">API</span></div>
+          <div class="setting-row"><span><strong>Rôles</strong><br>${(authUser.roles || []).join(", ") || "CLIENT"}</span><span class="muted">Vérifié</span></div>
+        </div>
+      `;
+    }
+    if (blocks[1]) {
+      blocks[1].innerHTML = `
+        <h4>Réservations</h4>
+        <div class="setting-list">
+          <div class="setting-row"><span><strong>Réservations actives</strong><br>${state.bookings.length}</span><span class="setting-chip">Mes RDV</span></div>
+          <div class="setting-row"><span><strong>Mode favori</strong><br>${state.place}</span><span class="muted">Préférence</span></div>
+        </div>
+      `;
+    }
+    if (blocks[2]) {
+      blocks[2].innerHTML = `
+        <h4>Préférences</h4>
+        <div class="setting-list">
+          <div class="setting-row"><span><strong>Catégorie active</strong><br>${state.categories.find((c) => c.key === state.category)?.label || "Beauté"}</span><span class="muted">Recherche</span></div>
+          <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? `${state.notifications.length} nouvelle(s)` : "Aucune nouvelle notification"}</span><span class="setting-chip">Actif</span></div>
+        </div>
+      `;
+    }
+    if (blocks[3]) {
+      blocks[3].innerHTML = `
+        <h4>Paiement & sécurité</h4>
+        <div class="setting-list">
+          <div class="setting-row"><span><strong>Session</strong><br>Connectée</span><span class="muted">JWT</span></div>
+          <div class="setting-row"><span><strong>Connexion</strong><br>Backend UBODROP synchronisé</span><span class="muted">Sécurisé</span></div>
+        </div>
+      `;
+    }
+  }
+
+  function conversationTitle(conv) {
+    return conv?.title || conv?.professional?.name || conv?.client?.name || conv?.otherParticipantName || `Conversation ${String(conv?.id || "").slice(0, 6)}`;
+  }
+
+  function normalizeConversations(data) {
+    return extractArray(data).map((conv) => ({
+      id: conv?.id || conv?.conversationId,
+      title: conversationTitle(conv),
+      lastMessage: conv?.lastMessage?.content || conv?.lastMessage || conv?.latestMessage || "",
+      lastAt: conv?.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—",
+      raw: conv
+    }));
+  }
+
+  function renderConversations() {
+    const card = document.querySelector("#screen-pro-messages .list-card");
+    if (!card) return;
+
+    if (!appApi.getToken()) {
+      card.innerHTML = emptyCard(emptyState.accountGuest.title, emptyState.accountGuest.text, "Se connecter", "screen-login");
+      bindGo();
+      return;
+    }
+
+    if (!state.conversations.length) {
+      card.innerHTML = emptyCard(emptyState.messages.title, emptyState.messages.text);
+      return;
+    }
+
+    card.innerHTML = state.conversations.map((conv) => `
+      <div class="list-item" data-conversation-id="${conv.id}">
+        <img src="assets/img/ubo-drop-logo.png" alt="${conversationTitle(conv)}">
+        <div style="flex:1;">
+          <strong>${conversationTitle(conv)}</strong>
+          <p>${truncate(conv.lastMessage || "Ouvrir la conversation", 54)}</p>
+        </div>
+        <span class="muted">${conv.lastAt}</span>
+      </div>
+    `).join("");
+
+    card.querySelectorAll("[data-conversation-id]").forEach((item) => {
+      item.onclick = async () => {
+        state.currentConversationId = item.dataset.conversationId;
+        await loadMessages(state.currentConversationId);
+        goTo("screen-chat");
+      };
+    });
+  }
+
+  async function loadMessages(conversationId) {
+    try {
+      const data = await appApi.messages(conversationId);
+      renderChat(extractArray(data));
+    } catch (error) {
+      renderChat([], `Impossible de charger les messages : ${error.message}`);
+    }
+  }
+
+  function renderChat(messages, errorMessage = "") {
+    const body = document.querySelector("#screen-chat .chat-body");
+    const head = document.querySelector("#screen-chat .chat-head strong");
+    if (head) {
+      const current = state.conversations.find((conv) => conv.id === state.currentConversationId);
+      head.textContent = current ? conversationTitle(current) : "Conversation";
+    }
+    if (!body) return;
+
+    if (!appApi.getToken()) {
+      body.innerHTML = `<div class="bubble in">${emptyState.accountGuest.text}<small>Maintenant</small></div>`;
+      return;
+    }
+
+    if (errorMessage) {
+      body.innerHTML = `<div class="bubble in">${errorMessage}<small>Maintenant</small></div>`;
+      return;
+    }
+
+    if (!messages.length) {
+      body.innerHTML = `<div class="bubble in">${emptyState.messages.text}<small>Maintenant</small></div>`;
+      return;
+    }
+
+    body.innerHTML = messages.map((msg) => {
+      const isOut = Boolean(msg?.isMine || msg?.senderType === "CLIENT" || msg?.senderType === "PROFESSIONAL");
+      return `
+        <div class="bubble ${isOut ? "out" : "in"}">
+          ${msg?.content || "Message"}
+          <small>${msg?.createdAt ? new Date(msg.createdAt).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) : "—"}</small>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function renderProDashboard() {
+    const header = document.querySelector("#screen-pro-dashboard .pro-header-top");
+    const statCards = document.querySelectorAll("#screen-pro-dashboard .stat-card");
+    const cards = document.querySelectorAll("#screen-pro-dashboard .list-card");
+
+    if (state.userMode !== "pro" || !appApi.getToken()) {
+      if (header) {
         header.innerHTML = `
           <div style="display:flex; gap:12px; align-items:center;">
-            <img class="pro-avatar-lg" src="${state.selectedPro?.image || 'assets/img/service-barber.jpeg'}" alt="Pro">
+            <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
             <div>
-              <strong style="font-size:1.15rem;">Bonjour, ${authUser.displayName}</strong>
-              <div class="section-sub">${authUser.roleLabel} • ${authUser.email}</div>
+              <strong style="font-size:1.15rem;">${emptyState.proDashboard.title}</strong>
+              <div class="section-sub">${emptyState.proDashboard.text}</div>
             </div>
           </div>
-          <div class="online-chip">En ligne</div>
+          <div class="online-chip">En attente</div>
         `;
       }
-
-      const statCards = document.querySelectorAll('#screen-pro-dashboard .stat-card');
-      if (statCards.length >= 4) {
-        statCards[0].innerHTML = `<strong>${state.bookings.length}</strong><span>RDV synchronisés</span>`;
-        statCards[1].innerHTML = `<strong>${state.conversations.length}</strong><span>Conversations</span>`;
-        statCards[2].innerHTML = `<strong>${state.notifications.length}</strong><span>Notifications</span>`;
-        statCards[3].innerHTML = `<strong>${state.pros.length}</strong><span>Pros listés</span>`;
-      }
-
-      const cards = document.querySelectorAll('#screen-pro-dashboard .list-card');
-      const rdvCard = cards[0];
-      if (rdvCard) {
-        const body = state.bookings.length
-          ? state.bookings.slice(0, 3).map((booking) => `
-              <div class="agenda-item">
-                <div>
-                  <strong>${booking?.service?.name || 'Réservation'}</strong>
-                  <p>${booking?.status || 'Confirmé'}</p>
-                </div>
-                <strong>${euro(booking?.priceAmount ?? booking?.service?.priceAmount)}</strong>
-              </div>
-            `).join('')
-          : `<div class="agenda-item"><div><strong>Aucun RDV pour le moment</strong><p>Les nouvelles réservations apparaîtront ici.</p></div><strong>—</strong></div>`;
-        rdvCard.innerHTML = `
-          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Derniers RDV</strong></div><button class="sheet-link">Planning</button></div>
-          ${body}
-        `;
-      }
-
-      const msgCard = cards[1];
-      if (msgCard) {
-        const body = state.conversations.length
-          ? state.conversations.slice(0, 2).map((conv) => `
-              <div class="chat-preview" data-conversation-id="${conv.id}">
-                <div><strong>${conversationTitle(conv)}</strong><p>${truncate(conv.lastMessage || 'Conversation disponible', 54)}</p></div>
-                <span class="muted">${conv.lastAt || '—'}</span>
-              </div>
-            `).join('')
-          : `<div class="chat-preview"><div><strong>Aucune conversation</strong><p>Les messages clients apparaîtront ici.</p></div><span class="muted">—</span></div>`;
-        msgCard.innerHTML = `
-          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Messagerie</strong></div><button class="sheet-link" data-go="screen-pro-messages">Ouvrir</button></div>
-          ${body}
-        `;
-        bindGo();
-      }
-    }
-
-    function renderConversations() {
-      const card = document.querySelector('#screen-pro-messages .list-card');
-      if (!card) return;
-
-      if (!state.conversations.length) {
-        card.innerHTML = `<div class="section-sub">Aucune conversation disponible pour le moment.</div>`;
-        return;
-      }
-
-      card.innerHTML = state.conversations.map((conv) => `
-        <div class="list-item" data-conversation-id="${conv.id}">
-          <img src="${state.selectedPro?.image || 'assets/img/service-barber.jpeg'}" alt="${conversationTitle(conv)}">
-          <div style="flex:1;">
-            <strong>${conversationTitle(conv)}</strong>
-            <p>${truncate(conv.lastMessage || 'Ouvrir la conversation', 54)}</p>
-          </div>
-          <span class="muted">${conv.lastAt}</span>
-        </div>
-      `).join('');
-
-      card.querySelectorAll('[data-conversation-id]').forEach((item) => {
-        item.onclick = async () => {
-          state.currentConversationId = item.dataset.conversationId;
-          await loadMessages(state.currentConversationId);
-          goTo('screen-chat');
-        };
+      statCards.forEach((card) => {
+        card.innerHTML = `<strong>0</strong><span>Donnée indisponible</span>`;
       });
+      cards.forEach((card) => {
+        card.innerHTML = emptyCard("Aucune activité", "Les données professionnelles s'afficheront ici dès qu'un vrai compte pro sera actif.");
+      });
+      return;
     }
 
-    async function loadMessages(conversationId) {
-      try {
-        const data = await appApi.messages(conversationId);
-        renderChat(extractArray(data));
-      } catch (error) {
-        renderChat([], `Impossible de charger les messages : ${error.message}`);
-      }
+    const authUser = formatAuthUser(state.authUser);
+    if (header) {
+      header.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:center;">
+          <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
+          <div>
+            <strong style="font-size:1.15rem;">Bonjour, ${authUser.displayName}</strong>
+            <div class="section-sub">${authUser.roleLabel} • ${authUser.email}</div>
+          </div>
+        </div>
+        <div class="online-chip">En ligne</div>
+      `;
     }
 
-    function renderChat(messages, errorMessage = '') {
-      const body = document.querySelector('#screen-chat .chat-body');
-      const head = document.querySelector('#screen-chat .chat-head strong');
-      if (head) {
-        const current = state.conversations.find((conv) => conv.id === state.currentConversationId);
-        head.textContent = current ? conversationTitle(current) : (state.selectedPro?.name || 'Conversation');
-      }
-
-      if (!body) return;
-
-      if (errorMessage) {
-        body.innerHTML = `<div class="bubble in">${errorMessage}<small>Maintenant</small></div>`;
-        return;
-      }
-
-      if (!messages.length) {
-        body.innerHTML = `<div class="bubble in">Aucun message pour le moment.<small>Maintenant</small></div>`;
-        return;
-      }
-
-      body.innerHTML = messages.map((msg, index) => {
-        const isOut = index % 2 === 1;
-        const content = msg?.content || msg?.message || 'Message';
-        const at = msg?.createdAt ? new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—';
-        return `<div class="bubble ${isOut ? 'out' : 'in'}">${content}<small>${at}</small></div>`;
-      }).join('');
+    if (statCards.length >= 4) {
+      statCards[0].innerHTML = `<strong>${state.bookings.length}</strong><span>RDV synchronisés</span>`;
+      statCards[1].innerHTML = `<strong>${state.conversations.length}</strong><span>Conversations</span>`;
+      statCards[2].innerHTML = `<strong>${state.notifications.length}</strong><span>Notifications</span>`;
+      statCards[3].innerHTML = `<strong>${state.pros.length}</strong><span>Pros listés</span>`;
     }
 
-    async function hydrateSession() {
-      state.session = appApi.getSession();
-      if (!state.session?.accessToken) return;
-
-      try {
-        const me = await appApi.me();
-        state.authUser = me;
-        state.userMode = mapRoleToMode(me);
-      } catch (_) {
-        appApi.clearSession();
-        state.session = null;
-        state.authUser = null;
-        state.userMode = 'guest';
-      }
+    if (cards[0]) {
+      cards[0].innerHTML = state.bookings.length
+        ? state.bookings.slice(0, 3).map((booking) => `
+            <div class="agenda-item">
+              <div>
+                <strong>${booking?.service?.name || "Réservation"}</strong>
+                <p>${booking?.status || "Confirmé"}</p>
+              </div>
+              <strong>${euro(booking?.priceAmount ?? booking?.service?.priceAmount)}</strong>
+            </div>
+          `).join("")
+        : emptyCard("Aucun RDV", "Les nouvelles réservations apparaîtront ici.");
     }
 
-    async function loadCategories() {
-      try {
-        const data = await appApi.categories();
-        state.categories = normalizeCategories(data);
-      } catch (_) {
-        state.categories = [...fallbackCategories];
-      }
-      if (!state.categories.some((cat) => cat.key === state.category)) {
-        state.category = state.categories[0]?.key || 'coiffure';
-      }
-      renderFilterCategories();
+    if (cards[1]) {
+      cards[1].innerHTML = state.conversations.length
+        ? state.conversations.slice(0, 2).map((conv) => `
+            <div class="chat-preview" data-conversation-id="${conv.id}">
+              <div><strong>${conversationTitle(conv)}</strong><p>${truncate(conv.lastMessage || "Conversation disponible", 54)}</p></div>
+              <span class="muted">${conv.lastAt || "—"}</span>
+            </div>
+          `).join("")
+        : emptyCard("Aucun message", "Les messages clients apparaîtront ici.");
     }
+  }
 
-    async function loadPros() {
-      try {
-        const data = await appApi.searchProfessionals();
-        const normalized = normalizePros(data);
-        if (normalized.length) state.pros = normalized;
-      } catch (_) {
-        state.pros = [...fallbackPros];
-      }
-      if (!state.selectedPro) state.selectedPro = state.pros[0];
-      renderPros();
-    }
-
-    async function loadBookings() {
-      if (!appApi.getToken()) {
-        state.bookings = [];
-        renderBookings();
-        return;
-      }
-      try {
-        const [current, history] = await Promise.allSettled([appApi.myBookings(), appApi.bookingHistory()]);
-        const bookings = [];
-        if (current.status === 'fulfilled') bookings.push(...extractArray(current.value));
-        if (history.status === 'fulfilled') bookings.push(...extractArray(history.value));
-        state.bookings = bookings.filter((item, index, arr) => arr.findIndex((b) => String(b?.id) === String(item?.id)) === index);
-      } catch (_) {
-        state.bookings = [];
-      }
-      renderBookings();
-    }
-
-    async function loadNotifications() {
-      if (!appApi.getToken()) {
-        state.notifications = [];
-        renderAccount();
-        return;
-      }
-      try {
-        const data = await appApi.notifications();
-        state.notifications = extractArray(data);
-      } catch (_) {
-        state.notifications = [];
-      }
-      renderAccount();
-    }
-
-    async function loadConversations() {
-      if (!appApi.getToken()) {
-        state.conversations = [];
-        renderConversations();
-        return;
-      }
-      try {
-        const data = await appApi.conversations();
-        state.conversations = normalizeConversations(data);
-      } catch (_) {
-        state.conversations = [];
-      }
-      renderConversations();
-      renderProDashboard();
-    }
-
-    async function handleAuthSuccess(authResponse) {
-      appApi.saveSession(authResponse);
-      state.session = authResponse;
+  async function hydrateSession() {
+    state.session = appApi.getSession();
+    if (!state.session?.accessToken) return;
+    try {
       const me = await appApi.me();
       state.authUser = me;
       state.userMode = mapRoleToMode(me);
-      await Promise.all([loadBookings(), loadNotifications(), loadConversations()]);
+    } catch (_) {
+      appApi.clearSession();
+      state.session = null;
+      state.authUser = null;
+      state.userMode = "guest";
+    }
+  }
+
+  async function loadCategories() {
+    try {
+      state.categories = normalizeCategories(await appApi.categories());
+    } catch (_) {
+      state.categories = [...categoriesFallback];
+    }
+    if (!state.categories.some((cat) => cat.key === state.category)) {
+      state.category = state.categories[0]?.key || "coiffure";
+    }
+    renderFilterCategories();
+  }
+
+  async function loadPros() {
+    try {
+      state.pros = normalizePros(await appApi.searchProfessionals());
+    } catch (_) {
+      state.pros = [];
+    }
+    if (!state.pros.length) state.selectedPro = null;
+    renderPros();
+  }
+
+  async function loadBookings() {
+    if (!appApi.getToken()) {
+      state.bookings = [];
+      renderBookings();
+      return;
+    }
+    try {
+      const [current, history] = await Promise.allSettled([appApi.myBookings(), appApi.bookingHistory()]);
+      const bookings = [];
+      if (current.status === "fulfilled") bookings.push(...extractArray(current.value));
+      if (history.status === "fulfilled") bookings.push(...extractArray(history.value));
+      state.bookings = bookings.filter((item, index, arr) => arr.findIndex((b) => String(b?.id) === String(item?.id)) === index);
+    } catch (_) {
+      state.bookings = [];
+    }
+    renderBookings();
+  }
+
+  async function loadNotifications() {
+    if (!appApi.getToken()) {
+      state.notifications = [];
       renderAccount();
-      renderProDashboard();
-      goTo(state.userMode === 'pro' ? 'screen-pro-dashboard' : 'screen-account');
+      return;
     }
-
-    async function handleLogin() {
-      const inputs = document.querySelectorAll('#screen-login .field input');
-      const email = inputs[0]?.value.trim() || '';
-      const password = inputs[1]?.value || '';
-      if (!email || !password) {
-        notify('Renseigne ton email et ton mot de passe.');
-        return;
-      }
-      try {
-        const authResponse = await appApi.login(email, password);
-        await handleAuthSuccess(authResponse);
-      } catch (error) {
-        notify(`Connexion impossible : ${error.message}`);
-      }
+    try {
+      state.notifications = extractArray(await appApi.notifications());
+    } catch (_) {
+      state.notifications = [];
     }
+    renderAccount();
+  }
 
-    async function handleRegisterClient() {
-      const inputs = document.querySelectorAll('#screen-register-client .field input');
-      const email = inputs[2]?.value.trim() || '';
-      const password = inputs[4]?.value || '';
-      if (!email || !password) {
-        notify('Email et mot de passe obligatoires.');
-        return;
-      }
-      try {
-        const authResponse = await appApi.registerClient(email, password);
-        await handleAuthSuccess(authResponse);
-      } catch (error) {
-        notify(`Inscription client impossible : ${error.message}`);
-      }
+  async function loadConversations() {
+    if (!appApi.getToken()) {
+      state.conversations = [];
+      renderConversations();
+      return;
     }
-
-    async function handleRegisterProfessional() {
-      const inputs = document.querySelectorAll('#screen-register-pro .field input');
-      const email = inputs[2]?.value.trim() || '';
-      const password = prompt('Choisis un mot de passe pour ton compte professionnel :', 'Pro123456!') || '';
-      if (!email || !password) {
-        notify('Email et mot de passe obligatoires.');
-        return;
-      }
-      try {
-        const authResponse = await appApi.registerProfessional(email, password);
-        await handleAuthSuccess(authResponse);
-      } catch (error) {
-        notify(`Inscription pro impossible : ${error.message}`);
-      }
+    try {
+      state.conversations = normalizeConversations(await appApi.conversations());
+    } catch (_) {
+      state.conversations = [];
     }
+    renderConversations();
+    renderProDashboard();
+  }
 
-    async function handleReserveClick() {
-      if (!appApi.getToken()) {
-        notify('Connecte-toi pour continuer.');
-        goTo('screen-login');
-        return;
-      }
-      const pro = state.selectedPro || state.pros[0];
-      notify(`Prestataire sélectionné : ${pro.name}. Les réservations actives apparaîtront dans l’écran RDV.`);
-      await loadBookings();
-      goTo('screen-rdv');
+  async function handleAuthSuccess(authResponse) {
+    appApi.saveSession(authResponse);
+    state.session = authResponse;
+    state.authUser = await appApi.me();
+    state.userMode = mapRoleToMode(state.authUser);
+    await Promise.all([loadBookings(), loadNotifications(), loadConversations()]);
+    renderAccount();
+    renderProDashboard();
+    goTo(state.userMode === "pro" ? "screen-pro-dashboard" : "screen-account");
+  }
+
+  async function handleLogin() {
+    const inputs = document.querySelectorAll("#screen-login .field input");
+    const email = inputs[0]?.value.trim() || "";
+    const password = inputs[1]?.value || "";
+    if (!email || !password) {
+      notify("Renseigne ton email et ton mot de passe.");
+      return;
     }
-
-    async function handleSendMessage() {
-      const input = document.querySelector('#screen-chat .chat-input input');
-      const content = input?.value.trim() || '';
-      if (!content) return;
-      if (!state.currentConversationId) {
-        notify('Aucune conversation ouverte.');
-        return;
-      }
-      try {
-        await appApi.sendMessage(state.currentConversationId, content);
-        input.value = '';
-        await loadMessages(state.currentConversationId);
-        await loadConversations();
-      } catch (error) {
-        notify(`Envoi impossible : ${error.message}`);
-      }
+    try {
+      await handleAuthSuccess(await appApi.login(email, password));
+    } catch (error) {
+      notify(`Connexion impossible : ${error.message}`);
     }
+  }
 
-    document.getElementById('filterBtn').onclick = () => toggleFilter(true);
-    document.getElementById('applyFilters').onclick = () => toggleFilter(false);
-    document.getElementById('resetFilters').onclick = () => {
-      state.category = state.categories[0]?.key || 'coiffure';
-      state.place = 'À domicile';
-      renderFilterCategories();
-      renderPlaceChips();
-      renderPros();
-    };
-    document.getElementById('filterOverlay').addEventListener('click', (e) => {
-      if (e.target.id === 'filterOverlay') toggleFilter(false);
-    });
+  async function handleRegisterClient() {
+    const inputs = document.querySelectorAll("#screen-register-client .field input");
+    const email = inputs[2]?.value.trim() || "";
+    const password = inputs[4]?.value || "";
+    if (!email || !password) {
+      notify("Email et mot de passe obligatoires.");
+      return;
+    }
+    try {
+      await handleAuthSuccess(await appApi.registerClient(email, password));
+    } catch (error) {
+      notify(`Inscription client impossible : ${error.message}`);
+    }
+  }
 
-    document.getElementById('sheetHandle').onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
-    document.getElementById('sheetCycle').onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
+  async function handleRegisterProfessional() {
+    const inputs = document.querySelectorAll("#screen-register-pro .field input");
+    const email = inputs[2]?.value.trim() || "";
+    const password = prompt("Choisis un mot de passe pour ton compte professionnel :", "Pro123456!") || "";
+    if (!email || !password) {
+      notify("Email et mot de passe obligatoires.");
+      return;
+    }
+    try {
+      await handleAuthSuccess(await appApi.registerProfessional(email, password));
+    } catch (error) {
+      notify(`Inscription pro impossible : ${error.message}`);
+    }
+  }
 
-    (function initBottomSheetDrag() {
-      const sheet = document.getElementById('bottomSheet');
-      const handle = document.getElementById('sheetHandle');
-      const header = sheet.querySelector('.sheet-header');
-      const dragTargets = [handle, header];
-      const stateHeights = [72, 168, 292, 458];
-      let startY = 0;
-      let startH = 0;
-      let dragging = false;
+  async function handleReserveClick() {
+    if (!appApi.getToken()) {
+      notify("Connecte-toi pour continuer.");
+      goTo("screen-login");
+      return;
+    }
+    if (!state.selectedPro) {
+      notify("Aucun professionnel disponible pour le moment.");
+      return;
+    }
+    notify(`Prestataire sélectionné : ${state.selectedPro.name}. L'intégration complète de réservation peut maintenant être branchée sur le endpoint booking précis.`);
+    await loadBookings();
+    goTo("screen-rdv");
+  }
 
-      const getY = (e) => ('touches' in e ? e.touches[0].clientY : e.clientY);
-
-      const start = (e) => {
-        dragging = true;
-        startY = getY(e);
-        startH = sheet.getBoundingClientRect().height;
-        sheet.classList.add('dragging');
-        e.preventDefault();
-      };
-      const move = (e) => {
-        if (!dragging) return;
-        const delta = startY - getY(e);
-        const next = Math.max(56, Math.min(458, startH + delta));
-        sheet.style.height = next + 'px';
-      };
-      const end = () => {
-        if (!dragging) return;
-        dragging = false;
-        sheet.classList.remove('dragging');
-        const current = sheet.getBoundingClientRect().height;
-        let nearest = 0;
-        let nearestDiff = Infinity;
-        stateHeights.forEach((h, idx) => {
-          const diff = Math.abs(current - h);
-          if (diff < nearestDiff) {
-            nearestDiff = diff;
-            nearest = idx;
-          }
-        });
-        sheet.style.height = '';
-        setSheetState(nearest);
-      };
-
-      dragTargets.forEach((target) => {
-        target.addEventListener('mousedown', start);
-        target.addEventListener('touchstart', start, { passive: false });
-      });
-      window.addEventListener('mousemove', move, { passive: true });
-      window.addEventListener('touchmove', move, { passive: true });
-      window.addEventListener('mouseup', end);
-      window.addEventListener('touchend', end);
-      window.addEventListener('touchcancel', end);
-    })();
-
-    document.getElementById('detailCta').onclick = handleReserveClick;
-    document.getElementById('loginClientBtn').onclick = handleLogin;
-    document.getElementById('loginProBtn').onclick = handleLogin;
-    document.getElementById('registerClientBtn').onclick = handleRegisterClient;
-    document.getElementById('registerProBtn').onclick = handleRegisterProfessional;
-    document.querySelector('#screen-chat .send-btn').onclick = handleSendMessage;
-
-    async function initApp() {
-      bindGo();
-      renderPlaceChips();
-      setSheetState(1);
-      renderNav('screen-home');
-
-      await hydrateSession();
-      await loadCategories();
-      await loadPros();
-      await loadBookings();
-      await loadNotifications();
+  async function handleSendMessage() {
+    const input = document.querySelector("#screen-chat .chat-input input");
+    const content = input?.value.trim() || "";
+    if (!content) return;
+    if (!state.currentConversationId) {
+      notify("Aucune conversation ouverte.");
+      return;
+    }
+    try {
+      await appApi.sendMessage(state.currentConversationId, content);
+      input.value = "";
+      await loadMessages(state.currentConversationId);
       await loadConversations();
-
-      renderAccount();
-      renderProDashboard();
-      bindOpenPro();
-
-      if (state.session?.accessToken) {
-        goTo(state.userMode === 'pro' ? 'screen-pro-dashboard' : 'screen-search');
-      }
+    } catch (error) {
+      notify(`Envoi impossible : ${error.message}`);
     }
+  }
 
-    initApp();
-  </script>
+  document.getElementById("filterBtn").onclick = () => toggleFilter(true);
+  document.getElementById("applyFilters").onclick = () => toggleFilter(false);
+  document.getElementById("resetFilters").onclick = () => {
+    state.category = state.categories[0]?.key || "coiffure";
+    state.place = "À domicile";
+    renderFilterCategories();
+    renderPlaceChips();
+    renderPros();
+  };
+  document.getElementById("filterOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "filterOverlay") toggleFilter(false);
+  });
+
+  document.getElementById("sheetHandle").onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
+  document.getElementById("sheetCycle").onclick = () => setSheetState(state.sheetState >= 3 ? 1 : state.sheetState + 1);
+
+  (function initBottomSheetDrag() {
+    const sheet = document.getElementById("bottomSheet");
+    const handle = document.getElementById("sheetHandle");
+    const header = sheet.querySelector(".sheet-header");
+    const dragTargets = [handle, header];
+    const stateHeights = [72, 168, 292, 458];
+    let startY = 0;
+    let startH = 0;
+    let dragging = false;
+
+    const getY = (e) => ("touches" in e ? e.touches[0].clientY : e.clientY);
+
+    const start = (e) => {
+      dragging = true;
+      startY = getY(e);
+      startH = sheet.getBoundingClientRect().height;
+      sheet.classList.add("dragging");
+      e.preventDefault();
+    };
+    const move = (e) => {
+      if (!dragging) return;
+      const delta = startY - getY(e);
+      const next = Math.max(56, Math.min(458, startH + delta));
+      sheet.style.height = next + "px";
+    };
+    const end = () => {
+      if (!dragging) return;
+      dragging = false;
+      sheet.classList.remove("dragging");
+      const current = sheet.getBoundingClientRect().height;
+      let nearest = 0;
+      let nearestDiff = Infinity;
+      stateHeights.forEach((h, idx) => {
+        const diff = Math.abs(current - h);
+        if (diff < nearestDiff) { nearestDiff = diff; nearest = idx; }
+      });
+      sheet.style.height = "";
+      setSheetState(nearest);
+    };
+
+    dragTargets.forEach(target => {
+      target.addEventListener("mousedown", start);
+      target.addEventListener("touchstart", start, { passive: false });
+    });
+    window.addEventListener("mousemove", move, { passive: true });
+    window.addEventListener("touchmove", move, { passive: true });
+    window.addEventListener("mouseup", end);
+    window.addEventListener("touchend", end);
+    window.addEventListener("touchcancel", end);
+  })();
+
+  document.getElementById("detailCta").onclick = handleReserveClick;
+  document.getElementById("loginClientBtn").onclick = handleLogin;
+  document.getElementById("loginProBtn").onclick = handleLogin;
+  document.getElementById("registerClientBtn").onclick = handleRegisterClient;
+  document.getElementById("registerProBtn").onclick = handleRegisterProfessional;
+  document.querySelector("#screen-chat .send-btn").onclick = handleSendMessage;
+  document.querySelector(".map-position-btn").onclick = centerOnUser;
+
+  (async function initApp() {
+    bindGo();
+    renderPlaceChips();
+    setSheetState(1);
+    renderNav("screen-home");
+    renderFavorites();
+
+    await hydrateSession();
+    await loadCategories();
+    await loadPros();
+    await loadBookings();
+    await loadNotifications();
+    await loadConversations();
+
+    renderAccount();
+    renderProDashboard();
+    bindOpenPro();
+    await initGoogleMap();
+
+    if (state.session?.accessToken) {
+      goTo(state.userMode === "pro" ? "screen-pro-dashboard" : "screen-search");
+    }
+  })();
+</script>
 
 </body>
 </html>

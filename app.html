@@ -885,12 +885,10 @@
         <div class="account-name">Compte invité</div>
         <div class="account-role">Connecte-toi pour afficher tes données réelles.</div>
       </div>
-      <span class="setting-chip">Invité</span>
     </div>
   </div>
 
   <div class="settings-grid">
-    <div class="setting-block"></div>
     <div class="setting-block"></div>
     <div class="setting-block"></div>
     <div class="setting-block"></div>
@@ -1533,7 +1531,7 @@ function syncGoogleUiVisibility(screenId) {
       }
       const script = document.createElement("script");
       script.id = "googleMapsScript";
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
       script.async = true;
       script.defer = true;
       script.onload = resolve;
@@ -1761,7 +1759,6 @@ function syncGoogleUiVisibility(screenId) {
             <div class="account-name">${emptyState.accountGuest.title}</div>
             <div class="account-role">${emptyState.accountGuest.text}</div>
           </div>
-          <span class="setting-chip">Invité</span>
         `;
       }
       blocks.forEach((block, index) => {
@@ -1780,7 +1777,6 @@ function syncGoogleUiVisibility(screenId) {
           <div class="account-name">${authUser.displayName}</div>
           <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
         </div>
-        <span class="setting-chip">${state.notifications.length ? `${state.notifications.length} notif.` : "Connecté"}</span>
       `;
     }
 
@@ -1788,7 +1784,7 @@ function syncGoogleUiVisibility(screenId) {
       blocks[0].innerHTML = `
         <h4>Informations personnelles</h4>
         <div class="setting-list">
-          <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span><span class="setting-chip">API</span></div>
+          <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span></div>
           <div class="setting-row"><span><strong>Rôles</strong><br>${(authUser.roles || []).join(", ") || "CLIENT"}</span><span class="muted">Vérifié</span></div>
         </div>
       `;
@@ -1808,15 +1804,6 @@ function syncGoogleUiVisibility(screenId) {
         <div class="setting-list">
           <div class="setting-row"><span><strong>Catégorie active</strong><br>${state.categories.find((c) => c.key === state.category)?.label || "Beauté"}</span><span class="muted">Recherche</span></div>
           <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? `${state.notifications.length} nouvelle(s)` : "Aucune nouvelle notification"}</span><span class="setting-chip">Actif</span></div>
-        </div>
-      `;
-    }
-    if (blocks[3]) {
-      blocks[3].innerHTML = `
-        <h4>Paiement & sécurité</h4>
-        <div class="setting-list">
-          <div class="setting-row"><span><strong>Session</strong><br>Connectée</span><span class="muted">JWT</span></div>
-          <div class="setting-row"><span><strong>Connexion</strong><br>Backend UBODROP synchronisé</span><span class="muted">Sécurisé</span></div>
         </div>
       `;
     }

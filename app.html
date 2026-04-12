@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UBODROP — App premium V3</title>
+  <title>UBODROP</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -587,6 +587,29 @@
     .stack-16 > * + * { margin-top: 16px; }
     .stack-18 > * + * { margin-top: 18px; }
 
+
+    .map-stage .gm-style,
+    .map-stage .gm-style div,
+    .map-stage .gm-style canvas,
+    .map-stage .gm-style iframe {
+      border-radius: inherit;
+    }
+    .map-stage.search-disabled .gm-style,
+    .map-stage.search-disabled #googleMapCanvas {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .pac-container {
+      z-index: 9999 !important;
+      border-radius: 18px !important;
+      border: 1px solid rgba(117, 92, 147, .14) !important;
+      box-shadow: 0 20px 40px rgba(40, 21, 61, .12) !important;
+      overflow: hidden !important;
+      font-family: "Montserrat", sans-serif !important;
+    }
+    .pac-item { padding: 10px 14px !important; font-size: 13px !important; }
+    .pac-logo:after { display: none !important; }
+
     @media (max-width: 768px) {
       html, body {
         width: 100%;
@@ -671,16 +694,11 @@
           </div>
 
           <div class="card proof-card">
-            <div class="proof-line">⭐ <span>4.8 — +500 clients satisfaits</span></div>
-            <div class="proof-sub">3 pros disponibles près de toi</div>
-            <div class="mini-avatars">
-              <img src="assets/img/pro-estheticienne.jpg" alt="Nora — Esthétique">
-              <img src="assets/img/milton-barber.jpeg" alt="Milton — Barbier">
-              <img src="assets/img/pro-manucure.jpg" alt="Luna — Manucure">
-            </div>
-          </div>
+  <div class="proof-line">✨ <span>Ouverture progressive</span></div>
+  <div class="proof-sub">Les premiers prestataires arrivent bientôt sur UBODROP. Aucune donnée fictive n’est affichée en production.</div>
+</div>
 
-          <div class="mt-20">
+<div class="mt-20">
             <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client">Créer un compte</button>
           </div>
           <div class="inline-note mt-16">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
@@ -702,36 +720,13 @@
             <div class="map-floating">
               <div class="searchbar compact" style="flex:1;">
                 <span>⌕</span>
-                <input value="Paris 11e, 75011" aria-label="Recherche" />
+                <input value="" placeholder="Indiquez un lieu" aria-label="Recherche" />
                 <span style="color:#bbb2c2;">›</span>
               </div>
             </div>
             <div class="place-row" id="placeRow"></div>
           </div>
-
-          <div class="map-user-dot"></div>
-          <button class="map-position-btn">📍 Ma position</button>
-
-          <div class="map-pin" style="left:21%; top:32%;" data-open-pro="Nora Skin">
-            <div class="map-bubble"><img src="assets/img/pro-estheticienne.jpg" alt="Nora Skin"></div>
-            <div class="map-tag">⭐ 4.9</div>
-          </div>
-          <div class="map-pin" style="left:61%; top:24%;" data-open-pro="Milton">
-            <div class="map-bubble"><img src="assets/img/milton-barber.jpeg" alt="Milton"></div>
-            <div class="map-tag">⭐ 4.8</div>
-          </div>
-          <div class="map-pin" style="left:74%; top:38%;" data-open-pro="Kingbrel">
-            <div class="map-bubble"><img src="assets/img/kingbrel-barber.jpeg" alt="Kingbrel"></div>
-            <div class="map-tag">⭐ 5.0</div>
-          </div>
-          <div class="map-pin" style="left:34%; top:55%;" data-open-pro="Maya Make Up">
-            <div class="map-bubble"><img src="assets/img/pro-maquillage.jpg" alt="Maya Make Up"></div>
-            <div class="map-tag">⭐ 4.9</div>
-          </div>
-          <div class="map-pin" style="left:79%; top:56%;" data-open-pro="Luna Nails">
-            <div class="map-bubble"><img src="assets/img/pro-manucure.jpg" alt="Luna Nails"></div>
-            <div class="map-tag">⭐ 4.8</div>
-          </div>
+          <button class="map-position-btn" id="mapPositionBtn">📍 Ma position</button>
 
           <div class="bottom-sheet sheet-state-1" id="bottomSheet">
             <button class="sheet-handle" id="sheetHandle" aria-label="Déplier"></button>
@@ -762,9 +757,9 @@
         <div class="card detail-card">
           <div class="detail-head">
             <div>
-              <h1 id="detailName">Sarah Coiffure</h1>
+              <h1 id="detailName">Professionnel UBODROP</h1>
               <div class="detail-meta" id="detailMeta"></div>
-              <div class="section-sub mt-12" id="detailDesc">12 ans d'expérience • Spécialiste balayage</div>
+              <div class="section-sub mt-12" id="detailDesc">Les informations détaillées apparaîtront ici dès qu’un professionnel réel sera disponible.</div>
             </div>
             <div class="badge" id="detailPrice">à partir de 35€</div>
           </div>
@@ -780,7 +775,7 @@
         </div>
 
         <div class="sticky-cta">
-          <button class="primary-btn" id="detailCta">Réserver Sarah</button>
+          <button class="primary-btn" id="detailCta">Se connecter pour réserver</button>
         </div>
       </section>
 
@@ -806,10 +801,10 @@
           <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
           <div class="auth-title">Créer un compte</div>
           <div class="auth-sub">Rejoins UBODROP en quelques secondes pour réserver un barber, une coiffeuse ou un pro beauté près de toi.</div>
-          <div class="field"><label>Prénom</label><input type="text" placeholder="Damien"></div>
-          <div class="field"><label>Nom</label><input type="text" placeholder="Miyouna"></div>
+          <div class="field"><label>Prénom</label><input type="text" placeholder="Prénom"></div>
+          <div class="field"><label>Nom</label><input type="text" placeholder="Nom"></div>
           <div class="field"><label>Email</label><input type="email" placeholder="nom@email.com"></div>
-          <div class="field"><label>Téléphone</label><input type="tel" placeholder="06 00 00 00 00"></div>
+          <div class="field"><label>Téléphone</label><input type="tel" placeholder="06 XX XX XX XX"></div>
           <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
           <div class="mt-20"><button class="primary-btn" id="registerClientBtn">Créer mon compte</button></div>
           <div class="inline-note">Tu es un pro ? <button class="switch-link" data-go="screen-register-pro">Créer un compte professionnel</button></div>
@@ -821,7 +816,7 @@
         <div class="card auth-panel mt-16">
           <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
           <div class="auth-title">Devenir pro</div>
-          <div class="auth-sub">Récupération de la logique dashboard pro de l’ancienne version, redesignée avec la direction artistique premium de la V3.</div>
+          <div class="auth-sub">Prépare ton arrivée sur UBODROP et active ton espace professionnel dès l’ouverture des inscriptions réelles.</div>
           <div class="field"><label>Prénom</label><input type="text" placeholder="Karim"></div>
           <div class="field"><label>Nom</label><input type="text" placeholder="Benali"></div>
           <div class="field"><label>Email</label><input type="email" placeholder="pro@email.com"></div>
@@ -861,183 +856,109 @@
       </section>
 
       <section class="screen" id="screen-favs">
-        <div class="screen-topbar">
-          <button class="icon-btn" data-go="screen-search">‹</button>
-          <div class="title-wrap">
-            <h2>Mes favoris</h2>
-            <p>Tes prestataires préférés pour réserver plus vite.</p>
-          </div>
-        </div>
-        <div class="card list-card">
-          <div class="list-item">
-            <img src="assets/img/service-manucure.jpg" alt="Nail Queen">
-            <div style="flex:1;">
-              <strong>Luna Nails</strong>
-              <p>Onglerie • Semi • Nail art • ★ 4.8</p>
-            </div>
-            <button class="tiny-btn" data-open-pro="Luna Nails">Réserver</button>
-          </div>
-          <div class="list-item">
-            <img src="assets/img/service-maquillage.jpg" alt="Maya">
-            <div style="flex:1;">
-              <strong>Maya Make Up</strong>
-              <p>Glow skin • Événementiel • ★ 4.7</p>
-            </div>
-            <button class="tiny-btn" data-open-pro="Maya Make Up">Voir</button>
-          </div>
-        </div>
-      </section>
+  <div class="screen-topbar">
+    <button class="icon-btn" data-go="screen-search">‹</button>
+    <div class="title-wrap">
+      <h2>Mes favoris</h2>
+      <p>Retrouve ici les professionnels que tu ajouteras plus tard à tes favoris.</p>
+    </div>
+  </div>
+  <div class="card list-card">
+    <div class="section-sub">Aucun favori pour le moment.</div>
+  </div>
+</section>
 
 
       <section class="screen" id="screen-account">
-        <div class="screen-topbar">
-          <button class="icon-btn" data-go="screen-search">‹</button>
-          <div class="title-wrap">
-            <h2>Compte & réglages</h2>
-            <p>Toutes les informations utiles regroupées sur une seule page.</p>
-          </div>
-        </div>
+  <div class="screen-topbar">
+    <button class="icon-btn" data-go="screen-search">‹</button>
+    <div class="title-wrap">
+      <h2>Compte & réglages</h2>
+      <p>Retrouve ici ton profil, tes préférences et l’état de ta session.</p>
+    </div>
+  </div>
 
-        <div class="card list-card">
-          <div class="account-header">
-            <img class="account-avatar" src="assets/img/service-maquillage.jpg" alt="Profil client">
-            <div style="flex:1;">
-              <div class="account-name">Damien M.</div>
-              <div class="account-role">Compte client premium • Paris 11e</div>
-            </div>
-            <span class="setting-chip">Vérifié</span>
-          </div>
-        </div>
+  <div class="card list-card">
+    <div class="account-header">
+      <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Invité">
+      <div style="flex:1;">
+        <div class="account-name">Compte invité</div>
+        <div class="account-role">Connecte-toi pour afficher tes données réelles.</div>
+      </div>
+      <span class="setting-chip">Invité</span>
+    </div>
+  </div>
 
-        <div class="settings-grid">
-          <div class="setting-block">
-            <h4>Informations personnelles</h4>
-            <div class="setting-list">
-              <div class="setting-row"><span><strong>Nom</strong><br>Damien Miyouna</span><span class="muted">Modifier</span></div>
-              <div class="setting-row"><span><strong>Email</strong><br>damien@email.com</span><span class="muted">Modifier</span></div>
-              <div class="setting-row"><span><strong>Téléphone</strong><br>06 00 00 00 00</span><span class="muted">Modifier</span></div>
-            </div>
-          </div>
-
-          <div class="setting-block">
-            <h4>Adresse & lieu de prestation</h4>
-            <div class="setting-list">
-              <div class="setting-row"><span><strong>Adresse principale</strong><br>Paris 11e</span><span class="setting-chip">À domicile</span></div>
-              <div class="setting-row"><span><strong>Mode favori</strong><br>Chez le pro ou à domicile</span><span class="muted">Choisir</span></div>
-            </div>
-          </div>
-
-          <div class="setting-block">
-            <h4>Préférences</h4>
-            <div class="setting-list">
-              <div class="setting-row"><span><strong>Services favoris</strong><br>Coiffure, manucure, maquillage</span><span class="muted">Gérer</span></div>
-              <div class="setting-row"><span><strong>Notifications</strong><br>Rappels de réservation activés</span><span class="setting-chip">Actif</span></div>
-            </div>
-          </div>
-
-          <div class="setting-block">
-            <h4>Paiement & sécurité</h4>
-            <div class="setting-list">
-              <div class="setting-row"><span><strong>Moyen de paiement</strong><br>Visa •••• 2048</span><span class="muted">Modifier</span></div>
-              <div class="setting-row"><span><strong>Connexion</strong><br>Face ID + mot de passe</span><span class="muted">Sécurisé</span></div>
-            </div>
-          </div>
-        </div>
-      </section>
+  <div class="settings-grid">
+    <div class="setting-block"></div>
+    <div class="setting-block"></div>
+    <div class="setting-block"></div>
+    <div class="setting-block"></div>
+  </div>
+</section>
 
       <section class="screen" id="screen-pro-dashboard">
-        <div class="screen-topbar">
-          <button class="icon-btn" data-go="screen-search">‹</button>
-          <div class="title-wrap">
-            <h2>Dashboard pro</h2>
-            <p>Planning, réservations, revenus et disponibilité.</p>
-          </div>
-        </div>
+  <div class="screen-topbar">
+    <button class="icon-btn" data-go="screen-search">‹</button>
+    <div class="title-wrap">
+      <h2>Dashboard pro</h2>
+      <p>Planning, réservations, revenus et disponibilité.</p>
+    </div>
+  </div>
 
-        <div class="card pro-header-card">
-          <div class="pro-header-top">
-            <div style="display:flex; gap:12px; align-items:center;">
-              <img class="pro-avatar-lg" src="assets/img/service-barber.jpeg" alt="Karim">
-              <div>
-                <strong style="font-size:1.15rem;">Bonjour, Karim</strong>
-                <div class="section-sub">Barber certifié • Paris 11e</div>
-              </div>
-            </div>
-            <div class="online-chip">En ligne</div>
-          </div>
-          <div class="stats-grid">
-            <div class="soft-card stat-card"><strong>47</strong><span>RDV ce mois</span></div>
-            <div class="soft-card stat-card"><strong>1 240 €</strong><span>Revenus ce mois</span></div>
-            <div class="soft-card stat-card"><strong>185 €</strong><span>Aujourd’hui</span></div>
-            <div class="soft-card stat-card"><strong>4.9 ★</strong><span>Note moyenne</span></div>
-          </div>
+  <div class="card pro-header-card">
+    <div class="pro-header-top">
+      <div style="display:flex; gap:12px; align-items:center;">
+        <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Espace pro">
+        <div>
+          <strong style="font-size:1.15rem;">Espace pro indisponible</strong>
+          <div class="section-sub">Aucun professionnel réel n’est encore connecté à la plateforme.</div>
         </div>
+      </div>
+      <div class="online-chip">En attente</div>
+    </div>
+    <div class="stats-grid">
+      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
+      <div class="soft-card stat-card"><strong>0 €</strong><span>Donnée indisponible</span></div>
+      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
+      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
+    </div>
+  </div>
 
-        <div class="card list-card mt-16">
-          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Derniers RDV</strong></div><button class="sheet-link">Planning</button></div>
-          <div class="agenda-item"><div><strong>14:30 — Lucas M.</strong><p>Fade + Barbe • Confirmé</p></div><strong>35 €</strong></div>
-          <div class="agenda-item"><div><strong>16:00 — Thomas R.</strong><p>Coupe complète • Confirmé</p></div><strong>25 €</strong></div>
-          <div class="agenda-item"><div><strong>18:00 — Youssef K.</strong><p>Barbe premium • En attente</p></div><strong>20 €</strong></div>
-        </div>
-
-        <div class="card list-card mt-16">
-          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Messagerie</strong></div><button class="sheet-link" data-go="screen-pro-messages">Ouvrir</button></div>
-          <div class="chat-preview"><div><strong>Lucas M.</strong><p>J’ai bien reçu votre réservation pour 14h30.</p></div><span class="muted">14:07</span></div>
-          <div class="chat-preview"><div><strong>Thomas R.</strong><p>Je confirme la prestation chez le pro.</p></div><span class="muted">12:30</span></div>
-        </div>
-      </section>
+  <div class="card list-card mt-16"></div>
+  <div class="card list-card mt-16"></div>
+</section>
 
       <section class="screen" id="screen-pro-messages">
-        <div class="screen-topbar">
-          <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
-          <div class="title-wrap">
-            <h2>Messages</h2>
-            <p>Uniquement les clients ayant payé la prestation.</p>
-          </div>
-        </div>
-        <div class="card list-card">
-          <div class="list-item" data-go="screen-chat">
-            <img src="assets/img/service-barber.jpeg" alt="Lucas">
-            <div style="flex:1;">
-              <strong>Lucas M.</strong>
-              <p>Fade + barbe • 35 € payé • En ligne</p>
-            </div>
-            <span class="muted">14:07</span>
-          </div>
-          <div class="list-item" data-go="screen-chat">
-            <img src="assets/img/service-coiffeuse.jpg" alt="Thomas">
-            <div style="flex:1;">
-              <strong>Thomas R.</strong>
-              <p>Coupe complète • 25 € payé</p>
-            </div>
-            <span class="muted">12:30</span>
-          </div>
-        </div>
-      </section>
+  <div class="screen-topbar">
+    <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
+    <div class="title-wrap">
+      <h2>Messages</h2>
+      <p>Uniquement les conversations réelles apparaîtront ici.</p>
+    </div>
+  </div>
+  <div class="card list-card">
+    <div class="section-sub">Aucune conversation disponible pour le moment.</div>
+  </div>
+</section>
 
       <section class="screen chat-shell" id="screen-chat">
-        <div class="chat-head">
-          <button class="icon-btn" data-go="screen-pro-messages">‹</button>
-          <img src="assets/img/service-barber.jpeg" alt="Karim">
-          <div style="flex:1;">
-            <strong>Karim B.</strong>
-            <span class="muted" style="font-size:12px;">En ligne</span>
-          </div>
-          <button class="icon-btn">⋯</button>
-        </div>
-
-        <div class="chat-body">
-          <div class="bubble in">Bonjour ! J’ai bien reçu votre réservation pour un fade à 14h30. Je serai chez vous à l’heure.<small>14:02</small></div>
-          <div class="bubble out">Super merci ! Est-ce que vous pouvez aussi faire la barbe ?<small>14:05</small></div>
-          <div class="bubble in">Bien sûr, je rajoute ça. Le total sera 35€ au lieu de 25€.<small>14:06</small></div>
-          <div class="bubble out">Parfait, à tout à l’heure.<small>14:07</small></div>
-        </div>
-
-        <div class="chat-input">
-          <input type="text" placeholder="Écrire un message...">
-          <button class="send-btn">➤</button>
-        </div>
-      </section>
+  <div class="chat-head">
+    <button class="icon-btn" data-go="screen-pro-messages">‹</button>
+    <img src="assets/img/ubo-drop-logo.png" alt="Conversation UBODROP">
+    <div>
+      <strong>Conversation</strong>
+      <div class="section-sub">Aucun échange actif</div>
+    </div>
+  </div>
+  <div class="chat-body">
+    <div class="bubble in">Aucune conversation pour le moment.<small>Maintenant</small></div>
+  </div>
+  <div class="chat-input">
+    <input type="text" placeholder="Écrire un message..." />
+    <button class="send-btn" type="button">➤</button>
+  </div>
+</section>
 
       <nav class="bottom-nav" id="bottomNav">
         <div class="nav-grid" id="navGrid"></div>
@@ -1090,7 +1011,7 @@
   
 <script src="assets/js/config.js"></script>
 <script>
- 
+  const GOOGLE_MAPS_API_KEY = window.GOOGLE_MAPS_API_KEY || "";
   const APP_SESSION_KEY = "ubodrop_app_session";
 
   const categoriesFallback = [
@@ -1444,6 +1365,19 @@
     });
   }
 
+function syncGoogleUiVisibility(screenId) {
+  const isSearchScreen = screenId === "screen-search";
+  const stage = document.getElementById("mapStage");
+  if (stage) stage.classList.toggle("search-disabled", !isSearchScreen);
+  document.querySelectorAll(".pac-container").forEach((node) => {
+    node.style.display = isSearchScreen ? "" : "none";
+  });
+  if (!isSearchScreen) {
+    const input = getSearchInput();
+    if (input) input.blur();
+  }
+}
+
   function renderNav(screenId) {
     const nav = document.getElementById("bottomNav");
     const grid = document.getElementById("navGrid");
@@ -1467,6 +1401,7 @@
     document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
     document.getElementById(screenId)?.classList.add("active");
     renderNav(screenId);
+    syncGoogleUiVisibility(screenId);
   }
 
   function toggleFilter(open) {
@@ -1598,7 +1533,7 @@
       }
       const script = document.createElement("script");
       script.id = "googleMapsScript";
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&loading=async`;
       script.async = true;
       script.defer = true;
       script.onload = resolve;
@@ -1645,6 +1580,7 @@
       renderMapMarkers();
       renderMapEmptyMessage();
       state.mapsLoaded = true;
+      syncGoogleUiVisibility(document.querySelector(".screen.active")?.id || "screen-home");
     } catch (error) {
       const stage = document.getElementById("mapStage");
       stage.style.background = "linear-gradient(180deg, rgba(247,243,248,.8), rgba(247,243,248,.5))";
@@ -2299,7 +2235,7 @@
   document.getElementById("registerClientBtn").onclick = handleRegisterClient;
   document.getElementById("registerProBtn").onclick = handleRegisterProfessional;
   document.querySelector("#screen-chat .send-btn").onclick = handleSendMessage;
-  document.querySelector(".map-position-btn").onclick = centerOnUser;
+  document.getElementById("mapPositionBtn").onclick = centerOnUser;
 
   (async function initApp() {
     bindGo();

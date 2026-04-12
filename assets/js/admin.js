@@ -1,172 +1,452 @@
 /* ============================================================
    UBODROP — admin.js
-   Logique frontend du dashboard administrateur
-   ============================================================
-   ARCHITECTURE :
-   - adminState   → état courant de la session admin
-   - mockData     → données de démonstration centralisées
-   - authModule   → login / logout
-   - kpiModule    → rendu des KPI
-   - certModule   → gestion des certifications pro
-   - bankModule   → section compte bancaire / Revolut
-   - securityModule → changement de mot de passe
-   - uiModule     → navigation, toast, modal
-
-   TODO BACKEND : Chaque module indique les endpoints à brancher.
-   Remplacer les appels mock par des fetch() vers l'API correspondante.
+   Dashboard admin branché sur les vrais endpoints backend existants
+   Backend réel détecté :
+   - POST /api/v1/auth/login
+   - GET  /api/v1/auth/me
+   - GET  /api/v1/admin/professionals/pending
+   - PATCH /api/v1/admin/professionals/:id/verify
+   - PATCH /api/v1/admin/professionals/:id/visibility
+   - GET  /api/v1/admin/bookings
+   - GET  /api/v1/admin/audit-logs
    ============================================================ */
 
 'use strict';
 
-/* ================================================================
-   STATE GLOBAL
-   ================================================================ */
+const ADMIN_SESSION_KEY = 'ubo_admin_session';
+
 const adminState = {
   isLoggedIn: false,
   adminUsername: '',
-  kpiPeriod: 'day',          // 'day' | 'week' | 'month'
-  certFilter: 'all',         // 'all' | 'pending' | 'approved' | 'refused'
-  certSearch: '',
-  bankConnected: true,
+  adminEmail: '',
   currentSection: 'kpi',
+  kpiPeriod: 'day',
+  certFilter: 'all',
+  certSearch: '',
+  bankConnected: false,
+  token: '',
+  me: null,
+  professionalsPending: [],
+  bookings: [],
+  auditLogs: [],
 };
 
-/* ================================================================
-   MOCK DATA (remplacer par des appels API en production)
-   ================================================================
-   TODO BACKEND :
-   GET /admin/stats → remplace mockKPI
-   GET /admin/certifications → remplace mockCerts
-   GET /admin/banking → remplace mockBanking
-   ================================================================ */
-const mockData = {
-  credentials: {
-    username: 'Sofiane.Aboutaibe',
-    // NOTE SÉCURITÉ : En production, l'auth doit être gérée côté backend.
-    // Ne jamais stocker de credentials en clair en production.
-    password: 'UBODROP',
+const api = {
+  getSession() {
+    try {
+      return JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY) || 'null');
+    } catch (_) {
+      return null;
+    }
   },
-  kpi: {
-    online: { users: 142, pros: 38 },
-    total: { users: 4821, pros: 312 },
-    orders: {
-      day:   { count: 67,   trend: '+12%',  up: true  },
-      week:  { count: 489,  trend: '+8%',   up: true  },
-      month: { count: 1843, trend: '+22%',  up: true  },
-    },
-    revenue: {
-      day:   { amount: '340 €',   trend: '+9%',   up: true  },
-      week:  { amount: '2 480 €', trend: '+14%',  up: true  },
-      month: { amount: '9 210 €', trend: '+31%',  up: true  },
-    },
-    ca: {
-      day:   { amount: '3 400 €',   trend: '+9%',   up: true  },
-      week:  { amount: '24 800 €',  trend: '+14%',  up: true  },
-      month: { amount: '92 100 €',  trend: '+31%',  up: true  },
-    },
-  },
-  certifications: [
-    { id: 1, name: 'Amara Diallo',     specialty: 'Coiffeuse',         city: 'Paris 11e',    date: '09 avr. 2025', status: 'pending'  },
-    { id: 2, name: 'Kevin Osei',       specialty: 'Barbier',           city: 'Lyon',         date: '08 avr. 2025', status: 'pending'  },
-    { id: 3, name: 'Inès Halabi',      specialty: 'Manucure',          city: 'Marseille',    date: '07 avr. 2025', status: 'approved' },
-    { id: 4, name: 'Youssef Brahimi',  specialty: 'Tatoueur',          city: 'Toulouse',     date: '06 avr. 2025', status: 'pending'  },
-    { id: 5, name: 'Chloé Fontaine',   specialty: 'Esthéticienne',     city: 'Bordeaux',     date: '05 avr. 2025', status: 'refused'  },
-    { id: 6, name: 'Marcus Essien',    specialty: 'Barbier',           city: 'Nantes',       date: '04 avr. 2025', status: 'approved' },
-    { id: 7, name: 'Fatou Ndiaye',     specialty: 'Tresseuse',         city: 'Strasbourg',   date: '03 avr. 2025', status: 'pending'  },
-    { id: 8, name: 'Romain Leclerc',   specialty: 'Micro-pigmentation',city: 'Paris 9e',     date: '02 avr. 2025', status: 'pending'  },
-  ],
-  banking: {
-    holder:   'UBODROP SAS',
-    iban:     'FR76 3000 6000 0112 3456 7890 189',
-    ibanMasked: 'FR76 •••• •••• •••• •••• 7890 189',
-    bic:      'AGRIFRPP',
-    lastUpdate: '10 avr. 2025 à 14h22',
-    bank:     'Revolut',
-  },
-};
 
-/* ================================================================
-   AUTH MODULE
-   TODO BACKEND : remplacer la vérification locale par
-   POST /admin/login → { token, username } puis stocker le JWT.
-   ================================================================ */
-const authModule = {
-  init() {
-    // Vérifier session existante
-    const saved = sessionStorage.getItem('ubo_admin_session');
-    if (saved) {
+  saveSession(session) {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+  },
+
+  clearSession() {
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  },
+
+  getToken() {
+    return adminState.token || this.getSession()?.token || '';
+  },
+
+  getHeaders(extra = {}) {
+    const token = this.getToken();
+    return {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...extra,
+    };
+  },
+
+  async request(path, options = {}) {
+    const response = await fetch(`${API_URL}${path}`, {
+      ...options,
+      headers: this.getHeaders(options.headers || {}),
+    });
+
+    let data = null;
+    const contentType = response.headers.get('content-type') || '';
+
+    try {
+      if (contentType.includes('application/json')) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        data = text ? { message: text } : null;
+      }
+    } catch (_) {
+      data = null;
+    }
+
+    if (!response.ok) {
+      const message = Array.isArray(data?.message)
+        ? data.message.join(' | ')
+        : data?.message || `Erreur API (${response.status})`;
+
+      const error = new Error(message);
+      error.status = response.status;
+      error.payload = data;
+      throw error;
+    }
+
+    return data;
+  },
+
+  async login(email, password) {
+    return this.request('/api/v1/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+    });
+  },
+
+  async me() {
+    return this.request('/api/v1/auth/me', { method: 'GET' });
+  },
+
+  async getPendingProfessionals() {
+    return this.request('/api/v1/admin/professionals/pending', { method: 'GET' });
+  },
+
+  async verifyProfessional(id) {
+    const payloads = [
+      { verified: true },
+      { isVerified: true },
+      { status: 'verified' },
+      {},
+    ];
+
+    let lastError = null;
+    for (const payload of payloads) {
       try {
-        const session = JSON.parse(saved);
-        if (session.username) {
-          adminState.isLoggedIn = true;
-          adminState.adminUsername = session.username;
-          uiModule.showDashboard();
+        return await this.request(`/api/v1/admin/professionals/${id}/verify`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError || new Error('Impossible de vérifier le professionnel.');
+  },
+
+  async hideProfessional(id) {
+    const payloads = [
+      { visible: false },
+      { isVisible: false },
+      { status: 'hidden' },
+      {},
+    ];
+
+    let lastError = null;
+    for (const payload of payloads) {
+      try {
+        return await this.request(`/api/v1/admin/professionals/${id}/visibility`, {
+          method: 'PATCH',
+          body: JSON.stringify(payload),
+        });
+      } catch (error) {
+        lastError = error;
+      }
+    }
+
+    throw lastError || new Error('Impossible de masquer le professionnel.');
+  },
+
+  async getBookings() {
+    return this.request('/api/v1/admin/bookings', { method: 'GET' });
+  },
+
+  async getAuditLogs() {
+    return this.request('/api/v1/admin/audit-logs', { method: 'GET' });
+  },
+};
+
+const helpers = {
+  normalizeCollection(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data?.items)) return data.items;
+    if (Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data?.results)) return data.results;
+    if (Array.isArray(data?.rows)) return data.rows;
+    return [];
+  },
+
+  extractToken(data) {
+    return (
+      data?.accessToken ||
+      data?.token ||
+      data?.data?.accessToken ||
+      data?.data?.token ||
+      data?.tokens?.accessToken ||
+      data?.tokens?.token ||
+      ''
+    );
+  },
+
+  extractRole(me) {
+    if (typeof me?.role === 'string') return me.role;
+    if (typeof me?.user?.role === 'string') return me.user.role;
+    if (Array.isArray(me?.roles) && me.roles.length) return me.roles[0];
+    if (Array.isArray(me?.user?.roles) && me.user.roles.length) return me.user.roles[0];
+    return '';
+  },
+
+  isAdmin(me) {
+    const role = this.extractRole(me);
+    if (typeof me?.isAdmin === 'boolean') return me.isAdmin;
+    if (typeof me?.user?.isAdmin === 'boolean') return me.user.isAdmin;
+    return ['ADMIN', 'SUPER_ADMIN', 'admin', 'super_admin'].includes(role);
+  },
+
+  getDisplayName(me) {
+    return (
+      me?.fullName ||
+      me?.name ||
+      me?.username ||
+      me?.email ||
+      me?.user?.fullName ||
+      me?.user?.name ||
+      me?.user?.username ||
+      me?.user?.email ||
+      'Administrateur'
+    );
+  },
+
+  getDisplayEmail(me) {
+    return me?.email || me?.user?.email || '';
+  },
+
+  getProName(item) {
+    return (
+      item?.fullName ||
+      item?.name ||
+      [item?.firstName, item?.lastName].filter(Boolean).join(' ').trim() ||
+      item?.email ||
+      'Professionnel'
+    );
+  },
+
+  getProSpecialty(item) {
+    return (
+      item?.specialty ||
+      item?.profession ||
+      item?.categoryName ||
+      item?.serviceCategory ||
+      item?.jobTitle ||
+      'Spécialité non renseignée'
+    );
+  },
+
+  getProCity(item) {
+    return (
+      item?.city ||
+      item?.addressCity ||
+      item?.locationCity ||
+      item?.address?.city ||
+      'Ville non renseignée'
+    );
+  },
+
+  formatDate(value) {
+    if (!value) return 'Date non renseignée';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return String(value);
+    return d.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+    });
+  },
+
+  initials(name) {
+    return String(name)
+      .split(' ')
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase();
+  },
+};
+
+const authModule = {
+  async init() {
+    const saved = api.getSession();
+
+    if (saved?.token) {
+      adminState.token = saved.token;
+
+      try {
+        const me = await api.me();
+
+        if (!helpers.isAdmin(me)) {
+          this.logout(false);
+          uiModule.showLogin();
           return;
         }
-      } catch(e) { /* session corrompue */ }
+
+        adminState.isLoggedIn = true;
+        adminState.me = me;
+        adminState.adminUsername = helpers.getDisplayName(me);
+        adminState.adminEmail = helpers.getDisplayEmail(me);
+        await uiModule.showDashboard();
+        return;
+      } catch (_) {
+        this.logout(false);
+      }
     }
+
     uiModule.showLogin();
   },
 
-  login(username, password) {
-    // TODO BACKEND : fetch('POST /admin/login', { username, password })
-    if (
-      username === mockData.credentials.username &&
-      password === mockData.credentials.password
-    ) {
+  async login(email, password) {
+    try {
+      const loginData = await api.login(email, password);
+      const token = helpers.extractToken(loginData);
+
+      if (!token) {
+        throw new Error('Aucun token reçu depuis le backend.');
+      }
+
+      adminState.token = token;
+
+      const me = await api.me();
+
+      if (!helpers.isAdmin(me)) {
+        throw new Error("Ce compte n'a pas les droits administrateur.");
+      }
+
       adminState.isLoggedIn = true;
-      adminState.adminUsername = username;
-      // Stocker session (sessionStorage = fermeture onglet = déconnexion)
-      sessionStorage.setItem('ubo_admin_session', JSON.stringify({ username }));
-      uiModule.showDashboard();
+      adminState.me = me;
+      adminState.adminUsername = helpers.getDisplayName(me);
+      adminState.adminEmail = helpers.getDisplayEmail(me);
+
+      api.saveSession({
+        token,
+        username: adminState.adminUsername,
+        email: adminState.adminEmail,
+      });
+
+      await uiModule.showDashboard();
       return true;
+    } catch (error) {
+      console.error('Erreur login admin :', error);
+      uiModule.showInlineLoginError(error.message || 'Connexion impossible.');
+      return false;
     }
-    return false;
   },
 
-  logout() {
+  logout(showLogin = true) {
     adminState.isLoggedIn = false;
     adminState.adminUsername = '';
-    sessionStorage.removeItem('ubo_admin_session');
-    uiModule.showLogin();
+    adminState.adminEmail = '';
+    adminState.token = '';
+    adminState.me = null;
+    adminState.professionalsPending = [];
+    adminState.bookings = [];
+    adminState.auditLogs = [];
+    api.clearSession();
+    if (showLogin) uiModule.showLogin();
   },
 };
 
-/* ================================================================
-   KPI MODULE
-   ================================================================ */
 const kpiModule = {
+  async load() {
+    try {
+      const [prosRes, bookingsRes, auditRes] = await Promise.all([
+        api.getPendingProfessionals(),
+        api.getBookings(),
+        api.getAuditLogs(),
+      ]);
+
+      adminState.professionalsPending = helpers.normalizeCollection(prosRes);
+      adminState.bookings = helpers.normalizeCollection(bookingsRes);
+      adminState.auditLogs = helpers.normalizeCollection(auditRes);
+    } catch (error) {
+      console.error('Erreur chargement KPI admin :', error);
+      uiModule.toast(error.message || 'Impossible de charger les données admin.', 'error');
+    }
+  },
+
   render() {
-    const p = adminState.kpiPeriod;
-    const d = mockData.kpi;
+    const pendingPros = adminState.professionalsPending.length;
+    const bookings = adminState.bookings.length;
+    const auditLogs = adminState.auditLogs.length;
 
-    // Online
-    document.getElementById('kpiUsersOnline').textContent = d.online.users;
-    document.getElementById('kpiProsOnline').textContent  = d.online.pros;
-    // Total
-    document.getElementById('kpiUsersTotal').textContent  = d.total.users.toLocaleString('fr-FR');
-    document.getElementById('kpiProsTotal').textContent   = d.total.pros.toLocaleString('fr-FR');
-    // Orders
-    document.getElementById('kpiOrders').textContent      = d.orders[p].count.toLocaleString('fr-FR');
-    this._setTrend('kpiOrdersTrend', d.orders[p]);
-    // Revenue
-    document.getElementById('kpiRevenue').textContent     = d.revenue[p].amount;
-    this._setTrend('kpiRevenueTrend', d.revenue[p]);
-    // CA
-    document.getElementById('kpiCA').textContent          = d.ca[p].amount;
-    this._setTrend('kpiCATrend', d.ca[p]);
+    const bookingStatuses = adminState.bookings.reduce((acc, booking) => {
+      const key = String(booking?.status || 'unknown').toLowerCase();
+      acc[key] = (acc[key] || 0) + 1;
+      return acc;
+    }, {});
 
-    // Mise à jour des labels périodiques
-    const periodLabels = { day: 'Aujourd\'hui', week: 'Cette semaine', month: 'Ce mois' };
-    document.querySelectorAll('.kpi-period-label').forEach(el => {
-      el.textContent = periodLabels[p];
+    const completedBookings =
+      bookingStatuses.completed ||
+      bookingStatuses.done ||
+      bookingStatuses.confirmed ||
+      0;
+
+    const pendingBookings =
+      bookingStatuses.pending ||
+      bookingStatuses.created ||
+      0;
+
+    const uniqueClients = new Set(
+      adminState.bookings
+        .map((booking) =>
+          booking?.clientId ||
+          booking?.client?.id ||
+          booking?.userId ||
+          booking?.user?.id ||
+          null
+        )
+        .filter(Boolean)
+    ).size;
+
+    const setText = (id, value) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    };
+
+    setText('kpiUsersOnline', String(pendingPros));
+    setText('kpiProsOnline', String(bookings));
+    setText('kpiUsersTotal', uniqueClients.toLocaleString('fr-FR'));
+    setText('kpiProsTotal', auditLogs.toLocaleString('fr-FR'));
+    setText('kpiOrders', bookings.toLocaleString('fr-FR'));
+    setText('kpiRevenue', String(completedBookings));
+    setText('kpiCA', String(pendingBookings));
+
+    this._setTrend('kpiOrdersTrend', {
+      up: true,
+      trend: 'Bookings',
+    });
+    this._setTrend('kpiRevenueTrend', {
+      up: true,
+      trend: 'Terminées',
+    });
+    this._setTrend('kpiCATrend', {
+      up: false,
+      trend: 'En attente',
+    });
+
+    const periodLabels = {
+      day: 'Vue admin',
+      week: 'Vue admin',
+      month: 'Vue admin',
+    };
+
+    document.querySelectorAll('.kpi-period-label').forEach((el) => {
+      el.textContent = periodLabels[adminState.kpiPeriod] || 'Vue admin';
     });
   },
 
   _setTrend(id, data) {
     const el = document.getElementById(id);
     if (!el) return;
-    el.textContent = data.trend;
+
     el.className = `kpi-trend ${data.up ? 'up' : 'down'}`;
     el.innerHTML = `${data.up
       ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>'
@@ -174,316 +454,377 @@ const kpiModule = {
     } ${data.trend}`;
   },
 
-  setPeriod(period) {
+  async setPeriod(period) {
     adminState.kpiPeriod = period;
-    document.querySelectorAll('.kpi-tab-btn').forEach(btn => {
+    document.querySelectorAll('.kpi-tab-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.period === period);
     });
+    await this.load();
     this.render();
   },
 };
 
-/* ================================================================
-   CERTIFICATIONS MODULE
-   ================================================================ */
 const certModule = {
-  init() {
+  async init() {
+    try {
+      const data = await api.getPendingProfessionals();
+      adminState.professionalsPending = helpers.normalizeCollection(data);
+    } catch (error) {
+      console.error('Erreur chargement professionnels en attente :', error);
+      uiModule.toast(error.message || 'Impossible de charger les professionnels.', 'error');
+    }
     this.renderList();
   },
 
   renderList() {
     const list = document.getElementById('certList');
+    if (!list) return;
+
     const search = adminState.certSearch.toLowerCase();
     const filter = adminState.certFilter;
 
-    let certs = mockData.certifications.filter(c => {
-      const matchFilter = filter === 'all' || c.status === filter;
-      const matchSearch = !search ||
-        c.name.toLowerCase().includes(search) ||
-        c.specialty.toLowerCase().includes(search) ||
-        c.city.toLowerCase().includes(search);
-      return matchFilter && matchSearch;
+    const items = adminState.professionalsPending.filter((item) => {
+      const name = helpers.getProName(item).toLowerCase();
+      const specialty = helpers.getProSpecialty(item).toLowerCase();
+      const city = helpers.getProCity(item).toLowerCase();
+
+      const status = item?.status
+        ? String(item.status).toLowerCase()
+        : 'pending';
+
+      const matchesFilter = filter === 'all' || status === filter || (filter === 'pending' && !item?.status);
+      const matchesSearch =
+        !search ||
+        name.includes(search) ||
+        specialty.includes(search) ||
+        city.includes(search);
+
+      return matchesFilter && matchesSearch;
     });
 
-    if (certs.length === 0) {
-      list.innerHTML = '<div class="cert-empty">Aucune demande trouvée.</div>';
+    if (items.length === 0) {
+      list.innerHTML = '<div class="cert-empty">Aucun professionnel en attente trouvé.</div>';
       return;
     }
 
-    list.innerHTML = certs.map((c, i) => `
-      <div class="cert-card" style="animation-delay:${i * 0.06}s" data-id="${c.id}">
-        <div class="cert-avatar">${c.name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase()}</div>
-        <div class="cert-info">
-          <div class="cert-name">${c.name}</div>
-          <div class="cert-meta">${c.specialty} · ${c.city}</div>
-        </div>
-        <div class="cert-date">${c.date}</div>
-        <span class="cert-status ${c.status}">${this._statusLabel(c.status)}</span>
-        <div class="cert-actions">
-          <button class="btn-action see" onclick="certModule.openDetail(${c.id})">Voir</button>
-          <button class="btn-action approve" onclick="certModule.updateStatus(${c.id},'approved')"
-            ${c.status !== 'pending' ? 'disabled' : ''}>Valider</button>
-          <button class="btn-action refuse" onclick="certModule.updateStatus(${c.id},'refused')"
-            ${c.status !== 'pending' ? 'disabled' : ''}>Refuser</button>
-        </div>
-      </div>
-    `).join('');
+    list.innerHTML = items
+      .map((item, index) => {
+        const id = item?.id ?? item?.professionalId ?? item?.userId;
+        const name = helpers.getProName(item);
+        const specialty = helpers.getProSpecialty(item);
+        const city = helpers.getProCity(item);
+        const date = helpers.formatDate(item?.createdAt || item?.submittedAt || item?.updatedAt);
+        const status = String(item?.status || 'pending').toLowerCase();
+
+        return `
+          <div class="cert-card" style="animation-delay:${index * 0.04}s" data-id="${id}">
+            <div class="cert-avatar">${helpers.initials(name)}</div>
+            <div class="cert-info">
+              <div class="cert-name">${name}</div>
+              <div class="cert-meta">${specialty} · ${city}</div>
+            </div>
+            <div class="cert-date">${date}</div>
+            <span class="cert-status ${status}">${this._statusLabel(status)}</span>
+            <div class="cert-actions">
+              <button class="btn-action see" onclick="certModule.openDetail('${id}')">Voir</button>
+              <button class="btn-action approve" onclick="certModule.approve('${id}')">Valider</button>
+              <button class="btn-action refuse" onclick="certModule.refuse('${id}')">Masquer</button>
+            </div>
+          </div>
+        `;
+      })
+      .join('');
   },
 
-  _statusLabel(s) {
-    return { pending: 'En attente', approved: 'Validé', refused: 'Refusé' }[s] || s;
-  },
-
-  updateStatus(id, status) {
-    // TODO BACKEND : PUT /admin/certifications/:id { status }
-    const cert = mockData.certifications.find(c => c.id === id);
-    if (!cert || cert.status !== 'pending') return;
-    cert.status = status;
-    this.renderList();
-    uiModule.toast(
-      status === 'approved'
-        ? `✅ ${cert.name} validé avec succès`
-        : `❌ ${cert.name} refusé`,
-      status === 'approved' ? 'success' : 'error'
+  _statusLabel(status) {
+    return (
+      {
+        pending: 'En attente',
+        approved: 'Validé',
+        verified: 'Vérifié',
+        refused: 'Refusé',
+        hidden: 'Masqué',
+      }[status] || 'En attente'
     );
   },
 
+  _findById(id) {
+    return adminState.professionalsPending.find((item) => String(item?.id ?? item?.professionalId ?? item?.userId) === String(id));
+  },
+
+  async approve(id) {
+    try {
+      await api.verifyProfessional(id);
+      adminState.professionalsPending = adminState.professionalsPending.filter(
+        (item) => String(item?.id ?? item?.professionalId ?? item?.userId) !== String(id)
+      );
+      this.renderList();
+      await kpiModule.load();
+      kpiModule.render();
+      uiModule.toast('Professionnel validé avec succès.', 'success');
+      this.closeModal();
+    } catch (error) {
+      console.error('Erreur validation professionnel :', error);
+      uiModule.toast(error.message || 'Impossible de valider ce professionnel.', 'error');
+    }
+  },
+
+  async refuse(id) {
+    try {
+      await api.hideProfessional(id);
+      adminState.professionalsPending = adminState.professionalsPending.filter(
+        (item) => String(item?.id ?? item?.professionalId ?? item?.userId) !== String(id)
+      );
+      this.renderList();
+      await kpiModule.load();
+      kpiModule.render();
+      uiModule.toast('Professionnel masqué avec succès.', 'success');
+      this.closeModal();
+    } catch (error) {
+      console.error('Erreur masquage professionnel :', error);
+      uiModule.toast(error.message || 'Impossible de masquer ce professionnel.', 'error');
+    }
+  },
+
   openDetail(id) {
-    const cert = mockData.certifications.find(c => c.id === id);
-    if (!cert) return;
-    document.getElementById('modalTitle').textContent = cert.name;
-    document.getElementById('modalBody').innerHTML = `
-      <div class="modal-detail-row"><span class="modal-detail-label">Spécialité</span><span class="modal-detail-value">${cert.specialty}</span></div>
-      <div class="modal-detail-row"><span class="modal-detail-label">Ville</span><span class="modal-detail-value">${cert.city}</span></div>
-      <div class="modal-detail-row"><span class="modal-detail-label">Demande le</span><span class="modal-detail-value">${cert.date}</span></div>
-      <div class="modal-detail-row"><span class="modal-detail-label">Statut</span><span class="modal-detail-value"><span class="cert-status ${cert.status}">${this._statusLabel(cert.status)}</span></span></div>
+    const item = this._findById(id);
+    if (!item) return;
+
+    const modalTitle = document.getElementById('modalTitle');
+    const modalBody = document.getElementById('modalBody');
+    const overlay = document.getElementById('modalOverlay');
+
+    if (!modalTitle || !modalBody || !overlay) return;
+
+    const name = helpers.getProName(item);
+    const specialty = helpers.getProSpecialty(item);
+    const city = helpers.getProCity(item);
+    const date = helpers.formatDate(item?.createdAt || item?.submittedAt || item?.updatedAt);
+    const email = item?.email || item?.user?.email || 'Non renseigné';
+    const phone = item?.phone || item?.user?.phone || 'Non renseigné';
+    const role = item?.role || item?.user?.role || 'professional';
+    const status = String(item?.status || 'pending').toLowerCase();
+
+    modalTitle.textContent = name;
+    modalBody.innerHTML = `
+      <div class="modal-detail-row"><span class="modal-detail-label">Spécialité</span><span class="modal-detail-value">${specialty}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Ville</span><span class="modal-detail-value">${city}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Email</span><span class="modal-detail-value">${email}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Téléphone</span><span class="modal-detail-value">${phone}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Rôle</span><span class="modal-detail-value">${role}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Demande le</span><span class="modal-detail-value">${date}</span></div>
+      <div class="modal-detail-row"><span class="modal-detail-label">Statut</span><span class="modal-detail-value"><span class="cert-status ${status}">${this._statusLabel(status)}</span></span></div>
     `;
-    document.getElementById('modalOverlay').classList.remove('hidden');
+
+    overlay.classList.remove('hidden');
   },
 
   closeModal() {
-    document.getElementById('modalOverlay').classList.add('hidden');
+    const overlay = document.getElementById('modalOverlay');
+    if (overlay) overlay.classList.add('hidden');
   },
 
   setFilter(filter) {
     adminState.certFilter = filter;
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.filter === filter);
     });
     this.renderList();
   },
 
-  setSearch(val) {
-    adminState.certSearch = val;
+  setSearch(value) {
+    adminState.certSearch = value;
     this.renderList();
   },
 };
 
-/* ================================================================
-   BANKING MODULE
-   ================================================================ */
 const bankModule = {
   render() {
-    const b = mockData.banking;
-    // IBAN
-    document.getElementById('bankIBAN').textContent = b.ibanMasked;
-    document.getElementById('bankHolder').textContent = b.holder;
-    document.getElementById('bankLastUpdate').textContent = `Dernière modification : ${b.lastUpdate}`;
-    // Statut
+    const ibanEl = document.getElementById('bankIBAN');
+    const holderEl = document.getElementById('bankHolder');
+    const lastUpdateEl = document.getElementById('bankLastUpdate');
     const statusEl = document.getElementById('bankStatus');
-    statusEl.className = `bank-status-badge ${adminState.bankConnected ? 'connected' : 'disconnected'}`;
-    statusEl.innerHTML = `<span class="bank-status-dot"></span> ${adminState.bankConnected ? 'Connecté' : 'Non connecté'}`;
-    // Bouton
-    document.getElementById('btnBankConnect').textContent = adminState.bankConnected ? 'Modifier le compte' : 'Connecter Revolut';
+    const btnEl = document.getElementById('btnBankConnect');
+
+    if (ibanEl) ibanEl.textContent = 'Non disponible';
+    if (holderEl) holderEl.textContent = 'Aucun endpoint banking exposé côté backend';
+    if (lastUpdateEl) lastUpdateEl.textContent = 'Le backend actuel ne fournit pas de module bancaire admin.';
+    if (statusEl) {
+      statusEl.className = 'bank-status-badge disconnected';
+      statusEl.innerHTML = '<span class="bank-status-dot"></span> Non exposé';
+    }
+    if (btnEl) btnEl.textContent = 'Module non disponible';
   },
 
   toggleConnect() {
-    // TODO BACKEND : POST /admin/banking/connect → OAuth Revolut
-    adminState.bankConnected = !adminState.bankConnected;
-    this.render();
-    uiModule.toast(
-      adminState.bankConnected ? '✅ Compte Revolut connecté' : '⚡ Compte déconnecté',
-      adminState.bankConnected ? 'success' : 'error'
-    );
+    uiModule.toast("Le backend actuel ne propose pas encore de route admin banking.", 'error');
   },
 
   copyIBAN() {
-    const iban = mockData.banking.iban;
-    navigator.clipboard?.writeText(iban).then(() => {
-      uiModule.toast('📋 IBAN copié dans le presse-papiers', 'success');
-    }).catch(() => {
-      uiModule.toast('IBAN : ' + iban, 'success');
-    });
+    uiModule.toast("Aucun IBAN disponible via l'API actuelle.", 'error');
   },
 };
 
-/* ================================================================
-   SECURITY MODULE
-   ================================================================ */
 const securityModule = {
-  // NOTE : En production, le changement de mot de passe doit passer par
-  // PUT /admin/password avec authentification JWT + hachage bcrypt côté backend.
-  changePassword(current, newPw, confirm) {
+  changePassword() {
     const msgEl = document.getElementById('pwMsg');
-    msgEl.classList.add('hidden');
+    if (!msgEl) return false;
 
-    if (current !== mockData.credentials.password) {
-      this._showMsg(msgEl, 'error', 'Mot de passe actuel incorrect.');
-      return false;
-    }
-    if (newPw.length < 6) {
-      this._showMsg(msgEl, 'error', 'Le nouveau mot de passe doit contenir au moins 6 caractères.');
-      return false;
-    }
-    if (newPw !== confirm) {
-      this._showMsg(msgEl, 'error', 'Les mots de passe ne correspondent pas.');
-      return false;
-    }
-    // TODO BACKEND : PUT /admin/password { currentPassword, newPassword }
-    mockData.credentials.password = newPw;
-    this._showMsg(msgEl, 'success', 'Mot de passe mis à jour avec succès.');
-    document.getElementById('pwForm').reset();
-    return true;
-  },
-
-  _showMsg(el, type, text) {
-    el.className = `settings-msg ${type}`;
-    el.innerHTML = `${type === 'success'
-      ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
-      : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'
-    } ${text}`;
-    el.classList.remove('hidden');
+    msgEl.className = 'settings-msg error';
+    msgEl.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> Le backend actuel ne propose pas encore de route admin pour changer le mot de passe.';
+    msgEl.classList.remove('hidden');
+    return false;
   },
 };
 
-/* ================================================================
-   UI MODULE
-   ================================================================ */
 const uiModule = {
   showLogin() {
-    document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('dashboard').classList.add('hidden');
+    document.getElementById('loginScreen')?.classList.remove('hidden');
+    document.getElementById('dashboard')?.classList.add('hidden');
   },
 
-  showDashboard() {
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
-    document.getElementById('topbarAdminName').textContent = adminState.adminUsername;
+  async showDashboard() {
+    document.getElementById('loginScreen')?.classList.add('hidden');
+    document.getElementById('dashboard')?.classList.remove('hidden');
 
-    // Skeleton puis rendu réel
-    setTimeout(() => {
-      kpiModule.render();
-      certModule.init();
-      bankModule.render();
-    }, 600);
+    const topbarAdminName = document.getElementById('topbarAdminName');
+    if (topbarAdminName) {
+      topbarAdminName.textContent = adminState.adminUsername || adminState.adminEmail || 'Administrateur';
+    }
 
     this.navigateTo('kpi');
+
+    await kpiModule.load();
+    kpiModule.render();
+    await certModule.init();
+    bankModule.render();
   },
 
   navigateTo(section) {
     adminState.currentSection = section;
 
-    document.querySelectorAll('.admin-section').forEach(el => {
+    document.querySelectorAll('.admin-section').forEach((el) => {
       el.classList.toggle('active', el.id === `section-${section}`);
     });
-    document.querySelectorAll('.sidenav-item, .mobile-nav-item').forEach(btn => {
+
+    document.querySelectorAll('.sidenav-item, .mobile-nav-item').forEach((btn) => {
       btn.classList.toggle('active', btn.dataset.section === section);
     });
   },
 
+  showInlineLoginError(message) {
+    const err = document.getElementById('loginError');
+    if (!err) return;
+    err.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      ${message}
+    `;
+    err.classList.remove('hidden');
+  },
+
+  hideInlineLoginError() {
+    const err = document.getElementById('loginError');
+    if (err) err.classList.add('hidden');
+  },
+
   toast(message, type = 'success') {
     const el = document.getElementById('toast');
+    if (!el) return;
+
     const icon = type === 'success'
       ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>'
       : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>';
+
     el.innerHTML = icon + `<span>${message}</span>`;
     el.className = `toast ${type}`;
     el.classList.remove('hidden');
+
     clearTimeout(el._timeout);
     el._timeout = setTimeout(() => el.classList.add('hidden'), 3500);
   },
 };
 
-/* ================================================================
-   INIT
-   ================================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-
-  // — LOGIN —
+document.addEventListener('DOMContentLoaded', async () => {
   const loginForm = document.getElementById('loginForm');
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const username = document.getElementById('loginUsername').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    const ok = authModule.login(username, password);
-    if (!ok) {
-      const err = document.getElementById('loginError');
-      err.classList.remove('hidden');
-      document.getElementById('loginPassword').value = '';
-      setTimeout(() => err.classList.add('hidden'), 4000);
-    }
-  });
+  if (loginForm) {
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      uiModule.hideInlineLoginError();
 
-  // Toggle password visibility (login)
-  document.getElementById('toggleLoginPw').addEventListener('click', () => {
+      const email = document.getElementById('loginUsername')?.value.trim() || '';
+      const password = document.getElementById('loginPassword')?.value || '';
+
+      const ok = await authModule.login(email, password);
+
+      if (!ok) {
+        const passwordEl = document.getElementById('loginPassword');
+        if (passwordEl) passwordEl.value = '';
+      }
+    });
+  }
+
+  document.getElementById('toggleLoginPw')?.addEventListener('click', () => {
     const inp = document.getElementById('loginPassword');
     const icon = document.getElementById('eyeIconLogin');
+    if (!inp || !icon) return;
+
     if (inp.type === 'password') {
       inp.type = 'text';
-      icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
     } else {
       inp.type = 'password';
-      icon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+      icon.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
     }
   });
 
-  // — NAVIGATION —
-  document.querySelectorAll('[data-section]').forEach(btn => {
+  document.querySelectorAll('[data-section]').forEach((btn) => {
     btn.addEventListener('click', () => uiModule.navigateTo(btn.dataset.section));
   });
 
-  // — LOGOUT —
-  document.getElementById('btnLogout').addEventListener('click', () => authModule.logout());
+  document.getElementById('btnLogout')?.addEventListener('click', () => authModule.logout());
 
-  // — KPI TABS —
-  document.querySelectorAll('.kpi-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => kpiModule.setPeriod(btn.dataset.period));
+  document.querySelectorAll('.kpi-tab-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      await kpiModule.setPeriod(btn.dataset.period);
+    });
   });
 
-  // — CERTIFICATIONS —
-  document.getElementById('certSearch').addEventListener('input', (e) => certModule.setSearch(e.target.value));
-  document.querySelectorAll('.filter-btn').forEach(btn => {
+  document.getElementById('certSearch')?.addEventListener('input', (e) => {
+    certModule.setSearch(e.target.value);
+  });
+
+  document.querySelectorAll('.filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => certModule.setFilter(btn.dataset.filter));
   });
 
-  // — MODAL —
-  document.getElementById('modalClose').addEventListener('click', () => certModule.closeModal());
-  document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  document.getElementById('modalClose')?.addEventListener('click', () => certModule.closeModal());
+
+  document.getElementById('modalOverlay')?.addEventListener('click', (e) => {
     if (e.target === document.getElementById('modalOverlay')) certModule.closeModal();
   });
 
-  // — BANKING —
-  document.getElementById('btnBankConnect').addEventListener('click', () => bankModule.toggleConnect());
-  document.getElementById('btnCopyIBAN').addEventListener('click', () => bankModule.copyIBAN());
+  document.getElementById('btnBankConnect')?.addEventListener('click', () => bankModule.toggleConnect());
+  document.getElementById('btnCopyIBAN')?.addEventListener('click', () => bankModule.copyIBAN());
 
-  // — PASSWORD FORM —
-  document.getElementById('pwForm').addEventListener('submit', (e) => {
+  document.getElementById('pwForm')?.addEventListener('submit', (e) => {
     e.preventDefault();
-    const cur = document.getElementById('pwCurrent').value;
-    const nw  = document.getElementById('pwNew').value;
-    const cf  = document.getElementById('pwConfirm').value;
-    securityModule.changePassword(cur, nw, cf);
+    securityModule.changePassword();
   });
 
-  // Toggle password visibility (settings)
-  document.querySelectorAll('.toggle-pw-settings').forEach(btn => {
+  document.querySelectorAll('.toggle-pw-settings').forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetId = btn.dataset.target;
       const inp = document.getElementById(targetId);
+      if (!inp) return;
       inp.type = inp.type === 'password' ? 'text' : 'password';
     });
   });
 
-  // — START —
-  authModule.init();
+  await authModule.init();
 });
+
+window.certModule = certModule;

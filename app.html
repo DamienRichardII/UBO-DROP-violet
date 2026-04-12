@@ -485,6 +485,17 @@
     .pro-header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
     .pro-avatar-lg { width: 60px; height: 60px; border-radius: 22px; object-fit: cover; }
     .online-chip { background: var(--green); color: var(--green-ink); padding: 8px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .online-toggle-btn { padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .22s ease; border: 0; }
+    .online-toggle-btn.is-online { background: var(--green); color: var(--green-ink); }
+    .online-toggle-btn.is-offline { background: rgba(200,200,200,.5); color: #666; }
+    .logout-row { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .logout-btn { width: 100%; padding: 13px; border-radius: 14px; font-size: 14px; font-weight: 700; color: var(--danger); background: rgba(239,99,99,.08); border: 1px solid rgba(239,99,99,.16); transition: .22s ease; cursor: pointer; }
+    .logout-btn:active { background: rgba(239,99,99,.14); }
+    .pricing-form { display: grid; gap: 12px; margin-top: 10px; }
+    .pricing-row { display: flex; align-items: center; gap: 10px; }
+    .pricing-row label { flex: 1; font-size: .93rem; color: var(--ink); font-weight: 600; }
+    .pricing-row input { width: 90px; height: 42px; border-radius: 12px; border: 1px solid var(--line-2); background: rgba(255,255,255,.92); padding: 0 12px; font-size: .95rem; font-weight: 700; text-align: right; outline: none; }
+    .save-pricing-btn { width: 100%; padding: 13px; border-radius: 14px; font-size: 14px; font-weight: 700; color: white; background: var(--glossy); margin-top: 4px; box-shadow: 0 8px 18px var(--glow); cursor: pointer; }
     .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 14px; }
     .stat-card { padding: 16px; }
     .stat-card strong { font-size: 1.5rem; font-weight: 800; display: block; }
@@ -820,9 +831,10 @@
           <div class="field"><label>Prénom</label><input type="text" placeholder="Karim"></div>
           <div class="field"><label>Nom</label><input type="text" placeholder="Benali"></div>
           <div class="field"><label>Email</label><input type="email" placeholder="pro@email.com"></div>
-          <div class="field"><label>Spécialité</label><select><option>Barber</option><option>Coiffure</option><option>Ongles</option><option>Maquillage</option></select></div>
+          <div class="field"><label>Spécialité</label><select><option>Barber</option><option>Coiffeuse</option><option>Manucure</option><option>Maquillage</option><option>Henné</option><option>Esthéticienne</option><option>Tatoueur</option><option>Massage</option><option>Micro pigmentation</option></select></div>
           <div class="field"><label>Années d'expérience</label><input type="text" placeholder="8"></div>
           <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" placeholder="000 000 000 00000"></div>
+          <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
           <div class="mt-20"><button class="primary-btn" id="registerProBtn">Créer mon compte pro</button></div>
         </div>
       </section>
@@ -925,9 +937,8 @@
 
   <div class="card list-card mt-16"></div>
   <div class="card list-card mt-16"></div>
+  <div class="card list-card mt-16" id="proPricingCard"></div>
 </section>
-
-      <section class="screen" id="screen-pro-messages">
   <div class="screen-topbar">
     <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
     <div class="title-wrap">
@@ -986,23 +997,15 @@
         </div>
         <div class="filter-group">
           <h4>Rayon</h4>
-          <div class="seg-grid">
-            <button class="seg-small active">5 km</button>
-            <button class="seg-small">15 km</button>
-          </div>
+          <div class="seg-grid seg-grid--3" id="filterRadiusGrid"></div>
         </div>
         <div class="filter-group">
           <h4>Budget indicatif</h4>
-          <div class="seg-grid seg-grid--4">
-            <button class="seg-small">€</button>
-            <button class="seg-small active">€€</button>
-            <button class="seg-small">€€€</button>
-            <button class="seg-small">€€€€</button>
-          </div>
+          <div class="seg-grid seg-grid--3" id="filterBudgetGrid"></div>
         </div>
       </div>
 
-      <div class="mt-24"><button class="primary-btn" id="applyFilters">Voir les résultats — 127 professionnels</button></div>
+      <div class="mt-24"><button class="primary-btn" id="applyFilters">Voir les résultats</button></div>
     </div>
   </div>
 
@@ -1071,7 +1074,11 @@
     mapMarkers: [],
     autocomplete: null,
     userMarker: null,
-    searchLocation: { lat: 48.8566, lng: 2.3522, label: "Paris" }
+    searchLocation: { lat: 48.8566, lng: 2.3522, label: "Paris" },
+    proOnline: true,
+    radius: 5,
+    budget: null,
+    pricingData: {}
   };
 
   const navIcons = {
@@ -1167,17 +1174,17 @@
       return this.request("/auth/me");
     },
 
-    registerClient(email, password) {
+    registerClient(payload) {
       return this.request("/auth/register/client", {
         method: "POST",
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(payload)
       });
     },
 
-    registerProfessional(email, password) {
+    registerProfessional(payload) {
       return this.request("/auth/register/professional", {
         method: "POST",
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify(payload)
       });
     },
 
@@ -1218,6 +1225,20 @@
 
     notifications() {
       return this.request("/notifications/me");
+    },
+
+    updateProPricing(pricing) {
+      return this.request("/profiles/pro/pricing", {
+        method: "PATCH",
+        body: JSON.stringify(pricing)
+      });
+    },
+
+    updateAvailability(isOnline) {
+      return this.request("/profiles/pro/availability", {
+        method: "PATCH",
+        body: JSON.stringify({ isOnline })
+      });
     }
   };
 
@@ -1450,6 +1471,46 @@ function syncGoogleUiVisibility(screenId) {
     });
   }
 
+  function renderRadiusOptions() {
+    const grid = document.getElementById("filterRadiusGrid");
+    if (!grid) return;
+    const options = [5, 10, 15];
+    grid.innerHTML = options.map(km => `
+      <button class="seg-small${state.radius === km ? " active" : ""}" data-radius="${km}">${km} km</button>
+    `).join("");
+    grid.querySelectorAll("[data-radius]").forEach(btn => {
+      btn.onclick = () => {
+        state.radius = Number(btn.dataset.radius);
+        renderRadiusOptions();
+      };
+    });
+  }
+
+  function renderBudgetOptions() {
+    const grid = document.getElementById("filterBudgetGrid");
+    if (!grid) return;
+    const options = [10, 20, 30, 60, 80, 100];
+    grid.innerHTML = options.map(val => `
+      <button class="seg-small${state.budget === val ? " active" : ""}" data-budget="${val}">${val}€</button>
+    `).join("");
+    grid.querySelectorAll("[data-budget]").forEach(btn => {
+      btn.onclick = () => {
+        const val = Number(btn.dataset.budget);
+        state.budget = state.budget === val ? null : val;
+        renderBudgetOptions();
+      };
+    });
+  }
+
+  function updateFilterCount() {
+    const btn = document.getElementById("applyFilters");
+    if (!btn) return;
+    const count = state.pros.length;
+    btn.textContent = count > 0
+      ? `Voir les résultats — ${count} professionnel${count > 1 ? "s" : ""}`
+      : "Voir les résultats — 0 professionnel";
+  }
+
   function getVisiblePros() {
     return state.pros.filter((pro) => pro.category === state.category || !state.category);
   }
@@ -1627,6 +1688,7 @@ function syncGoogleUiVisibility(screenId) {
   function renderPros() {
     const list = document.getElementById("proList");
     const visiblePros = getVisiblePros();
+    updateFilterCount();
     if (!visiblePros.length) {
       list.innerHTML = emptyCard(emptyState.pros.title, emptyState.pros.text, "Créer un compte", "screen-register-client");
       bindGo();
@@ -1766,6 +1828,7 @@ function syncGoogleUiVisibility(screenId) {
           ? emptyCard("Compte non connecté", "Connecte-toi pour retrouver tes informations et tes réservations.", "Se connecter", "screen-login")
           : emptyCard("Aucune donnée", "Ces informations apparaîtront après connexion.");
       });
+      document.querySelector("#screen-account .logout-row")?.remove();
       bindGo();
       return;
     }
@@ -1778,6 +1841,15 @@ function syncGoogleUiVisibility(screenId) {
           <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
         </div>
       `;
+      const accountCard = document.querySelector("#screen-account .list-card");
+      if (accountCard) {
+        accountCard.querySelector(".logout-row")?.remove();
+        const logoutRow = document.createElement("div");
+        logoutRow.className = "logout-row";
+        logoutRow.innerHTML = `<button class="logout-btn" id="logoutBtn">Se déconnecter</button>`;
+        accountCard.appendChild(logoutRow);
+        document.getElementById("logoutBtn").onclick = handleLogout;
+      }
     }
 
     if (blocks[0]) {
@@ -1939,8 +2011,12 @@ function syncGoogleUiVisibility(screenId) {
             <div class="section-sub">${authUser.roleLabel} • ${authUser.email}</div>
           </div>
         </div>
-        <div class="online-chip">En ligne</div>
+        <button class="online-toggle-btn ${state.proOnline ? 'is-online' : 'is-offline'}" id="proOnlineToggle">
+          ${state.proOnline ? '🟢 En ligne' : '⚫ Hors ligne'}
+        </button>
       `;
+      const toggleBtn = document.getElementById("proOnlineToggle");
+      if (toggleBtn) toggleBtn.onclick = toggleProOnlineStatus;
     }
 
     if (statCards.length >= 4) {
@@ -1973,6 +2049,34 @@ function syncGoogleUiVisibility(screenId) {
             </div>
           `).join("")
         : emptyCard("Aucun message", "Les messages clients apparaîtront ici.");
+    }
+
+    const pricingCard = document.getElementById("proPricingCard");
+    if (pricingCard) {
+      const services = [
+        { key: "barbier", label: "Barber / Coupe" },
+        { key: "coiffure", label: "Coiffeuse" },
+        { key: "ongles", label: "Manucure" },
+        { key: "maquillage", label: "Maquillage" },
+        { key: "henne", label: "Henné" },
+        { key: "esthetique", label: "Esthéticienne" },
+        { key: "massage", label: "Massage" },
+        { key: "tatouage", label: "Tatoueur" }
+      ];
+      pricingCard.innerHTML = `
+        <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Mes tarifs</h4>
+        <div class="section-sub" style="margin-bottom:12px; font-size:.88rem;">Renseigne tes prix de base (€). Ils seront affichés aux clients.</div>
+        <div class="pricing-form">
+          ${services.map(s => `
+            <div class="pricing-row">
+              <label>${s.label}</label>
+              <input type="number" min="0" step="1" placeholder="—" data-price-key="${s.key}" value="${state.pricingData[s.key] || ''}">
+            </div>
+          `).join("")}
+        </div>
+        <button class="save-pricing-btn" id="savePricingBtn">Enregistrer mes tarifs</button>
+      `;
+      document.getElementById("savePricingBtn").onclick = handleSavePricing;
     }
   }
 
@@ -2088,29 +2192,55 @@ function syncGoogleUiVisibility(screenId) {
 
   async function handleRegisterClient() {
     const inputs = document.querySelectorAll("#screen-register-client .field input");
+    const firstName = inputs[0]?.value.trim() || "";
+    const lastName = inputs[1]?.value.trim() || "";
     const email = inputs[2]?.value.trim() || "";
+    const phone = inputs[3]?.value.trim() || "";
     const password = inputs[4]?.value || "";
     if (!email || !password) {
       notify("Email et mot de passe obligatoires.");
       return;
     }
+    if (password.length < 6) {
+      notify("Le mot de passe doit faire au moins 6 caractères.");
+      return;
+    }
     try {
-      await handleAuthSuccess(await appApi.registerClient(email, password));
+      const payload = { email, password };
+      if (firstName) payload.firstName = firstName;
+      if (lastName) payload.lastName = lastName;
+      if (phone) payload.phone = phone;
+      await handleAuthSuccess(await appApi.registerClient(payload));
     } catch (error) {
-      notify(`Inscription client impossible : ${error.message}`);
+      notify(`Inscription impossible : ${error.message}`);
     }
   }
 
   async function handleRegisterProfessional() {
     const inputs = document.querySelectorAll("#screen-register-pro .field input");
+    const firstName = inputs[0]?.value.trim() || "";
+    const lastName = inputs[1]?.value.trim() || "";
     const email = inputs[2]?.value.trim() || "";
-    const password = prompt("Choisis un mot de passe pour ton compte professionnel :", "Pro123456!") || "";
+    const experience = inputs[3]?.value.trim() || "";
+    const siret = inputs[4]?.value.trim() || "";
+    const password = inputs[5]?.value || "";
+    const specialty = document.querySelector("#screen-register-pro .field select")?.value || "";
     if (!email || !password) {
       notify("Email et mot de passe obligatoires.");
       return;
     }
+    if (password.length < 6) {
+      notify("Le mot de passe doit faire au moins 6 caractères.");
+      return;
+    }
     try {
-      await handleAuthSuccess(await appApi.registerProfessional(email, password));
+      const payload = { email, password };
+      if (firstName) payload.firstName = firstName;
+      if (lastName) payload.lastName = lastName;
+      if (specialty) payload.specialty = specialty;
+      if (experience) payload.yearsExperience = experience;
+      if (siret) payload.siret = siret;
+      await handleAuthSuccess(await appApi.registerProfessional(payload));
     } catch (error) {
       notify(`Inscription pro impossible : ${error.message}`);
     }
@@ -2129,6 +2259,45 @@ function syncGoogleUiVisibility(screenId) {
     notify(`Prestataire sélectionné : ${state.selectedPro.name}. L'intégration complète de réservation peut maintenant être branchée sur le endpoint booking précis.`);
     await loadBookings();
     goTo("screen-rdv");
+  }
+
+  async function handleLogout() {
+    appApi.clearSession();
+    state.session = null;
+    state.authUser = null;
+    state.userMode = "guest";
+    state.bookings = [];
+    state.notifications = [];
+    state.conversations = [];
+    state.proOnline = true;
+    renderAccount();
+    renderProDashboard();
+    renderConversations();
+    renderBookings();
+    goTo("screen-home");
+  }
+
+  function toggleProOnlineStatus() {
+    state.proOnline = !state.proOnline;
+    // Endpoint prêt à brancher : appApi.updateAvailability(state.proOnline)
+    renderProDashboard();
+  }
+
+  async function handleSavePricing() {
+    const inputs = document.querySelectorAll("#proPricingCard .pricing-row input");
+    const pricing = {};
+    inputs.forEach((input) => {
+      const key = input.dataset.priceKey;
+      const val = parseFloat(input.value);
+      if (key && Number.isFinite(val) && val > 0) pricing[key] = val;
+    });
+    state.pricingData = { ...state.pricingData, ...pricing };
+    try {
+      await appApi.updateProPricing(state.pricingData);
+      notify("Tarifs enregistrés avec succès.");
+    } catch (_) {
+      notify("Tarifs enregistrés localement. La synchronisation sera disponible dès que l'endpoint backend sera actif.");
+    }
   }
 
   async function handleSendMessage() {
@@ -2154,8 +2323,12 @@ function syncGoogleUiVisibility(screenId) {
   document.getElementById("resetFilters").onclick = () => {
     state.category = state.categories[0]?.key || "coiffure";
     state.place = "À domicile";
+    state.radius = 5;
+    state.budget = null;
     renderFilterCategories();
     renderPlaceChips();
+    renderRadiusOptions();
+    renderBudgetOptions();
     renderPros();
   };
   document.getElementById("filterOverlay").addEventListener("click", (e) => {
@@ -2227,6 +2400,9 @@ function syncGoogleUiVisibility(screenId) {
   (async function initApp() {
     bindGo();
     renderPlaceChips();
+    renderRadiusOptions();
+    renderBudgetOptions();
+    updateFilterCount();
     setSheetState(1);
     renderNav("screen-home");
     renderFavorites();

@@ -1087,9 +1087,10 @@
     </div>
   </div>
 
-  <script src="assets/js/config.js"></script>
+  
+<script src="assets/js/config.js"></script>
 <script>
-    const categories = [
+    const fallbackCategories = [
       { key: 'barbier', label: 'Barber' },
       { key: 'coiffure', label: 'Coiffeuse' },
       { key: 'ongles', label: 'Manucure' },
@@ -1099,156 +1100,232 @@
       { key: 'tatouage', label: 'Tatoueur' },
       { key: 'massage', label: 'Massage' }
     ];
+
     const placeOptions = ['À domicile', 'Chez le pro', 'En salon'];
 
-    const proData = {
-      coiffure: [
-        {
-          name: 'Sofia Hair', image: 'assets/img/pro-coiffeuse.jpg', secondary: 'Coiffeuse • Brushing • Soin & coupe', rating: '4.9', reviews: '92 avis', distance: '2.4 km', location: 'Paris 8e', availability: 'Disponible', price: '€€', fromPrice: '35€', description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
-          services: [
-            { name: 'Brushing signature', meta: '45 min • En salon', price: '35€', tags: ['Populaire'] },
-            { name: 'Coupe + soin', meta: '1h10 • À domicile', price: '58€', tags: [] }
-          ],
-          gallery: ['assets/img/pro-coiffeuse.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-tresses.jpg']
-        }
-      ],
-      ongles: [
-        {
-          name: 'Luna Nails', image: 'assets/img/pro-manucure.jpg', secondary: 'Manucure • Gel • Nail art', rating: '4.8', reviews: '118 avis', distance: '2.1 km', location: 'Paris 3e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Manucure premium • finitions nettes et design élégant',
-          services: [
-            { name: 'Pose semi-permanent', meta: '45 min • À domicile', price: '35€', tags: [] },
-            { name: 'Nail art signature', meta: '1h15 • Chez le pro', price: '54€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-manucure.jpg', 'assets/img/service-manucure.jpg', 'assets/img/pro-maquillage.jpg']
-        }
-      ],
-      esthetique: [
-        {
-          name: 'Nora Skin', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Esthéticienne • Soin visage • Éclat peau', rating: '4.9', reviews: '74 avis', distance: '1.7 km', location: 'Paris 15e', availability: 'Disponible', price: '€€', fromPrice: '42€', description: 'Esthéticienne experte • soin visage, nettoyage profond et éclat',
-          services: [
-            { name: 'Soin visage complet', meta: '50 min • À domicile', price: '42€', tags: ['Glow'] },
-            { name: 'Nettoyage profond', meta: '1h10 • Chez le pro', price: '58€', tags: [] }
-          ],
-          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-maquillage.jpg']
-        }
-      ],
-      tatouage: [
-        {
-          name: 'Eli Ink', image: 'assets/img/pro-tatoueur.jpg', secondary: 'Tatoueur • Fine line • Pièces personnalisées', rating: '4.9', reviews: '64 avis', distance: '1.9 km', location: 'Paris 19e', availability: 'Disponible', price: '€€€', fromPrice: '80€', description: 'Tatoueur précis • lignes fines et rendez-vous en studio',
-          services: [
-            { name: 'Mini tattoo', meta: '45 min • Chez le pro', price: '80€', tags: [] },
-            { name: 'Projet personnalisé', meta: '1h30 • Chez le pro', price: '150€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-tatoueur.jpg', 'assets/img/service-tatoueur.jpg', 'assets/img/pro-tatoueur.jpg']
-        }
-      ],
-      maquillage: [
-        {
-          name: 'Maya Make Up', image: 'assets/img/pro-maquillage.jpg', secondary: 'Maquillage • Glow skin • Événementiel', rating: '4.9', reviews: '76 avis', distance: '3.4 km', location: 'Paris 16e', availability: 'Disponible', price: '€€€', fromPrice: '65€', description: 'Maquilleuse premium • teint lumineux et finitions photo-ready',
-          services: [
-            { name: 'Make-up jour', meta: '45 min • À domicile', price: '65€', tags: [] },
-            { name: 'Make-up soirée', meta: '1h • À domicile / Chez le pro', price: '90€', tags: ['Expert'] }
-          ],
-          gallery: ['assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg', 'assets/img/pro-estheticienne.jpg']
-        }
-      ],
-      massage: [
-        {
-          name: 'Yanis Relax', image: 'assets/img/pro-massage.jpg', secondary: 'Massage • Relaxant • Récupération', rating: '4.8', reviews: '52 avis', distance: '2.6 km', location: 'Paris 17e', availability: 'Disponible', price: '€€€', fromPrice: '70€', description: 'Massage bien-être • détente profonde et récupération musculaire',
-          services: [
-            { name: 'Massage relaxant', meta: '60 min • À domicile', price: '70€', tags: ['Populaire'] },
-            { name: 'Massage deep tissue', meta: '75 min • À domicile', price: '95€', tags: [] }
-          ],
-          gallery: ['assets/img/pro-massage.jpg', 'assets/img/service-massage.jpg', 'assets/img/pro-massage.jpg']
-        }
-      ],
-      tresses: [
-        {
-          name: 'Sofia Braids', image: 'assets/img/pro-tresses.jpg', secondary: 'Tresses • Coiffure protectrice • Baby hair', rating: '4.8', reviews: '67 avis', distance: '2.9 km', location: 'Paris 18e', availability: 'Disponible', price: '€€€', fromPrice: '55€', description: 'Spécialiste tresses • rendu propre, rapide et soigné',
-          services: [
-            { name: 'Tresses plaquées', meta: '1h • À domicile', price: '55€', tags: [] },
-            { name: 'Tresses freestyle', meta: '1h30 • À domicile / Chez le pro', price: '85€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-tresses.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-coiffeuse.jpg']
-        }
-      ],
-      barbier: [
-        {
-          name: 'Milton', image: 'assets/img/milton-barber.jpeg', secondary: 'Barbier • Coupe homme • Barbe', rating: '4.8', reviews: '89 avis', distance: '2.3 km', location: 'Paris 12e', availability: 'Disponible', price: '€€', fromPrice: '29€', description: 'Barbier moderne • coupe précise et barbe nette à domicile',
-          services: [
-            { name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
-            { name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/service-barber.jpeg']
-        },
-        {
-          name: 'Kingbrel', image: 'assets/img/kingbrel-barber.jpeg', secondary: 'Barbier • Coupe premium • Barbershop', rating: '5.0', reviews: '143 avis', distance: '2.7 km', location: 'Paris 10e', availability: 'Disponible', price: '€€€', fromPrice: '35€', description: 'Barbier premium • ambiance haut de gamme et coupe signature',
-          services: [
-            { name: 'Coupe premium', meta: '40 min • Chez le pro', price: '35€', tags: [] },
-            { name: 'Coupe + barbe', meta: '55 min • Chez le pro', price: '48€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/kingbrel-barber.jpeg', 'assets/img/milton-barber.jpeg', 'assets/img/service-barber.jpeg']
-        }
-      ],
-      henne: [
-        {
-          name: 'Ines Henné', image: 'assets/img/ines-henne.jpeg', secondary: 'Henné • Motifs fins • Événementiel', rating: '4.9', reviews: '58 avis', distance: '3.1 km', location: 'Paris 20e', availability: 'Disponible', price: '€€', fromPrice: '40€', description: 'Artiste henné • dessins précis et finitions élégantes à domicile',
-          services: [
-            { name: 'Henné mains', meta: '45 min • À domicile', price: '40€', tags: [] },
-            { name: 'Henné mariée', meta: '1h30 • À domicile', price: '95€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/ines-henne.jpeg', 'assets/img/service-henne.jpeg', 'assets/img/pro-maquillage.jpg']
-        }
-      ],
-      perceur: [
-        {
-          name: 'Nora Piercing', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Perceur • Oreille • Styling', rating: '4.7', reviews: '41 avis', distance: '2.8 km', location: 'Paris 9e', availability: 'Disponible', price: '€€', fromPrice: '30€', description: 'Perceuse professionnelle • gestes propres et conseils de cicatrisation',
-          services: [
-            { name: 'Lobe styling', meta: '20 min • Chez le pro', price: '30€', tags: [] },
-            { name: 'Cartilage', meta: '30 min • Chez le pro', price: '45€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-manucure.jpg']
-        }
-      ],
-      blanchiment: [
-        {
-          name: 'Smile Studio', image: 'assets/img/pro-estheticienne.jpg', secondary: 'Blanchiment Dentaire • Éclat • Sourire', rating: '4.8', reviews: '49 avis', distance: '2.5 km', location: 'Paris 7e', availability: 'Disponible', price: '€€€', fromPrice: '79€', description: 'Blanchiment dentaire esthétique • séance encadrée et résultat naturel',
-          services: [
-            { name: 'Séance découverte', meta: '35 min • Chez le pro', price: '79€', tags: [] },
-            { name: 'Séance éclat+', meta: '50 min • Chez le pro', price: '109€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/service-estheticienne.jpg', 'assets/img/pro-maquillage.jpg']
-        }
-      ],
-      masso: [
-        {
-          name: 'Amine Therapy', image: 'assets/img/pro-massage.jpg', secondary: 'Masso-Thérapeute • Détente • Récupération', rating: '4.9', reviews: '61 avis', distance: '3.3 km', location: 'Paris 14e', availability: 'Disponible', price: '€€€', fromPrice: '85€', description: 'Masso-thérapeute • protocoles ciblés pour détente et récupération',
-          services: [
-            { name: 'Drainage ciblé', meta: '60 min • À domicile', price: '85€', tags: [] },
-            { name: 'Massage thérapeutique', meta: '75 min • À domicile', price: '110€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/pro-massage.jpg', 'assets/img/service-massage.jpg', 'assets/img/pro-estheticienne.jpg']
-        }
-      ],
-      micropigmentation: [
-        {
-          name: 'Samuel Pigment', image: 'assets/img/samuel-micropigmentation.webp', secondary: 'Micro-Pigmentation • Finition nette • Correction', rating: '4.9', reviews: '54 avis', distance: '4.1 km', location: 'Paris 6e', availability: 'Disponible', price: '€€€€', fromPrice: '120€', description: 'Expert micro-pigmentation • ligne précise et résultat naturel',
-          services: [
-            { name: 'Ligne frontale', meta: '1h • Chez le pro', price: '120€', tags: [] },
-            { name: 'Retouche premium', meta: '1h20 • Chez le pro', price: '165€', tags: ['Populaire'] }
-          ],
-          gallery: ['assets/img/samuel-micropigmentation.webp', 'assets/img/hero-scalpcare.webp', 'assets/img/pro-coiffeuse.jpg']
-        }
-      ]
+    const fallbackPros = [
+      {
+        id: 'fallback-sofia',
+        category: 'coiffure',
+        name: 'Sofia Hair',
+        image: 'assets/img/pro-coiffeuse.jpg',
+        secondary: 'Coiffeuse • Brushing • Soin & coupe',
+        rating: '4.9',
+        reviews: '92 avis',
+        distance: '2.4 km',
+        location: 'Paris 8e',
+        availability: 'Disponible',
+        price: '€€',
+        fromPrice: '35€',
+        description: 'Coiffeuse premium • brushing, soin et coiffage en salon ou à domicile',
+        services: [
+          { id: 'fallback-sofia-1', name: 'Brushing signature', meta: '45 min • En salon', price: '35€', tags: ['Populaire'] },
+          { id: 'fallback-sofia-2', name: 'Coupe + soin', meta: '1h10 • À domicile', price: '58€', tags: [] }
+        ],
+        gallery: ['assets/img/pro-coiffeuse.jpg', 'assets/img/service-coiffeuse.jpg', 'assets/img/pro-tresses.jpg']
+      },
+      {
+        id: 'fallback-milton',
+        category: 'barbier',
+        name: 'Milton',
+        image: 'assets/img/milton-barber.jpeg',
+        secondary: 'Barbier • Coupe homme • Barbe',
+        rating: '4.8',
+        reviews: '89 avis',
+        distance: '2.3 km',
+        location: 'Paris 12e',
+        availability: 'Disponible',
+        price: '€€',
+        fromPrice: '29€',
+        description: 'Barbier moderne • coupe précise et barbe nette à domicile',
+        services: [
+          { id: 'fallback-milton-1', name: 'Fade + contour', meta: '35 min • À domicile', price: '29€', tags: ['Express'] },
+          { id: 'fallback-milton-2', name: 'Coupe + barbe', meta: '50 min • À domicile', price: '45€', tags: ['Populaire'] }
+        ],
+        gallery: ['assets/img/milton-barber.jpeg', 'assets/img/kingbrel-barber.jpeg', 'assets/img/service-barber.jpeg']
+      },
+      {
+        id: 'fallback-luna',
+        category: 'ongles',
+        name: 'Luna Nails',
+        image: 'assets/img/pro-manucure.jpg',
+        secondary: 'Manucure • Gel • Nail art',
+        rating: '4.8',
+        reviews: '118 avis',
+        distance: '2.1 km',
+        location: 'Paris 3e',
+        availability: 'Disponible',
+        price: '€€€',
+        fromPrice: '35€',
+        description: 'Manucure premium • finitions nettes et design élégant',
+        services: [
+          { id: 'fallback-luna-1', name: 'Pose semi-permanent', meta: '45 min • À domicile', price: '35€', tags: [] },
+          { id: 'fallback-luna-2', name: 'Nail art signature', meta: '1h15 • Chez le pro', price: '54€', tags: ['Populaire'] }
+        ],
+        gallery: ['assets/img/pro-manucure.jpg', 'assets/img/service-manucure.jpg', 'assets/img/pro-maquillage.jpg']
+      },
+      {
+        id: 'fallback-maya',
+        category: 'maquillage',
+        name: 'Maya Make Up',
+        image: 'assets/img/pro-maquillage.jpg',
+        secondary: 'Maquillage • Glow skin • Événementiel',
+        rating: '4.9',
+        reviews: '76 avis',
+        distance: '3.4 km',
+        location: 'Paris 16e',
+        availability: 'Disponible',
+        price: '€€€',
+        fromPrice: '65€',
+        description: 'Maquilleuse premium • teint lumineux et finitions photo-ready',
+        services: [
+          { id: 'fallback-maya-1', name: 'Make-up jour', meta: '45 min • À domicile', price: '65€', tags: [] },
+          { id: 'fallback-maya-2', name: 'Make-up soirée', meta: '1h • À domicile / Chez le pro', price: '90€', tags: ['Expert'] }
+        ],
+        gallery: ['assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg', 'assets/img/pro-estheticienne.jpg']
+      },
+      {
+        id: 'fallback-nora',
+        category: 'esthetique',
+        name: 'Nora Skin',
+        image: 'assets/img/pro-estheticienne.jpg',
+        secondary: 'Esthéticienne • Soin visage • Éclat peau',
+        rating: '4.9',
+        reviews: '74 avis',
+        distance: '1.7 km',
+        location: 'Paris 15e',
+        availability: 'Disponible',
+        price: '€€',
+        fromPrice: '42€',
+        description: 'Esthéticienne experte • soin visage, nettoyage profond et éclat',
+        services: [
+          { id: 'fallback-nora-1', name: 'Soin visage complet', meta: '50 min • À domicile', price: '42€', tags: ['Glow'] },
+          { id: 'fallback-nora-2', name: 'Nettoyage profond', meta: '1h10 • Chez le pro', price: '58€', tags: [] }
+        ],
+        gallery: ['assets/img/pro-estheticienne.jpg', 'assets/img/pro-maquillage.jpg', 'assets/img/service-maquillage.jpg']
+      }
+    ];
+
+    const APP_SESSION_KEY = 'ubodrop_app_session';
+
+    const state = {
+      category: 'coiffure',
+      place: 'À domicile',
+      userMode: 'guest',
+      sheetState: 1,
+      categories: [...fallbackCategories],
+      pros: [...fallbackPros],
+      selectedPro: fallbackPros[0],
+      selectedService: null,
+      authUser: null,
+      session: null,
+      conversations: [],
+      currentConversationId: null,
+      bookings: [],
+      notifications: []
     };
 
-    const flatPros = Object.values(proData).flat().filter((pro, index, arr) => arr.findIndex(item => item.name === pro.name) === index);
-    const state = { category: 'coiffure', place: 'À domicile', userMode: 'guest', sheetState: 1 };
+    const appApi = {
+      getToken() {
+        try {
+          const raw = localStorage.getItem(APP_SESSION_KEY);
+          if (!raw) return '';
+          const session = JSON.parse(raw);
+          return session?.accessToken || '';
+        } catch {
+          return '';
+        }
+      },
+      getSession() {
+        try {
+          const raw = localStorage.getItem(APP_SESSION_KEY);
+          return raw ? JSON.parse(raw) : null;
+        } catch {
+          return null;
+        }
+      },
+      saveSession(data) {
+        localStorage.setItem(APP_SESSION_KEY, JSON.stringify(data));
+      },
+      clearSession() {
+        localStorage.removeItem(APP_SESSION_KEY);
+      },
+      async request(path, options = {}) {
+        const token = this.getToken();
+        const response = await fetch(`${API_URL}/api/v1${path}`, {
+          ...options,
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...(options.headers || {})
+          }
+        });
+
+        let data = null;
+        const contentType = response.headers.get('content-type') || '';
+
+        try {
+          if (contentType.includes('application/json')) {
+            data = await response.json();
+          } else {
+            data = await response.text();
+          }
+        } catch (_) {
+          data = null;
+        }
+
+        if (!response.ok) {
+          const message = Array.isArray(data?.message)
+            ? data.message.join(' | ')
+            : data?.message || (typeof data === 'string' ? data : `Erreur API (${response.status})`);
+          throw new Error(message);
+        }
+        return data;
+      },
+      login(email, password) {
+        return this.request('/auth/login', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+      },
+      me() { return this.request('/auth/me'); },
+      registerClient(email, password) {
+        return this.request('/auth/register/client', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+      },
+      registerProfessional(email, password) {
+        return this.request('/auth/register/professional', {
+          method: 'POST',
+          body: JSON.stringify({ email, password })
+        });
+      },
+      categories() { return this.request('/categories'); },
+      searchProfessionals() { return this.request('/search/professionals'); },
+      publicProfessional(id) { return this.request(`/profiles/pro/public/${id}`); },
+      myBookings() { return this.request('/bookings/me'); },
+      bookingHistory() { return this.request('/bookings/history'); },
+      conversations() { return this.request('/messaging/conversations/me'); },
+      createConversation(payload) {
+        return this.request('/messaging/conversations', {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      },
+      messages(conversationId) { return this.request(`/messaging/conversations/${conversationId}/messages`); },
+      sendMessage(conversationId, content) {
+        return this.request(`/messaging/conversations/${conversationId}/messages`, {
+          method: 'POST',
+          body: JSON.stringify({ content })
+        });
+      },
+      notifications() { return this.request('/notifications/me'); }
+    };
 
     const navIcons = {
       search: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4 4"></path></svg>',
       map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l-4 2V6l4-2 6 2 4-2v14l-4 2-6-2Z"></path><path d="M9 4v14M15 6v14"></path></svg>',
-      heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-6.5-4.35-8.5-8C1.8 8.5 3.5 5 7.2 5c1.95 0 3.08.93 4.8 2.72C13.72 5.93 14.85 5 16.8 5 20.5 5 22.2 8.5 20.5 12c-2 3.65-8.5 8-8.5 8Z"></path></svg>',
       calendar: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="3"></rect><path d="M8 3.5v4M16 3.5v4M3.5 9.5h17"></path></svg>',
       user: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.2" r="3.2"></circle><path d="M5 19c1.5-3 4.2-4.5 7-4.5s5.5 1.5 7 4.5"></path></svg>',
       dashboard: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 13.5A8 8 0 0 1 20 13.5"></path><path d="M12 13l4-4"></path><path d="M6 18h12"></path></svg>',
@@ -1263,6 +1340,7 @@
       { id: 'screen-chat', label: 'Chat', icon: navIcons.chat },
       { id: 'screen-account', label: 'Compte', icon: navIcons.user }
     ];
+
     const screenToNavPro = [
       { id: 'screen-pro-dashboard', label: 'Dashboard', icon: navIcons.dashboard },
       { id: 'screen-pro-messages', label: 'Messages', icon: navIcons.messages },
@@ -1270,115 +1348,187 @@
       { id: 'screen-home', label: 'Accueil', icon: navIcons.home }
     ];
 
-    function renderPlaceChips() {
-      const row = document.getElementById('placeRow');
-      const filterGrid = document.getElementById('filterPlaceGrid');
-      row.innerHTML = '';
-      filterGrid.innerHTML = '';
-      placeOptions.forEach(place => {
-        const chip = document.createElement('button');
-        chip.className = 'place-chip' + (state.place === place ? ' active' : '');
-        chip.textContent = place;
-        chip.onclick = () => { state.place = place; renderPlaceChips(); renderPros(); };
-        row.appendChild(chip);
+    function notify(message) { window.alert(message); }
 
-        const seg = document.createElement('button');
-        seg.className = 'seg' + (state.place === place ? ' active' : '');
-        seg.textContent = place;
-        seg.onclick = () => { state.place = place; renderPlaceChips(); };
-        filterGrid.appendChild(seg);
+    function extractArray(data) {
+      if (Array.isArray(data)) return data;
+      if (Array.isArray(data?.items)) return data.items;
+      if (Array.isArray(data?.data)) return data.data;
+      if (Array.isArray(data?.results)) return data.results;
+      if (Array.isArray(data?.rows)) return data.rows;
+      return [];
+    }
+
+    function euro(value) {
+      const n = Number(value);
+      return Number.isFinite(n) ? `${n}€` : (value || '—');
+    }
+
+    function truncate(text, max = 90) {
+      const s = String(text || '');
+      return s.length > max ? `${s.slice(0, max - 1)}…` : s;
+    }
+
+    function initials(text) {
+      return String(text || '').split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('') || 'U';
+    }
+
+    function assetForCategory(key) {
+      const map = {
+        barbier: 'assets/img/milton-barber.jpeg',
+        coiffure: 'assets/img/pro-coiffeuse.jpg',
+        ongles: 'assets/img/pro-manucure.jpg',
+        henne: 'assets/img/pro-maquillage.jpg',
+        maquillage: 'assets/img/pro-maquillage.jpg',
+        esthetique: 'assets/img/pro-estheticienne.jpg',
+        tatouage: 'assets/img/kingbrel-barber.jpeg',
+        massage: 'assets/img/pro-estheticienne.jpg'
+      };
+      return map[key] || 'assets/img/pro-estheticienne.jpg';
+    }
+
+    function categoryKeyFromText(value) {
+      const text = String(value || '').toLowerCase();
+      if (text.includes('barb')) return 'barbier';
+      if (text.includes('coiff')) return 'coiffure';
+      if (text.includes('ong') || text.includes('nail') || text.includes('manuc')) return 'ongles';
+      if (text.includes('henn')) return 'henne';
+      if (text.includes('maqu')) return 'maquillage';
+      if (text.includes('esth') || text.includes('skin') || text.includes('soin')) return 'esthetique';
+      if (text.includes('tat')) return 'tatouage';
+      if (text.includes('mass')) return 'massage';
+      return 'coiffure';
+    }
+
+    function mapRoleToMode(user) {
+      const roles = user?.roles || user?.user?.roles || [];
+      if (Array.isArray(roles) && roles.some((role) => String(role).toUpperCase() === 'PROFESSIONAL')) return 'pro';
+      return 'client';
+    }
+
+    function normalizeCategories(data) {
+      const arr = extractArray(data);
+      if (!arr.length) return [...fallbackCategories];
+      return arr.map((item) => {
+        const key = categoryKeyFromText(item?.name || item?.label);
+        return {
+          key,
+          label: item?.label || item?.name || key,
+          raw: item
+        };
+      }).filter((item, index, list) => list.findIndex((c) => c.key === item.key) === index);
+    }
+
+    function normalizeService(service, index = 0) {
+      return {
+        id: service?.id || `service-${index}`,
+        name: service?.name || service?.label || `Prestation ${index + 1}`,
+        meta: [
+          service?.durationMinutes ? `${service.durationMinutes} min` : service?.meta,
+          service?.executionMode
+        ].filter(Boolean).join(' • ') || 'Prestation disponible',
+        price: euro(service?.priceAmount ?? service?.price),
+        tags: []
+      };
+    }
+
+    function normalizePros(data) {
+      const arr = extractArray(data);
+      if (!arr.length) return [...fallbackPros];
+
+      return arr.map((item, index) => {
+        const categorySource =
+          item?.category?.name ||
+          item?.primaryCategory?.name ||
+          item?.specialty ||
+          item?.serviceCategory ||
+          item?.profession ||
+          item?.services?.[0]?.category?.name ||
+          item?.services?.[0]?.name ||
+          'coiffure';
+
+        const key = categoryKeyFromText(categorySource);
+        const name =
+          item?.displayName ||
+          item?.businessName ||
+          item?.name ||
+          [item?.firstName, item?.lastName].filter(Boolean).join(' ').trim() ||
+          item?.user?.email ||
+          `Professionnel ${index + 1}`;
+
+        const services = Array.isArray(item?.services) && item.services.length
+          ? item.services.map(normalizeService)
+          : [{
+              id: `${item?.id || index}-default`,
+              name: fallbackCategories.find((c) => c.key === key)?.label || 'Prestation',
+              meta: item?.executionMode || 'Prestation disponible',
+              price: euro(item?.fromPriceAmount ?? item?.priceAmount ?? item?.price ?? 35),
+              tags: []
+            }];
+
+        const image =
+          item?.avatarUrl ||
+          item?.imageUrl ||
+          item?.profileImageUrl ||
+          item?.profileImage ||
+          item?.coverImage ||
+          assetForCategory(key);
+
+        const city = item?.city || item?.addressCity || item?.locationCity || item?.address?.city || 'Paris';
+        const ratingValue = item?.averageRating ?? item?.rating ?? 4.8;
+        const reviewsCount = item?.reviewsCount ?? item?.reviewCount ?? 0;
+
+        return {
+          id: item?.id || item?.profileId || item?.userId || `pro-${index}`,
+          category: key,
+          name,
+          image,
+          secondary: item?.headline || item?.bioShort || `${fallbackCategories.find((c) => c.key === key)?.label || 'Professionnel'} • UBODROP`,
+          rating: Number(ratingValue).toFixed(1),
+          reviews: `${reviewsCount} avis`,
+          distance: item?.distanceKm ? `${item.distanceKm} km` : 'près de toi',
+          location: city,
+          availability: item?.isAvailable === false ? 'Indisponible' : 'Disponible',
+          price: item?.priceTier || '€€',
+          fromPrice: euro(item?.fromPriceAmount ?? item?.priceAmount ?? item?.price ?? services[0]?.price ?? 35),
+          description: item?.bio || item?.description || 'Professionnel vérifié disponible sur UBODROP.',
+          services,
+          gallery: [image, ...(Array.isArray(item?.gallery) ? item.gallery : []), assetForCategory(key)].slice(0, 3),
+          raw: item
+        };
       });
     }
 
-    function renderFilterCategories() {
-      const row = document.getElementById('filterCategoryRow');
-      row.innerHTML = '';
-      categories.forEach(cat => {
-        const btn = document.createElement('button');
-        btn.className = 'pill' + (state.category === cat.key ? ' active' : '');
-        btn.textContent = cat.label;
-        btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
-        row.appendChild(btn);
-      });
+    function formatAuthUser(user) {
+      const email = user?.email || user?.user?.email || 'email@ubodrop.com';
+      const roles = user?.roles || user?.user?.roles || [];
+      return {
+        email,
+        roles,
+        displayName: email.split('@')[0],
+        roleLabel: roles.some((r) => String(r).toUpperCase() === 'PROFESSIONAL') ? 'Compte professionnel' : 'Compte client'
+      };
     }
 
-    function getVisiblePros() {
-      const selected = proData[state.category] || [];
-      if (selected.length >= 5) return selected.slice(0, 5);
-      const others = flatPros.filter(p => !selected.includes(p));
-      return [...selected, ...others].slice(0, 5);
-    }
-
-    function renderPros() {
-      const list = document.getElementById('proList');
-      list.innerHTML = '';
-      getVisiblePros().forEach(pro => {
-        const card = document.createElement('div');
-        card.className = 'pro-card';
-        card.innerHTML = `
-          <img class="pro-avatar" src="${pro.image}" alt="${pro.name}">
-          <div class="pro-main">
-            <div class="pro-name">${pro.name}</div>
-            <div class="pro-secondary">${pro.secondary}</div>
-            <div class="pro-rating">⭐ ${pro.rating} <span>(${pro.reviews})</span> <span>• ${pro.distance}</span></div>
-            <div class="pro-meta">${state.place} • ${pro.location}</div>
-          </div>
-          <div style="text-align:right;">
-            <div class="avail">${pro.availability}</div>
-            <div class="pro-meta" style="margin-top:8px;">${pro.price}</div>
-            <button class="book-btn" data-open-pro="${pro.name}">Réserver</button>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-      bindOpenPro();
-    }
-
-    function findPro(name) {
-      return flatPros.find(p => p.name === name) || flatPros[0];
-    }
-
-    function openPro(name) {
-      const pro = findPro(name);
-      document.getElementById('detailHero').src = pro.gallery[0];
-      document.getElementById('detailName').textContent = pro.name;
-      document.getElementById('detailDesc').textContent = pro.description;
-      document.getElementById('detailPrice').textContent = `à partir de ${pro.fromPrice}`;
-      document.getElementById('detailCta').textContent = `Réserver ${pro.name.split(' ')[0]}`;
-      document.getElementById('detailMeta').innerHTML = `
-        <span>⭐ ${pro.rating} (${pro.reviews})</span>
-        <span>• ${pro.distance}</span>
-        <span>• ${pro.location}</span>
-      `;
-      const gallery = document.getElementById('detailGallery');
-      gallery.innerHTML = pro.gallery.slice(1).map(src => `<img src="${src}" alt="Galerie ${pro.name}">`).join('');
-      const services = document.getElementById('detailServices');
-      services.innerHTML = pro.services.map(service => `
-        <div class="service-row">
-          <div>
-            <h4>${service.name}</h4>
-            <p>${service.meta}${service.tags.length ? ' • ' + service.tags.join(', ') : ''}</p>
-          </div>
-          <div class="service-price"><strong>${service.price}</strong><button class="tiny-btn">Choisir</button></div>
-        </div>
-      `).join('');
-      goTo('screen-detail');
-    }
-
-    function bindOpenPro() {
-      document.querySelectorAll('[data-open-pro]').forEach(el => {
-        el.onclick = () => openPro(el.getAttribute('data-open-pro'));
+    function bindGo() {
+      document.querySelectorAll('[data-go]').forEach((btn) => {
+        btn.onclick = () => goTo(btn.getAttribute('data-go'));
       });
     }
 
     function renderNav(screenId) {
       const nav = document.getElementById('bottomNav');
       const grid = document.getElementById('navGrid');
-      const authScreens = ['screen-home','screen-login','screen-register-client','screen-register-pro'];
-      if (authScreens.includes(screenId)) { nav.classList.remove('show'); return; }
+      const authScreens = ['screen-home', 'screen-login', 'screen-register-client', 'screen-register-pro'];
+
+      if (authScreens.includes(screenId)) {
+        nav.classList.remove('show');
+        return;
+      }
+
       nav.classList.add('show');
       const items = state.userMode === 'pro' ? screenToNavPro : screenToNavClient;
-      grid.innerHTML = items.map(item => `
+      grid.innerHTML = items.map((item) => `
         <button class="nav-item ${item.id === screenId ? 'active' : ''}" data-go="${item.id}">
           <span class="nav-icon">${item.icon}</span>
           <span>${item.label}</span>
@@ -1388,15 +1538,9 @@
     }
 
     function goTo(screenId) {
-      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach((screen) => screen.classList.remove('active'));
       document.getElementById(screenId)?.classList.add('active');
       renderNav(screenId);
-    }
-
-    function bindGo() {
-      document.querySelectorAll('[data-go]').forEach(btn => {
-        btn.onclick = () => goTo(btn.getAttribute('data-go'));
-      });
     }
 
     function toggleFilter(open) {
@@ -1410,21 +1554,558 @@
       sheet.classList.remove('sheet-state-0', 'sheet-state-1', 'sheet-state-2', 'sheet-state-3');
       sheet.classList.add(`sheet-state-${state.sheetState}`);
       const cycleLabel = document.getElementById('sheetCycle');
-      if (cycleLabel) {
-        cycleLabel.textContent = ['Ouvrir', 'Monter', 'Développer', 'Réduire'][state.sheetState];
+      if (cycleLabel) cycleLabel.textContent = ['Ouvrir', 'Monter', 'Développer', 'Réduire'][state.sheetState];
+    }
+
+    function renderPlaceChips() {
+      const row = document.getElementById('placeRow');
+      const filterGrid = document.getElementById('filterPlaceGrid');
+      row.innerHTML = '';
+      filterGrid.innerHTML = '';
+
+      placeOptions.forEach((place) => {
+        const chip = document.createElement('button');
+        chip.className = 'place-chip' + (state.place === place ? ' active' : '');
+        chip.textContent = place;
+        chip.onclick = () => {
+          state.place = place;
+          renderPlaceChips();
+          renderPros();
+        };
+        row.appendChild(chip);
+
+        const seg = document.createElement('button');
+        seg.className = 'seg' + (state.place === place ? ' active' : '');
+        seg.textContent = place;
+        seg.onclick = () => {
+          state.place = place;
+          renderPlaceChips();
+        };
+        filterGrid.appendChild(seg);
+      });
+    }
+
+    function renderFilterCategories() {
+      const row = document.getElementById('filterCategoryRow');
+      row.innerHTML = '';
+
+      state.categories.forEach((cat) => {
+        const btn = document.createElement('button');
+        btn.className = 'pill' + (state.category === cat.key ? ' active' : '');
+        btn.textContent = cat.label;
+        btn.onclick = () => {
+          state.category = cat.key;
+          renderFilterCategories();
+          renderPros();
+        };
+        row.appendChild(btn);
+      });
+    }
+
+    function getVisiblePros() {
+      const selected = state.pros.filter((pro) => pro.category === state.category);
+      const source = selected.length ? selected : state.pros;
+      return source.slice(0, 5);
+    }
+
+    function renderPros() {
+      const list = document.getElementById('proList');
+      list.innerHTML = '';
+
+      getVisiblePros().forEach((pro) => {
+        const card = document.createElement('div');
+        card.className = 'pro-card';
+        card.innerHTML = `
+          <img class="pro-avatar" src="${pro.image}" alt="${pro.name}">
+          <div class="pro-main">
+            <div class="pro-name">${pro.name}</div>
+            <div class="pro-secondary">${truncate(pro.secondary, 48)}</div>
+            <div class="pro-rating">⭐ ${pro.rating} <span>(${pro.reviews})</span> <span>• ${pro.distance}</span></div>
+            <div class="pro-meta">${state.place} • ${pro.location}</div>
+          </div>
+          <div style="text-align:right;">
+            <div class="avail">${pro.availability}</div>
+            <div class="pro-meta" style="margin-top:8px;">${pro.fromPrice}</div>
+            <button class="book-btn" data-open-pro="${pro.id}">Réserver</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      bindOpenPro();
+    }
+
+    function findPro(idOrName) {
+      return state.pros.find((p) => p.id === idOrName || p.name === idOrName) || state.pros[0];
+    }
+
+    async function openPro(idOrName) {
+      let pro = findPro(idOrName);
+
+      try {
+        if (pro?.id && !String(pro.id).startsWith('fallback-')) {
+          const detail = await appApi.publicProfessional(pro.id);
+          const detailedPros = normalizePros([detail]);
+          if (detailedPros.length) pro = { ...pro, ...detailedPros[0] };
+        }
+      } catch (_) {}
+
+      state.selectedPro = pro;
+      document.getElementById('detailHero').src = pro.gallery[0];
+      document.getElementById('detailName').textContent = pro.name;
+      document.getElementById('detailDesc').textContent = pro.description;
+      document.getElementById('detailPrice').textContent = `à partir de ${pro.fromPrice}`;
+      document.getElementById('detailCta').textContent = state.userMode === 'guest' ? 'Se connecter pour réserver' : `Réserver ${pro.name.split(' ')[0]}`;
+      document.getElementById('detailMeta').innerHTML = `
+        <span>⭐ ${pro.rating} (${pro.reviews})</span>
+        <span>• ${pro.distance}</span>
+        <span>• ${pro.location}</span>
+      `;
+
+      const gallery = document.getElementById('detailGallery');
+      gallery.innerHTML = pro.gallery.slice(1).map((src) => `<img src="${src}" alt="Galerie ${pro.name}">`).join('');
+
+      const services = document.getElementById('detailServices');
+      services.innerHTML = pro.services.map((service) => `
+        <div class="service-row">
+          <div>
+            <h4>${service.name}</h4>
+            <p>${service.meta}${service.tags.length ? ' • ' + service.tags.join(', ') : ''}</p>
+          </div>
+          <div class="service-price"><strong>${service.price}</strong><button class="tiny-btn choose-service-btn" data-service-id="${service.id}">Choisir</button></div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.choose-service-btn').forEach((btn) => {
+        btn.onclick = () => {
+          const service = pro.services.find((item) => String(item.id) === btn.dataset.serviceId);
+          state.selectedService = service || pro.services[0];
+          notify(`Prestation sélectionnée : ${state.selectedService.name}`);
+        };
+      });
+
+      goTo('screen-detail');
+    }
+
+    function bindOpenPro() {
+      document.querySelectorAll('[data-open-pro]').forEach((el) => {
+        el.onclick = () => openPro(el.getAttribute('data-open-pro'));
+      });
+    }
+
+    function conversationTitle(conv) {
+      return conv?.title || conv?.professional?.name || conv?.client?.name || conv?.otherParticipantName || `Conversation ${String(conv?.id || '').slice(0, 6)}`;
+    }
+
+    function normalizeConversations(data) {
+      return extractArray(data).map((conv) => ({
+        id: conv?.id || conv?.conversationId,
+        title: conversationTitle(conv),
+        lastMessage: conv?.lastMessage?.content || conv?.lastMessage || conv?.latestMessage || '',
+        lastAt: conv?.updatedAt ? new Date(conv.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—',
+        raw: conv
+      }));
+    }
+
+    function renderBookings() {
+      const card = document.querySelector('#screen-rdv .list-card');
+      if (!card) return;
+
+      if (!state.bookings.length) {
+        card.innerHTML = `<div class="section-sub">Aucune réservation pour le moment. Réserve un professionnel pour retrouver tes rendez-vous ici.</div>`;
+        return;
+      }
+
+      card.innerHTML = state.bookings.map((booking) => {
+        const proName = booking?.professional?.displayName || booking?.professional?.name || booking?.provider?.name || 'Prestataire';
+        const serviceName = booking?.service?.name || booking?.title || 'Prestation';
+        const when = booking?.scheduledAt ? new Date(booking.scheduledAt).toLocaleString('fr-FR') : booking?.createdAt ? new Date(booking.createdAt).toLocaleString('fr-FR') : 'Date à confirmer';
+        const price = euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount);
+        const image = state.selectedPro?.image || assetForCategory(state.category);
+        return `
+          <div class="list-item">
+            <img src="${image}" alt="${proName}">
+            <div style="flex:1;">
+              <strong>${proName}</strong>
+              <p>${serviceName} • ${when} • ${price}</p>
+            </div>
+            <div class="avail">${booking?.status || 'Confirmé'}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderAccount() {
+      const authUser = formatAuthUser(state.authUser || {});
+      const accountHeader = document.querySelector('#screen-account .account-header');
+      if (accountHeader) {
+        accountHeader.innerHTML = `
+          <img class="account-avatar" src="${state.selectedPro?.image || 'assets/img/service-maquillage.jpg'}" alt="Profil utilisateur">
+          <div style="flex:1;">
+            <div class="account-name">${authUser.displayName}</div>
+            <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
+          </div>
+          <span class="setting-chip">${state.notifications.length ? `${state.notifications.length} notif.` : 'Connecté'}</span>
+        `;
+      }
+
+      const blocks = document.querySelectorAll('#screen-account .setting-block');
+      if (blocks[0]) {
+        blocks[0].innerHTML = `
+          <h4>Informations personnelles</h4>
+          <div class="setting-list">
+            <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span><span class="setting-chip">API</span></div>
+            <div class="setting-row"><span><strong>Rôles</strong><br>${(authUser.roles || []).join(', ') || 'CLIENT'}</span><span class="muted">Vérifié</span></div>
+          </div>
+        `;
+      }
+      if (blocks[1]) {
+        blocks[1].innerHTML = `
+          <h4>Réservations</h4>
+          <div class="setting-list">
+            <div class="setting-row"><span><strong>Réservations actives</strong><br>${state.bookings.length}</span><span class="setting-chip">Mes RDV</span></div>
+            <div class="setting-row"><span><strong>Mode favori</strong><br>${state.place}</span><span class="muted">Préférence</span></div>
+          </div>
+        `;
+      }
+      if (blocks[2]) {
+        blocks[2].innerHTML = `
+          <h4>Préférences</h4>
+          <div class="setting-list">
+            <div class="setting-row"><span><strong>Catégorie favorite</strong><br>${state.categories.find((c) => c.key === state.category)?.label || 'Beauté'}</span><span class="muted">Recherche</span></div>
+            <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? `${state.notifications.length} nouvelle(s)` : 'Aucune nouvelle notification'}</span><span class="setting-chip">Actif</span></div>
+          </div>
+        `;
+      }
+      if (blocks[3]) {
+        blocks[3].innerHTML = `
+          <h4>Paiement & sécurité</h4>
+          <div class="setting-list">
+            <div class="setting-row"><span><strong>Session</strong><br>${appApi.getToken() ? 'Connectée' : 'Déconnectée'}</span><span class="muted">JWT</span></div>
+            <div class="setting-row"><span><strong>Connexion</strong><br>Backend UBODROP synchronisé</span><span class="muted">Sécurisé</span></div>
+          </div>
+        `;
+      }
+    }
+
+    function renderProDashboard() {
+      const header = document.querySelector('#screen-pro-dashboard .pro-header-top');
+      if (header && state.authUser) {
+        const authUser = formatAuthUser(state.authUser);
+        header.innerHTML = `
+          <div style="display:flex; gap:12px; align-items:center;">
+            <img class="pro-avatar-lg" src="${state.selectedPro?.image || 'assets/img/service-barber.jpeg'}" alt="Pro">
+            <div>
+              <strong style="font-size:1.15rem;">Bonjour, ${authUser.displayName}</strong>
+              <div class="section-sub">${authUser.roleLabel} • ${authUser.email}</div>
+            </div>
+          </div>
+          <div class="online-chip">En ligne</div>
+        `;
+      }
+
+      const statCards = document.querySelectorAll('#screen-pro-dashboard .stat-card');
+      if (statCards.length >= 4) {
+        statCards[0].innerHTML = `<strong>${state.bookings.length}</strong><span>RDV synchronisés</span>`;
+        statCards[1].innerHTML = `<strong>${state.conversations.length}</strong><span>Conversations</span>`;
+        statCards[2].innerHTML = `<strong>${state.notifications.length}</strong><span>Notifications</span>`;
+        statCards[3].innerHTML = `<strong>${state.pros.length}</strong><span>Pros listés</span>`;
+      }
+
+      const cards = document.querySelectorAll('#screen-pro-dashboard .list-card');
+      const rdvCard = cards[0];
+      if (rdvCard) {
+        const body = state.bookings.length
+          ? state.bookings.slice(0, 3).map((booking) => `
+              <div class="agenda-item">
+                <div>
+                  <strong>${booking?.service?.name || 'Réservation'}</strong>
+                  <p>${booking?.status || 'Confirmé'}</p>
+                </div>
+                <strong>${euro(booking?.priceAmount ?? booking?.service?.priceAmount)}</strong>
+              </div>
+            `).join('')
+          : `<div class="agenda-item"><div><strong>Aucun RDV pour le moment</strong><p>Les nouvelles réservations apparaîtront ici.</p></div><strong>—</strong></div>`;
+        rdvCard.innerHTML = `
+          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Derniers RDV</strong></div><button class="sheet-link">Planning</button></div>
+          ${body}
+        `;
+      }
+
+      const msgCard = cards[1];
+      if (msgCard) {
+        const body = state.conversations.length
+          ? state.conversations.slice(0, 2).map((conv) => `
+              <div class="chat-preview" data-conversation-id="${conv.id}">
+                <div><strong>${conversationTitle(conv)}</strong><p>${truncate(conv.lastMessage || 'Conversation disponible', 54)}</p></div>
+                <span class="muted">${conv.lastAt || '—'}</span>
+              </div>
+            `).join('')
+          : `<div class="chat-preview"><div><strong>Aucune conversation</strong><p>Les messages clients apparaîtront ici.</p></div><span class="muted">—</span></div>`;
+        msgCard.innerHTML = `
+          <div class="row-between"><div><strong class="section-title" style="font-size:1.05rem;">Messagerie</strong></div><button class="sheet-link" data-go="screen-pro-messages">Ouvrir</button></div>
+          ${body}
+        `;
+        bindGo();
+      }
+    }
+
+    function renderConversations() {
+      const card = document.querySelector('#screen-pro-messages .list-card');
+      if (!card) return;
+
+      if (!state.conversations.length) {
+        card.innerHTML = `<div class="section-sub">Aucune conversation disponible pour le moment.</div>`;
+        return;
+      }
+
+      card.innerHTML = state.conversations.map((conv) => `
+        <div class="list-item" data-conversation-id="${conv.id}">
+          <img src="${state.selectedPro?.image || 'assets/img/service-barber.jpeg'}" alt="${conversationTitle(conv)}">
+          <div style="flex:1;">
+            <strong>${conversationTitle(conv)}</strong>
+            <p>${truncate(conv.lastMessage || 'Ouvrir la conversation', 54)}</p>
+          </div>
+          <span class="muted">${conv.lastAt}</span>
+        </div>
+      `).join('');
+
+      card.querySelectorAll('[data-conversation-id]').forEach((item) => {
+        item.onclick = async () => {
+          state.currentConversationId = item.dataset.conversationId;
+          await loadMessages(state.currentConversationId);
+          goTo('screen-chat');
+        };
+      });
+    }
+
+    async function loadMessages(conversationId) {
+      try {
+        const data = await appApi.messages(conversationId);
+        renderChat(extractArray(data));
+      } catch (error) {
+        renderChat([], `Impossible de charger les messages : ${error.message}`);
+      }
+    }
+
+    function renderChat(messages, errorMessage = '') {
+      const body = document.querySelector('#screen-chat .chat-body');
+      const head = document.querySelector('#screen-chat .chat-head strong');
+      if (head) {
+        const current = state.conversations.find((conv) => conv.id === state.currentConversationId);
+        head.textContent = current ? conversationTitle(current) : (state.selectedPro?.name || 'Conversation');
+      }
+
+      if (!body) return;
+
+      if (errorMessage) {
+        body.innerHTML = `<div class="bubble in">${errorMessage}<small>Maintenant</small></div>`;
+        return;
+      }
+
+      if (!messages.length) {
+        body.innerHTML = `<div class="bubble in">Aucun message pour le moment.<small>Maintenant</small></div>`;
+        return;
+      }
+
+      body.innerHTML = messages.map((msg, index) => {
+        const isOut = index % 2 === 1;
+        const content = msg?.content || msg?.message || 'Message';
+        const at = msg?.createdAt ? new Date(msg.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '—';
+        return `<div class="bubble ${isOut ? 'out' : 'in'}">${content}<small>${at}</small></div>`;
+      }).join('');
+    }
+
+    async function hydrateSession() {
+      state.session = appApi.getSession();
+      if (!state.session?.accessToken) return;
+
+      try {
+        const me = await appApi.me();
+        state.authUser = me;
+        state.userMode = mapRoleToMode(me);
+      } catch (_) {
+        appApi.clearSession();
+        state.session = null;
+        state.authUser = null;
+        state.userMode = 'guest';
+      }
+    }
+
+    async function loadCategories() {
+      try {
+        const data = await appApi.categories();
+        state.categories = normalizeCategories(data);
+      } catch (_) {
+        state.categories = [...fallbackCategories];
+      }
+      if (!state.categories.some((cat) => cat.key === state.category)) {
+        state.category = state.categories[0]?.key || 'coiffure';
+      }
+      renderFilterCategories();
+    }
+
+    async function loadPros() {
+      try {
+        const data = await appApi.searchProfessionals();
+        const normalized = normalizePros(data);
+        if (normalized.length) state.pros = normalized;
+      } catch (_) {
+        state.pros = [...fallbackPros];
+      }
+      if (!state.selectedPro) state.selectedPro = state.pros[0];
+      renderPros();
+    }
+
+    async function loadBookings() {
+      if (!appApi.getToken()) {
+        state.bookings = [];
+        renderBookings();
+        return;
+      }
+      try {
+        const [current, history] = await Promise.allSettled([appApi.myBookings(), appApi.bookingHistory()]);
+        const bookings = [];
+        if (current.status === 'fulfilled') bookings.push(...extractArray(current.value));
+        if (history.status === 'fulfilled') bookings.push(...extractArray(history.value));
+        state.bookings = bookings.filter((item, index, arr) => arr.findIndex((b) => String(b?.id) === String(item?.id)) === index);
+      } catch (_) {
+        state.bookings = [];
+      }
+      renderBookings();
+    }
+
+    async function loadNotifications() {
+      if (!appApi.getToken()) {
+        state.notifications = [];
+        renderAccount();
+        return;
+      }
+      try {
+        const data = await appApi.notifications();
+        state.notifications = extractArray(data);
+      } catch (_) {
+        state.notifications = [];
+      }
+      renderAccount();
+    }
+
+    async function loadConversations() {
+      if (!appApi.getToken()) {
+        state.conversations = [];
+        renderConversations();
+        return;
+      }
+      try {
+        const data = await appApi.conversations();
+        state.conversations = normalizeConversations(data);
+      } catch (_) {
+        state.conversations = [];
+      }
+      renderConversations();
+      renderProDashboard();
+    }
+
+    async function handleAuthSuccess(authResponse) {
+      appApi.saveSession(authResponse);
+      state.session = authResponse;
+      const me = await appApi.me();
+      state.authUser = me;
+      state.userMode = mapRoleToMode(me);
+      await Promise.all([loadBookings(), loadNotifications(), loadConversations()]);
+      renderAccount();
+      renderProDashboard();
+      goTo(state.userMode === 'pro' ? 'screen-pro-dashboard' : 'screen-account');
+    }
+
+    async function handleLogin() {
+      const inputs = document.querySelectorAll('#screen-login .field input');
+      const email = inputs[0]?.value.trim() || '';
+      const password = inputs[1]?.value || '';
+      if (!email || !password) {
+        notify('Renseigne ton email et ton mot de passe.');
+        return;
+      }
+      try {
+        const authResponse = await appApi.login(email, password);
+        await handleAuthSuccess(authResponse);
+      } catch (error) {
+        notify(`Connexion impossible : ${error.message}`);
+      }
+    }
+
+    async function handleRegisterClient() {
+      const inputs = document.querySelectorAll('#screen-register-client .field input');
+      const email = inputs[2]?.value.trim() || '';
+      const password = inputs[4]?.value || '';
+      if (!email || !password) {
+        notify('Email et mot de passe obligatoires.');
+        return;
+      }
+      try {
+        const authResponse = await appApi.registerClient(email, password);
+        await handleAuthSuccess(authResponse);
+      } catch (error) {
+        notify(`Inscription client impossible : ${error.message}`);
+      }
+    }
+
+    async function handleRegisterProfessional() {
+      const inputs = document.querySelectorAll('#screen-register-pro .field input');
+      const email = inputs[2]?.value.trim() || '';
+      const password = prompt('Choisis un mot de passe pour ton compte professionnel :', 'Pro123456!') || '';
+      if (!email || !password) {
+        notify('Email et mot de passe obligatoires.');
+        return;
+      }
+      try {
+        const authResponse = await appApi.registerProfessional(email, password);
+        await handleAuthSuccess(authResponse);
+      } catch (error) {
+        notify(`Inscription pro impossible : ${error.message}`);
+      }
+    }
+
+    async function handleReserveClick() {
+      if (!appApi.getToken()) {
+        notify('Connecte-toi pour continuer.');
+        goTo('screen-login');
+        return;
+      }
+      const pro = state.selectedPro || state.pros[0];
+      notify(`Prestataire sélectionné : ${pro.name}. Les réservations actives apparaîtront dans l’écran RDV.`);
+      await loadBookings();
+      goTo('screen-rdv');
+    }
+
+    async function handleSendMessage() {
+      const input = document.querySelector('#screen-chat .chat-input input');
+      const content = input?.value.trim() || '';
+      if (!content) return;
+      if (!state.currentConversationId) {
+        notify('Aucune conversation ouverte.');
+        return;
+      }
+      try {
+        await appApi.sendMessage(state.currentConversationId, content);
+        input.value = '';
+        await loadMessages(state.currentConversationId);
+        await loadConversations();
+      } catch (error) {
+        notify(`Envoi impossible : ${error.message}`);
       }
     }
 
     document.getElementById('filterBtn').onclick = () => toggleFilter(true);
     document.getElementById('applyFilters').onclick = () => toggleFilter(false);
     document.getElementById('resetFilters').onclick = () => {
-      state.category = 'coiffure';
+      state.category = state.categories[0]?.key || 'coiffure';
       state.place = 'À domicile';
       renderFilterCategories();
       renderPlaceChips();
       renderPros();
     };
-    document.getElementById('filterOverlay').addEventListener('click', e => {
+    document.getElementById('filterOverlay').addEventListener('click', (e) => {
       if (e.target.id === 'filterOverlay') toggleFilter(false);
     });
 
@@ -1465,13 +2146,16 @@
         let nearestDiff = Infinity;
         stateHeights.forEach((h, idx) => {
           const diff = Math.abs(current - h);
-          if (diff < nearestDiff) { nearestDiff = diff; nearest = idx; }
+          if (diff < nearestDiff) {
+            nearestDiff = diff;
+            nearest = idx;
+          }
         });
         sheet.style.height = '';
         setSheetState(nearest);
       };
 
-      dragTargets.forEach(target => {
+      dragTargets.forEach((target) => {
         target.addEventListener('mousedown', start);
         target.addEventListener('touchstart', start, { passive: false });
       });
@@ -1482,18 +2166,37 @@
       window.addEventListener('touchcancel', end);
     })();
 
-    document.getElementById('loginClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-account'); };
-    document.getElementById('loginProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
-    document.getElementById('registerClientBtn').onclick = () => { state.userMode = 'client'; goTo('screen-account'); };
-    document.getElementById('registerProBtn').onclick = () => { state.userMode = 'pro'; goTo('screen-pro-dashboard'); };
+    document.getElementById('detailCta').onclick = handleReserveClick;
+    document.getElementById('loginClientBtn').onclick = handleLogin;
+    document.getElementById('loginProBtn').onclick = handleLogin;
+    document.getElementById('registerClientBtn').onclick = handleRegisterClient;
+    document.getElementById('registerProBtn').onclick = handleRegisterProfessional;
+    document.querySelector('#screen-chat .send-btn').onclick = handleSendMessage;
 
-    renderPlaceChips();
-    renderFilterCategories();
-    renderPros();
-    bindGo();
-    bindOpenPro();
-    setSheetState(1);
-    renderNav('screen-home');
+    async function initApp() {
+      bindGo();
+      renderPlaceChips();
+      setSheetState(1);
+      renderNav('screen-home');
+
+      await hydrateSession();
+      await loadCategories();
+      await loadPros();
+      await loadBookings();
+      await loadNotifications();
+      await loadConversations();
+
+      renderAccount();
+      renderProDashboard();
+      bindOpenPro();
+
+      if (state.session?.accessToken) {
+        goTo(state.userMode === 'pro' ? 'screen-pro-dashboard' : 'screen-search');
+      }
+    }
+
+    initApp();
   </script>
+
 </body>
 </html>

@@ -547,6 +547,28 @@
     .filter-grid { display: grid; gap: 18px; margin-top: 18px; }
     .filter-group { display: grid; gap: 12px; }
     .filter-group h4 { font-size: 14px; font-weight: 800; margin: 0; }
+
+    /* Onglets espace pro */
+    .pro-tabs::-webkit-scrollbar { display: none; }
+    .pro-tab {
+      white-space: nowrap; padding: 10px 16px; border-radius: 999px;
+      background: rgba(255,255,255,.82); border: 1px solid var(--line);
+      font-size: 13px; font-weight: 700; color: #695e72;
+      box-shadow: var(--shadow-xs); cursor: pointer; transition: .2s ease;
+    }
+    .pro-tab.active {
+      color: white; background: var(--glossy);
+      box-shadow: 0 8px 18px var(--glow); border-color: rgba(255,255,255,.12);
+    }
+    .pro-tab-panel { animation: fadeUp .28s ease; }
+    .field { display: grid; gap: 6px; margin-bottom: 10px; }
+    .field label { font-size: 13px; font-weight: 700; color: var(--ink); }
+    .field input, .field select, .field textarea {
+      padding: 12px 14px; border-radius: var(--radius-sm); border: 1px solid var(--line-2);
+      background: rgba(255,255,255,.92); font-size: 14px; color: var(--ink);
+      outline: none; width: 100%; transition: .2s ease;
+    }
+    .field input:focus, .field select:focus { border-color: var(--violet-2); box-shadow: 0 0 0 3px rgba(127,56,188,.12); }
     .seg-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
     .seg-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .seg-grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -827,15 +849,32 @@
         <div class="card auth-panel mt-16">
           <img class="auth-logo" src="assets/img/ubo-drop-logo.png" alt="logo">
           <div class="auth-title">Devenir pro</div>
-          <div class="auth-sub">Prépare ton arrivée sur UBODROP et active ton espace professionnel dès l’ouverture des inscriptions réelles.</div>
-          <div class="field"><label>Prénom</label><input type="text" placeholder="Karim"></div>
-          <div class="field"><label>Nom</label><input type="text" placeholder="Benali"></div>
-          <div class="field"><label>Email</label><input type="email" placeholder="pro@email.com"></div>
-          <div class="field"><label>Spécialité</label><select><option>Barber</option><option>Coiffeuse</option><option>Manucure</option><option>Maquillage</option><option>Henné</option><option>Esthéticienne</option><option>Tatoueur</option><option>Massage</option><option>Micro pigmentation</option></select></div>
-          <div class="field"><label>Années d'expérience</label><input type="text" placeholder="8"></div>
-          <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" placeholder="000 000 000 00000"></div>
-          <div class="field"><label>Mot de passe</label><input type="password" placeholder="••••••••"></div>
+          <div class="auth-sub">Crée ton espace professionnel UBODROP et commence à recevoir des clients.</div>
+          <div class="field"><label>Prénom</label><input type="text" id="proRegFirstName" placeholder="Karim" autocomplete="given-name"></div>
+          <div class="field"><label>Nom</label><input type="text" id="proRegLastName" placeholder="Benali" autocomplete="family-name"></div>
+          <div class="field"><label>Email</label><input type="email" id="proRegEmail" placeholder="pro@email.com" autocomplete="email"></div>
+          <div class="field"><label>Téléphone <span class="muted">(optionnel)</span></label><input type="tel" id="proRegPhone" placeholder="+33 6 00 00 00 00" autocomplete="tel"></div>
+          <div class="field"><label>Spécialité principale</label>
+            <select id="proRegSpecialty">
+              <option value="">-- Choisir une spécialité --</option>
+              <option value="BARBER">Barber</option>
+              <option value="COIFFEUSE">Coiffeuse</option>
+              <option value="MANUCURE">Manucure</option>
+              <option value="MAQUILLAGE">Maquillage</option>
+              <option value="HENNE">Henné</option>
+              <option value="ESTHETICIENNE">Esthéticienne</option>
+              <option value="TATOUEUR">Tatoueur</option>
+              <option value="MASSAGE">Massage</option>
+              <option value="MICRO_PIGMENTATION">Micro-pigmentation</option>
+            </select>
+          </div>
+          <div class="field"><label>Années d’expérience</label><input type="number" id="proRegExperience" placeholder="8" min="0" max="60"></div>
+          <div class="field"><label>Ville d’activité <span class="muted">(optionnel)</span></label><input type="text" id="proRegCity" placeholder="Paris" autocomplete="address-level2"></div>
+          <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" id="proRegSiret" placeholder="000 000 000 00000" maxlength="17"></div>
+          <div class="field"><label>Description courte <span class="muted">(optionnel)</span></label><input type="text" id="proRegBio" placeholder="Expert coiffure afro depuis 8 ans…"></div>
+          <div class="field"><label>Mot de passe <span class="muted">(8 caractères min.)</span></label><input type="password" id="proRegPassword" placeholder="••••••••" autocomplete="new-password"></div>
           <div class="mt-20"><button class="primary-btn" id="registerProBtn">Créer mon compte pro</button></div>
+          <div class="inline-note">Tu as déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
         </div>
       </section>
 
@@ -844,27 +883,10 @@
           <button class="icon-btn" data-go="screen-search">‹</button>
           <div class="title-wrap">
             <h2>Mes réservations</h2>
-            <p>Un parcours client plus complet et crédible.</p>
+            <p>Tes rendez-vous confirmés et passés.</p>
           </div>
         </div>
-        <div class="card list-card">
-          <div class="list-item">
-            <img src="assets/img/service-barber.jpeg" alt="Karim">
-            <div style="flex:1;">
-              <strong>Karim B.</strong>
-              <p>Fade + barbe • Aujourd’hui 14:30 • 35 €</p>
-            </div>
-            <div class="avail">Confirmé</div>
-          </div>
-          <div class="list-item">
-            <img src="assets/img/service-coiffeuse.jpg" alt="Sarah">
-            <div style="flex:1;">
-              <strong>Sarah C.</strong>
-              <p>Brushing • 29 mars 10:00 • 35 €</p>
-            </div>
-            <div class="tiny-btn">Modifier</div>
-          </div>
-        </div>
+        <div class="card list-card"></div>
       </section>
 
       <section class="screen" id="screen-favs">
@@ -909,46 +931,105 @@
 
       <section class="screen" id="screen-pro-dashboard">
   <div class="screen-topbar">
-    <button class="icon-btn" data-go="screen-search">‹</button>
     <div class="title-wrap">
-      <h2>Dashboard pro</h2>
-      <p>Planning, réservations, revenus et disponibilité.</p>
+      <h2>Espace pro</h2>
+      <p>Dashboard, profil, portfolio et coordonnées bancaires.</p>
     </div>
   </div>
 
+  <!-- En-tête profil -->
   <div class="card pro-header-card">
-    <div class="pro-header-top">
+    <div class="pro-header-top" id="proDashHeader">
       <div style="display:flex; gap:12px; align-items:center;">
         <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Espace pro">
         <div>
-          <strong style="font-size:1.15rem;">Espace pro indisponible</strong>
-          <div class="section-sub">Aucun professionnel réel n’est encore connecté à la plateforme.</div>
+          <strong style="font-size:1.15rem;">Espace pro</strong>
+          <div class="section-sub">Connecte-toi pour accéder à ton espace.</div>
         </div>
       </div>
       <div class="online-chip">En attente</div>
     </div>
     <div class="stats-grid">
-      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
-      <div class="soft-card stat-card"><strong>0 €</strong><span>Donnée indisponible</span></div>
-      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
-      <div class="soft-card stat-card"><strong>0</strong><span>Donnée indisponible</span></div>
+      <div class="soft-card stat-card" id="statRdv"><strong>0</strong><span>RDV</span></div>
+      <div class="soft-card stat-card" id="statConvs"><strong>0</strong><span>Messages</span></div>
+      <div class="soft-card stat-card" id="statNotifs"><strong>0</strong><span>Alertes</span></div>
+      <div class="soft-card stat-card" id="statPros"><strong>0</strong><span>Sur la carte</span></div>
     </div>
   </div>
 
-  <div class="card list-card mt-16"></div>
-  <div class="card list-card mt-16"></div>
-  <div class="card list-card mt-16" id="proPricingCard"></div>
+  <!-- Onglets -->
+  <div class="pro-tabs" id="proTabs" style="display:flex; gap:6px; margin:16px 0 0; overflow-x:auto; scrollbar-width:none;">
+    <button class="pro-tab active" data-tab="tab-rdv">📅 RDV</button>
+    <button class="pro-tab" data-tab="tab-profil">👤 Profil</button>
+    <button class="pro-tab" data-tab="tab-portfolio">🖼 Portfolio</button>
+    <button class="pro-tab" data-tab="tab-bancaire">🏦 Bancaire</button>
+  </div>
+
+  <!-- Onglet RDV -->
+  <div class="pro-tab-panel" id="tab-rdv">
+    <div class="card list-card mt-16" id="proRdvCard"></div>
+    <div class="card list-card mt-16" id="proConvsCard"></div>
+  </div>
+
+  <!-- Onglet Profil -->
+  <div class="pro-tab-panel" id="tab-profil" style="display:none;">
+    <div class="card list-card mt-16">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:12px;">Informations professionnelles</h4>
+      <div class="field"><label>Nom affiché</label><input type="text" id="proEditDisplayName" placeholder="Ex : Karim B."></div>
+      <div class="field"><label>Nom commercial <span class="muted">(optionnel)</span></label><input type="text" id="proEditBusinessName" placeholder="Ex : Studio K."></div>
+      <div class="field"><label>Téléphone</label><input type="tel" id="proEditPhone" placeholder="+33 6 00 00 00 00"></div>
+      <div class="field"><label>Ville</label><input type="text" id="proEditCity" placeholder="Paris"></div>
+      <div class="field"><label>Description</label><input type="text" id="proEditBio" placeholder="Spécialiste beauté…"></div>
+      <div class="field"><label>Années d’expérience</label><input type="number" id="proEditExperience" placeholder="8" min="0" max="60"></div>
+      <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" id="proEditSiret" placeholder="000 000 000 00000" maxlength="17"></div>
+      <div class="field"><label>Rayon d’intervention (km)</label><input type="number" id="proEditRadius" placeholder="10" min="1" max="200"></div>
+      <div class="field">
+        <label>Modes de prestation</label>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;">
+          <label style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:500;"><input type="checkbox" id="proModeHome"> À domicile</label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:500;"><input type="checkbox" id="proModeProLoc"> Chez le pro</label>
+          <label style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:500;"><input type="checkbox" id="proModeSalon"> En salon</label>
+        </div>
+      </div>
+      <button class="primary-btn mt-16" id="saveProProfileBtn">Enregistrer le profil</button>
+    </div>
+  </div>
+
+  <!-- Onglet Portfolio -->
+  <div class="pro-tab-panel" id="tab-portfolio" style="display:none;">
+    <div class="card list-card mt-16">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:12px;">Mon portfolio</h4>
+      <div class="field"><label>URL de la photo</label><input type="url" id="portfolioUrl" placeholder="https://…/ma-photo.jpg"></div>
+      <div class="field"><label>Légende <span class="muted">(optionnel)</span></label><input type="text" id="portfolioCaption" placeholder="Coupe dégradée — 2024"></div>
+      <button class="primary-btn" id="addPortfolioBtn" style="margin-bottom:16px;">Ajouter la photo</button>
+      <div id="portfolioGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- Onglet Bancaire -->
+  <div class="pro-tab-panel" id="tab-bancaire" style="display:none;">
+    <div class="card list-card mt-16">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Informations bancaires</h4>
+      <div class="section-sub" style="margin-bottom:16px; font-size:.86rem;">Tes coordonnées bancaires sont utilisées pour recevoir tes paiements. Les données sensibles sont masquées à l’affichage.</div>
+      <div class="field"><label>Titulaire du compte</label><input type="text" id="bankHolder" placeholder="Karim Benali" autocomplete="name"></div>
+      <div class="field"><label>IBAN</label><input type="text" id="bankIban" placeholder="FR76 3000 1007 9400 0000 0000 000" maxlength="34" autocomplete="off"></div>
+      <div class="field"><label>BIC / SWIFT</label><input type="text" id="bankBic" placeholder="BNPAFRPP" maxlength="11" autocomplete="off"></div>
+      <div id="bankingStatus" class="soft-card" style="padding:12px 14px; font-size:.86rem; margin-bottom:12px; display:none;"></div>
+      <button class="primary-btn" id="saveBankingBtn">Enregistrer les coordonnées</button>
+      <div class="section-sub" style="margin-top:10px; font-size:.78rem;">🔒 Ces informations ne sont jamais partagées et sont stockées de façon sécurisée. L’intégration Stripe Connect permettra le virement automatique.</div>
+    </div>
+  </div>
 </section>
+
+      <section class="screen" id="screen-pro-messages">
   <div class="screen-topbar">
     <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
     <div class="title-wrap">
       <h2>Messages</h2>
-      <p>Uniquement les conversations réelles apparaîtront ici.</p>
+      <p>Tes conversations avec les clients apparaîtront ici.</p>
     </div>
   </div>
-  <div class="card list-card">
-    <div class="section-sub">Aucune conversation disponible pour le moment.</div>
-  </div>
+  <div class="card list-card"></div>
 </section>
 
       <section class="screen chat-shell" id="screen-chat">
@@ -1015,15 +1096,17 @@
   
   const APP_SESSION_KEY = "ubodrop_app_session";
 
+  // Source unique officielle — 9 métiers UBODROP (synchronisée avec le backend)
   const categoriesFallback = [
-    { key: "barbier", label: "Barber" },
-    { key: "coiffure", label: "Coiffeuse" },
-    { key: "ongles", label: "Manucure" },
-    { key: "henne", label: "Henné" },
-    { key: "maquillage", label: "Maquillage" },
-    { key: "esthetique", label: "Esthéticienne" },
-    { key: "tatouage", label: "Tatoueur" },
-    { key: "massage", label: "Massage" }
+    { key: "BARBER",             label: "Barber" },
+    { key: "MICRO_PIGMENTATION", label: "Micro-pigmentation" },
+    { key: "TATOUEUR",           label: "Tatoueur" },
+    { key: "HENNE",              label: "Henné" },
+    { key: "ESTHETICIENNE",      label: "Esthéticienne" },
+    { key: "MAQUILLAGE",         label: "Maquillage" },
+    { key: "COIFFEUSE",          label: "Coiffeuse" },
+    { key: "MASSAGE",            label: "Massage" },
+    { key: "MANUCURE",           label: "Manucure" }
   ];
 
   const placeOptions = ["À domicile", "Chez le pro", "En salon"];
@@ -1056,7 +1139,7 @@
   };
 
   const state = {
-    category: "coiffure",
+    category: "COIFFEUSE",
     place: "À domicile",
     userMode: "guest",
     sheetState: 1,
@@ -1099,9 +1182,9 @@
   ];
 
   const screenToNavPro = [
-    { id: "screen-pro-dashboard", label: "Dashboard", icon: navIcons.dashboard },
+    { id: "screen-pro-dashboard", label: "Espace pro", icon: navIcons.dashboard },
     { id: "screen-pro-messages", label: "Messages", icon: navIcons.messages },
-    { id: "screen-chat", label: "Chat", icon: navIcons.chat },
+    { id: "screen-search", label: "Carte", icon: navIcons.map },
     { id: "screen-home", label: "Accueil", icon: navIcons.home }
   ];
 
@@ -1227,10 +1310,43 @@
       return this.request("/notifications/me");
     },
 
-    updateProPricing(pricing) {
-      return this.request("/profiles/pro/pricing", {
+    updateProProfile(dto) {
+      return this.request("/profiles/pro/me", {
         method: "PATCH",
-        body: JSON.stringify(pricing)
+        body: JSON.stringify(dto)
+      });
+    },
+
+    updateClientProfile(dto) {
+      return this.request("/profiles/client/me", {
+        method: "PATCH",
+        body: JSON.stringify(dto)
+      });
+    },
+
+    getPortfolio() {
+      return this.request("/profiles/pro/portfolio");
+    },
+
+    addPortfolioPhoto(url, caption) {
+      return this.request("/profiles/pro/portfolio", {
+        method: "POST",
+        body: JSON.stringify({ url, caption })
+      });
+    },
+
+    deletePortfolioPhoto(photoId) {
+      return this.request(`/profiles/pro/portfolio/${photoId}`, { method: "DELETE" });
+    },
+
+    getBankingInfo() {
+      return this.request("/profiles/pro/banking-info");
+    },
+
+    updateBankingInfo(dto) {
+      return this.request("/profiles/pro/banking-info", {
+        method: "PATCH",
+        body: JSON.stringify(dto)
       });
     },
 
@@ -1265,17 +1381,19 @@
     return s.length > max ? `${s.slice(0, max - 1)}…` : s;
   }
 
+  // Convertit un nom brut backend → clé canonique (= CategoryName enum du backend)
   function categoryKeyFromText(value) {
-    const text = String(value || "").toLowerCase();
-    if (text.includes("barb")) return "barbier";
-    if (text.includes("coiff")) return "coiffure";
-    if (text.includes("ong") || text.includes("nail") || text.includes("manuc")) return "ongles";
-    if (text.includes("henn")) return "henne";
-    if (text.includes("maqu")) return "maquillage";
-    if (text.includes("esth") || text.includes("skin") || text.includes("soin")) return "esthetique";
-    if (text.includes("tat")) return "tatouage";
-    if (text.includes("mass")) return "massage";
-    return "coiffure";
+    const text = String(value || "").toUpperCase();
+    if (text.includes("BARBER") || text.includes("BARB")) return "BARBER";
+    if (text.includes("MICRO") || text.includes("PIGMENT")) return "MICRO_PIGMENTATION";
+    if (text.includes("TATOU")) return "TATOUEUR";
+    if (text.includes("HENN")) return "HENNE";
+    if (text.includes("ESTHET") || text.includes("SKIN") || text.includes("SOIN")) return "ESTHETICIENNE";
+    if (text.includes("MAQU")) return "MAQUILLAGE";
+    if (text.includes("COIFF")) return "COIFFEUSE";
+    if (text.includes("MASS")) return "MASSAGE";
+    if (text.includes("MANUC") || text.includes("ONGL") || text.includes("NAIL")) return "MANUCURE";
+    return "COIFFEUSE";
   }
 
   function mapRoleToMode(user) {
@@ -1297,14 +1415,24 @@
   function normalizeCategories(data) {
     const arr = extractArray(data);
     if (!arr.length) return [...categoriesFallback];
-    return arr.map((item) => {
-      const key = categoryKeyFromText(item?.name || item?.label);
+    const mapped = arr.map((item) => {
+      // Préférer la valeur brute de l'enum backend comme clé (ex: "BARBER", "COIFFEUSE"…)
+      const rawName = String(item?.name || "").toUpperCase();
+      const key = categoriesFallback.some(c => c.key === rawName)
+        ? rawName
+        : categoryKeyFromText(item?.name || item?.label);
       return {
         key,
         label: item?.label || item?.name || key,
         raw: item
       };
     }).filter((item, index, list) => list.findIndex((c) => c.key === item.key) === index);
+    // S'assurer que les 9 catégories sont toujours présentes (complète avec fallback si besoin)
+    const keys = mapped.map(c => c.key);
+    categoriesFallback.forEach(fb => {
+      if (!keys.includes(fb.key)) mapped.push(fb);
+    });
+    return mapped;
   }
 
   function normalizeService(service, index = 0) {
@@ -1330,7 +1458,7 @@
         item?.profession ||
         item?.services?.[0]?.category?.name ||
         item?.services?.[0]?.name ||
-        "coiffure";
+        "COIFFEUSE";
 
       const key = categoryKeyFromText(categorySource);
       const name =
@@ -1505,7 +1633,8 @@ function syncGoogleUiVisibility(screenId) {
   function updateFilterCount() {
     const btn = document.getElementById("applyFilters");
     if (!btn) return;
-    const count = state.pros.length;
+    // Compte réel des pros filtrés (catégorie active)
+    const count = getVisiblePros().length;
     btn.textContent = count > 0
       ? `Voir les résultats — ${count} professionnel${count > 1 ? "s" : ""}`
       : "Voir les résultats — 0 professionnel";
@@ -1852,32 +1981,59 @@ function syncGoogleUiVisibility(screenId) {
       }
     }
 
+    const clientProfile = state.authUser?.clientProfile;
+
     if (blocks[0]) {
       blocks[0].innerHTML = `
         <h4>Informations personnelles</h4>
         <div class="setting-list">
           <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span></div>
-          <div class="setting-row"><span><strong>Rôles</strong><br>${(authUser.roles || []).join(", ") || "CLIENT"}</span><span class="muted">Vérifié</span></div>
+          <div class="setting-row"><span><strong>Rôle</strong><br>${(authUser.roles || []).join(", ") || "CLIENT"}</span><span class="muted">Vérifié</span></div>
         </div>
+        <div class="field" style="margin-top:12px;"><label>Prénom</label><input type="text" id="clientFirstName" placeholder="Prénom" value="${clientProfile?.firstName || ""}"></div>
+        <div class="field"><label>Nom</label><input type="text" id="clientLastName" placeholder="Nom" value="${clientProfile?.lastName || ""}"></div>
+        <div class="field"><label>Téléphone</label><input type="tel" id="clientPhone" placeholder="+33 6 00 00 00 00" value="${clientProfile?.phone || ""}"></div>
+        <div class="field"><label>Ville</label><input type="text" id="clientCity" placeholder="Paris" value="${clientProfile?.city || ""}"></div>
+        <button class="primary-btn" style="margin-top:4px;" id="saveClientProfileBtn">Enregistrer</button>
       `;
+      document.getElementById("saveClientProfileBtn")?.addEventListener("click", handleSaveClientProfile);
     }
     if (blocks[1]) {
       blocks[1].innerHTML = `
         <h4>Réservations</h4>
         <div class="setting-list">
-          <div class="setting-row"><span><strong>Réservations actives</strong><br>${state.bookings.length}</span><span class="setting-chip">Mes RDV</span></div>
-          <div class="setting-row"><span><strong>Mode favori</strong><br>${state.place}</span><span class="muted">Préférence</span></div>
+          <div class="setting-row"><span><strong>Réservations</strong><br>${state.bookings.length ? state.bookings.length + " réservation(s)" : "Aucune réservation"}</span><button class="setting-chip" data-go="screen-rdv">Voir</button></div>
+          <div class="setting-row"><span><strong>Mode favori</strong><br>${state.place}</span><span class="muted">Recherche</span></div>
         </div>
       `;
+      blocks[1].querySelectorAll("[data-go]").forEach(btn => btn.onclick = () => goTo(btn.dataset.go));
     }
     if (blocks[2]) {
       blocks[2].innerHTML = `
-        <h4>Préférences</h4>
+        <h4>Préférences & notifications</h4>
         <div class="setting-list">
-          <div class="setting-row"><span><strong>Catégorie active</strong><br>${state.categories.find((c) => c.key === state.category)?.label || "Beauté"}</span><span class="muted">Recherche</span></div>
-          <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? `${state.notifications.length} nouvelle(s)` : "Aucune nouvelle notification"}</span><span class="setting-chip">Actif</span></div>
+          <div class="setting-row"><span><strong>Catégorie active</strong><br>${state.categories.find((c) => c.key === state.category)?.label || "Beauté"}</span><span class="muted">Filtre carte</span></div>
+          <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? state.notifications.length + " non lue(s)" : "Aucune nouvelle"}</span><span class="setting-chip">Actif</span></div>
         </div>
       `;
+    }
+  }
+
+  async function handleSaveClientProfile() {
+    if (!appApi.getToken()) return;
+    const dto = {
+      firstName: document.getElementById("clientFirstName")?.value.trim() || undefined,
+      lastName:  document.getElementById("clientLastName")?.value.trim() || undefined,
+      phone:     document.getElementById("clientPhone")?.value.trim() || undefined,
+      city:      document.getElementById("clientCity")?.value.trim() || undefined,
+    };
+    Object.keys(dto).forEach(k => dto[k] === undefined && delete dto[k]);
+    try {
+      const updated = await appApi.updateClientProfile(dto);
+      if (state.authUser) state.authUser.clientProfile = { ...(state.authUser.clientProfile || {}), ...updated };
+      notify("Profil mis à jour.");
+    } catch (error) {
+      notify(`Sauvegarde impossible : ${error.message}`);
     }
   }
 
@@ -1975,109 +2131,126 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   function renderProDashboard() {
-    const header = document.querySelector("#screen-pro-dashboard .pro-header-top");
-    const statCards = document.querySelectorAll("#screen-pro-dashboard .stat-card");
-    const cards = document.querySelectorAll("#screen-pro-dashboard .list-card");
+    const header   = document.getElementById("proDashHeader");
+    const statRdv  = document.getElementById("statRdv");
+    const statConvs = document.getElementById("statConvs");
+    const statNotifs = document.getElementById("statNotifs");
+    const statPros = document.getElementById("statPros");
+    const rdvCard  = document.getElementById("proRdvCard");
+    const convsCard = document.getElementById("proConvsCard");
 
     if (state.userMode !== "pro" || !appApi.getToken()) {
-      if (header) {
-        header.innerHTML = `
-          <div style="display:flex; gap:12px; align-items:center;">
-            <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
-            <div>
-              <strong style="font-size:1.15rem;">${emptyState.proDashboard.title}</strong>
-              <div class="section-sub">${emptyState.proDashboard.text}</div>
-            </div>
+      if (header) header.innerHTML = `
+        <div style="display:flex; gap:12px; align-items:center;">
+          <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
+          <div>
+            <strong style="font-size:1.15rem;">${emptyState.proDashboard.title}</strong>
+            <div class="section-sub">${emptyState.proDashboard.text}</div>
           </div>
-          <div class="online-chip">En attente</div>
-        `;
-      }
-      statCards.forEach((card) => {
-        card.innerHTML = `<strong>0</strong><span>Donnée indisponible</span>`;
-      });
-      cards.forEach((card) => {
-        card.innerHTML = emptyCard("Aucune activité", "Les données professionnelles s'afficheront ici dès qu'un vrai compte pro sera actif.");
-      });
+        </div>
+        <div class="online-chip">En attente</div>`;
+      if (statRdv) statRdv.innerHTML = `<strong>0</strong><span>RDV</span>`;
+      if (statConvs) statConvs.innerHTML = `<strong>0</strong><span>Messages</span>`;
+      if (statNotifs) statNotifs.innerHTML = `<strong>0</strong><span>Alertes</span>`;
+      if (statPros) statPros.innerHTML = `<strong>0</strong><span>Sur la carte</span>`;
+      if (rdvCard) rdvCard.innerHTML = emptyCard("Connecte-toi", "Accède à ton espace pro en te connectant.", "Se connecter", "screen-login");
+      if (convsCard) convsCard.innerHTML = "";
       return;
     }
 
     const authUser = formatAuthUser(state.authUser);
+    const proProfile = state.authUser?.proProfile;
+
     if (header) {
       header.innerHTML = `
         <div style="display:flex; gap:12px; align-items:center;">
           <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
           <div>
-            <strong style="font-size:1.15rem;">Bonjour, ${authUser.displayName}</strong>
+            <strong style="font-size:1.15rem;">Bonjour, ${proProfile?.displayName || authUser.displayName}</strong>
             <div class="section-sub">${authUser.roleLabel} • ${authUser.email}</div>
           </div>
         </div>
         <button class="online-toggle-btn ${state.proOnline ? 'is-online' : 'is-offline'}" id="proOnlineToggle">
           ${state.proOnline ? '🟢 En ligne' : '⚫ Hors ligne'}
-        </button>
-      `;
-      const toggleBtn = document.getElementById("proOnlineToggle");
-      if (toggleBtn) toggleBtn.onclick = toggleProOnlineStatus;
+        </button>`;
+      document.getElementById("proOnlineToggle")?.addEventListener("click", toggleProOnlineStatus);
     }
 
-    if (statCards.length >= 4) {
-      statCards[0].innerHTML = `<strong>${state.bookings.length}</strong><span>RDV synchronisés</span>`;
-      statCards[1].innerHTML = `<strong>${state.conversations.length}</strong><span>Conversations</span>`;
-      statCards[2].innerHTML = `<strong>${state.notifications.length}</strong><span>Notifications</span>`;
-      statCards[3].innerHTML = `<strong>${state.pros.length}</strong><span>Pros listés</span>`;
-    }
+    if (statRdv)   statRdv.innerHTML   = `<strong>${state.bookings.length}</strong><span>RDV</span>`;
+    if (statConvs) statConvs.innerHTML = `<strong>${state.conversations.length}</strong><span>Messages</span>`;
+    if (statNotifs) statNotifs.innerHTML = `<strong>${state.notifications.length}</strong><span>Alertes</span>`;
+    if (statPros)  statPros.innerHTML  = `<strong>${state.pros.length}</strong><span>Sur la carte</span>`;
 
-    if (cards[0]) {
-      cards[0].innerHTML = state.bookings.length
-        ? state.bookings.slice(0, 3).map((booking) => `
+    if (rdvCard) {
+      rdvCard.innerHTML = state.bookings.length
+        ? state.bookings.slice(0, 5).map((b) => `
             <div class="agenda-item">
               <div>
-                <strong>${booking?.service?.name || "Réservation"}</strong>
-                <p>${booking?.status || "Confirmé"}</p>
+                <strong>${b?.service?.name || b?.serviceName || "Réservation"}</strong>
+                <p>${b?.status || "Confirmé"} ${b?.startsAt || b?.scheduledAt ? "• " + new Date(b.startsAt || b.scheduledAt).toLocaleDateString("fr-FR") : ""}</p>
               </div>
-              <strong>${euro(booking?.priceAmount ?? booking?.service?.priceAmount)}</strong>
-            </div>
-          `).join("")
+              <strong>${euro(b?.priceAmount ?? b?.totalAmount ?? b?.service?.price)}</strong>
+            </div>`).join("")
         : emptyCard("Aucun RDV", "Les nouvelles réservations apparaîtront ici.");
     }
 
-    if (cards[1]) {
-      cards[1].innerHTML = state.conversations.length
-        ? state.conversations.slice(0, 2).map((conv) => `
+    if (convsCard) {
+      convsCard.innerHTML = state.conversations.length
+        ? state.conversations.slice(0, 3).map((conv) => `
             <div class="chat-preview" data-conversation-id="${conv.id}">
               <div><strong>${conversationTitle(conv)}</strong><p>${truncate(conv.lastMessage || "Conversation disponible", 54)}</p></div>
               <span class="muted">${conv.lastAt || "—"}</span>
-            </div>
-          `).join("")
+            </div>`).join("")
         : emptyCard("Aucun message", "Les messages clients apparaîtront ici.");
+      convsCard.querySelectorAll("[data-conversation-id]").forEach((item) => {
+        item.onclick = async () => {
+          state.currentConversationId = item.dataset.conversationId;
+          await loadMessages(state.currentConversationId);
+          goTo("screen-chat");
+        };
+      });
     }
 
-    const pricingCard = document.getElementById("proPricingCard");
-    if (pricingCard) {
-      const services = [
-        { key: "barbier", label: "Barber / Coupe" },
-        { key: "coiffure", label: "Coiffeuse" },
-        { key: "ongles", label: "Manucure" },
-        { key: "maquillage", label: "Maquillage" },
-        { key: "henne", label: "Henné" },
-        { key: "esthetique", label: "Esthéticienne" },
-        { key: "massage", label: "Massage" },
-        { key: "tatouage", label: "Tatoueur" }
-      ];
-      pricingCard.innerHTML = `
-        <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Mes tarifs</h4>
-        <div class="section-sub" style="margin-bottom:12px; font-size:.88rem;">Renseigne tes prix de base (€). Ils seront affichés aux clients.</div>
-        <div class="pricing-form">
-          ${services.map(s => `
-            <div class="pricing-row">
-              <label>${s.label}</label>
-              <input type="number" min="0" step="1" placeholder="—" data-price-key="${s.key}" value="${state.pricingData[s.key] || ''}">
-            </div>
-          `).join("")}
-        </div>
-        <button class="save-pricing-btn" id="savePricingBtn">Enregistrer mes tarifs</button>
-      `;
-      document.getElementById("savePricingBtn").onclick = handleSavePricing;
+    // Pré-remplissage du formulaire Profil
+    if (proProfile) {
+      const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+      set("proEditDisplayName", proProfile.displayName);
+      set("proEditBusinessName", proProfile.businessName);
+      set("proEditPhone", proProfile.phone);
+      set("proEditCity", proProfile.city);
+      set("proEditBio", proProfile.bio);
+      set("proEditExperience", proProfile.yearsExperience);
+      set("proEditSiret", proProfile.siret);
+      set("proEditRadius", proProfile.serviceAreaKm);
+      const chkHome = document.getElementById("proModeHome");
+      const chkPro  = document.getElementById("proModeProLoc");
+      const chkSalon = document.getElementById("proModeSalon");
+      if (chkHome)  chkHome.checked  = !!proProfile.offersAtHome;
+      if (chkPro)   chkPro.checked   = !!proProfile.offersAtProLocation;
+      if (chkSalon) chkSalon.checked = !!proProfile.offersAtSalon;
     }
+
+    // Portfolio
+    renderPortfolioGrid(proProfile?.portfolioPhotos || []);
+    bindGo();
+  }
+
+  function renderPortfolioGrid(photos) {
+    const grid = document.getElementById("portfolioGrid");
+    if (!grid) return;
+    if (!photos.length) {
+      grid.innerHTML = `<div class="section-sub" style="grid-column:1/-1; text-align:center; padding:12px;">Aucune photo dans le portfolio.</div>`;
+      return;
+    }
+    grid.innerHTML = photos.map((p) => `
+      <div style="position:relative; border-radius:12px; overflow:hidden; aspect-ratio:1;">
+        <img src="${p.url}" alt="${p.caption || "Photo portfolio"}" style="width:100%; height:100%; object-fit:cover;">
+        <button data-delete-photo="${p.id}" style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.55);color:#fff;border:0;border-radius:6px;padding:2px 7px;font-size:11px;cursor:pointer;">✕</button>
+        ${p.caption ? `<div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.42);color:#fff;font-size:11px;padding:4px 6px;">${p.caption}</div>` : ""}
+      </div>`).join("");
+    grid.querySelectorAll("[data-delete-photo]").forEach((btn) => {
+      btn.onclick = () => handleDeletePortfolioPhoto(btn.dataset.deletePhoto);
+    });
   }
 
   async function hydrateSession() {
@@ -2102,7 +2275,7 @@ function syncGoogleUiVisibility(screenId) {
       state.categories = [...categoriesFallback];
     }
     if (!state.categories.some((cat) => cat.key === state.category)) {
-      state.category = state.categories[0]?.key || "coiffure";
+      state.category = state.categories[0]?.key || "COIFFEUSE";
     }
     renderFilterCategories();
   }
@@ -2217,29 +2390,32 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   async function handleRegisterProfessional() {
-    const inputs = document.querySelectorAll("#screen-register-pro .field input");
-    const firstName = inputs[0]?.value.trim() || "";
-    const lastName = inputs[1]?.value.trim() || "";
-    const email = inputs[2]?.value.trim() || "";
-    const experience = inputs[3]?.value.trim() || "";
-    const siret = inputs[4]?.value.trim() || "";
-    const password = inputs[5]?.value || "";
-    const specialty = document.querySelector("#screen-register-pro .field select")?.value || "";
-    if (!email || !password) {
-      notify("Email et mot de passe obligatoires.");
-      return;
-    }
-    if (password.length < 6) {
-      notify("Le mot de passe doit faire au moins 6 caractères.");
-      return;
-    }
+    const firstName  = document.getElementById("proRegFirstName")?.value.trim() || "";
+    const lastName   = document.getElementById("proRegLastName")?.value.trim() || "";
+    const email      = document.getElementById("proRegEmail")?.value.trim() || "";
+    const phone      = document.getElementById("proRegPhone")?.value.trim() || "";
+    const specialty  = document.getElementById("proRegSpecialty")?.value || "";
+    const experience = document.getElementById("proRegExperience")?.value.trim() || "";
+    const city       = document.getElementById("proRegCity")?.value.trim() || "";
+    const siret      = document.getElementById("proRegSiret")?.value.trim() || "";
+    const bio        = document.getElementById("proRegBio")?.value.trim() || "";
+    const password   = document.getElementById("proRegPassword")?.value || "";
+
+    if (!email) { notify("L'email est obligatoire."); return; }
+    if (!password || password.length < 8) { notify("Le mot de passe doit faire au moins 8 caractères."); return; }
+    if (!specialty) { notify("Choisis une spécialité pour continuer."); return; }
+
     try {
       const payload = { email, password };
-      if (firstName) payload.firstName = firstName;
-      if (lastName) payload.lastName = lastName;
-      if (specialty) payload.specialty = specialty;
-      if (experience) payload.yearsExperience = experience;
-      if (siret) payload.siret = siret;
+      if (firstName)              payload.firstName = firstName;
+      if (lastName)               payload.lastName = lastName;
+      if (phone)                  payload.phone = phone;
+      if (specialty)              payload.specialty = specialty;
+      if (experience)             payload.yearsExperience = Number(experience) || undefined;
+      if (city)                   payload.city = city;
+      if (siret)                  payload.siret = siret;
+      if (bio)                    payload.bio = bio;
+      payload.offersAtHome = true; // mode par défaut
       await handleAuthSuccess(await appApi.registerProfessional(payload));
     } catch (error) {
       notify(`Inscription pro impossible : ${error.message}`);
@@ -2283,21 +2459,102 @@ function syncGoogleUiVisibility(screenId) {
     renderProDashboard();
   }
 
-  async function handleSavePricing() {
-    const inputs = document.querySelectorAll("#proPricingCard .pricing-row input");
-    const pricing = {};
-    inputs.forEach((input) => {
-      const key = input.dataset.priceKey;
-      const val = parseFloat(input.value);
-      if (key && Number.isFinite(val) && val > 0) pricing[key] = val;
-    });
-    state.pricingData = { ...state.pricingData, ...pricing };
+  async function handleSaveProProfile() {
+    if (!appApi.getToken()) { notify("Connecte-toi pour sauvegarder."); return; }
+    const get = (id) => document.getElementById(id)?.value.trim() || undefined;
+    const getNum = (id) => { const v = document.getElementById(id)?.value; return v ? Number(v) : undefined; };
+    const dto = {
+      displayName:        get("proEditDisplayName"),
+      businessName:       get("proEditBusinessName"),
+      phone:              get("proEditPhone"),
+      city:               get("proEditCity"),
+      bio:                get("proEditBio"),
+      yearsExperience:    getNum("proEditExperience"),
+      siret:              get("proEditSiret"),
+      serviceAreaKm:      getNum("proEditRadius"),
+      offersAtHome:       !!document.getElementById("proModeHome")?.checked,
+      offersAtProLocation: !!document.getElementById("proModeProLoc")?.checked,
+      offersAtSalon:      !!document.getElementById("proModeSalon")?.checked,
+    };
+    // Retirer les undefined
+    Object.keys(dto).forEach(k => dto[k] === undefined && delete dto[k]);
     try {
-      await appApi.updateProPricing(state.pricingData);
-      notify("Tarifs enregistrés avec succès.");
-    } catch (_) {
-      notify("Tarifs enregistrés localement. La synchronisation sera disponible dès que l'endpoint backend sera actif.");
+      const updated = await appApi.updateProProfile(dto);
+      if (state.authUser) state.authUser.proProfile = { ...(state.authUser.proProfile || {}), ...updated };
+      notify("Profil enregistré avec succès.");
+    } catch (error) {
+      notify(`Impossible de sauvegarder : ${error.message}`);
     }
+  }
+
+  async function handleAddPortfolioPhoto() {
+    if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); return; }
+    const url     = document.getElementById("portfolioUrl")?.value.trim() || "";
+    const caption = document.getElementById("portfolioCaption")?.value.trim() || "";
+    if (!url) { notify("Renseigne l'URL de la photo."); return; }
+    try {
+      const photo = await appApi.addPortfolioPhoto(url, caption || undefined);
+      if (state.authUser?.proProfile) {
+        state.authUser.proProfile.portfolioPhotos = [
+          ...(state.authUser.proProfile.portfolioPhotos || []),
+          photo
+        ];
+        renderPortfolioGrid(state.authUser.proProfile.portfolioPhotos);
+      }
+      document.getElementById("portfolioUrl").value = "";
+      document.getElementById("portfolioCaption").value = "";
+    } catch (error) {
+      notify(`Ajout impossible : ${error.message}`);
+    }
+  }
+
+  async function handleDeletePortfolioPhoto(photoId) {
+    if (!appApi.getToken()) return;
+    try {
+      await appApi.deletePortfolioPhoto(photoId);
+      if (state.authUser?.proProfile) {
+        state.authUser.proProfile.portfolioPhotos = (state.authUser.proProfile.portfolioPhotos || []).filter(p => p.id !== photoId);
+        renderPortfolioGrid(state.authUser.proProfile.portfolioPhotos);
+      }
+    } catch (error) {
+      notify(`Suppression impossible : ${error.message}`);
+    }
+  }
+
+  async function handleSaveBankingInfo() {
+    if (!appApi.getToken()) { notify("Connecte-toi pour sauvegarder."); return; }
+    const dto = {
+      accountHolder: document.getElementById("bankHolder")?.value.trim() || undefined,
+      iban:          document.getElementById("bankIban")?.value.trim().replace(/\s/g,"") || undefined,
+      bic:           document.getElementById("bankBic")?.value.trim().toUpperCase() || undefined,
+    };
+    Object.keys(dto).forEach(k => dto[k] === undefined && delete dto[k]);
+    try {
+      const result = await appApi.updateBankingInfo(dto);
+      const status = document.getElementById("bankingStatus");
+      if (status) {
+        status.style.display = "block";
+        status.innerHTML = `✅ Coordonnées enregistrées.<br>IBAN masqué : <strong>${result?.ibanMasked || "—"}</strong>`;
+      }
+      // Effacer les champs sensibles après sauvegarde
+      ["bankIban", "bankBic"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
+    } catch (error) {
+      notify(`Sauvegarde impossible : ${error.message}`);
+    }
+  }
+
+  function initProTabs() {
+    const tabBtns = document.querySelectorAll("#proTabs .pro-tab");
+    const panels  = document.querySelectorAll("#screen-pro-dashboard .pro-tab-panel");
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        tabBtns.forEach(b => b.classList.remove("active"));
+        panels.forEach(p => p.style.display = "none");
+        btn.classList.add("active");
+        const target = document.getElementById(btn.dataset.tab);
+        if (target) target.style.display = "block";
+      });
+    });
   }
 
   async function handleSendMessage() {
@@ -2319,9 +2576,9 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   document.getElementById("filterBtn").onclick = () => toggleFilter(true);
-  document.getElementById("applyFilters").onclick = () => toggleFilter(false);
+  document.getElementById("applyFilters").onclick = () => { toggleFilter(false); renderPros(); };
   document.getElementById("resetFilters").onclick = () => {
-    state.category = state.categories[0]?.key || "coiffure";
+    state.category = state.categories[0]?.key || "COIFFEUSE";
     state.place = "À domicile";
     state.radius = 5;
     state.budget = null;
@@ -2329,8 +2586,17 @@ function syncGoogleUiVisibility(screenId) {
     renderPlaceChips();
     renderRadiusOptions();
     renderBudgetOptions();
+    updateFilterCount();
     renderPros();
   };
+
+  // Boutons de l'espace pro
+  document.getElementById("saveProProfileBtn")?.addEventListener("click", handleSaveProProfile);
+  document.getElementById("addPortfolioBtn")?.addEventListener("click", handleAddPortfolioPhoto);
+  document.getElementById("saveBankingBtn")?.addEventListener("click", handleSaveBankingInfo);
+
+  // Initialiser les onglets pro
+  initProTabs();
   document.getElementById("filterOverlay").addEventListener("click", (e) => {
     if (e.target.id === "filterOverlay") toggleFilter(false);
   });

@@ -159,7 +159,7 @@
     }
     .section-title { font-size: 1.28rem; font-weight: 800; letter-spacing: -.03em; }
     .section-sub { font-size: .93rem; line-height: 1.5; color: var(--muted); }
-    .pill-row { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; scrollbar-width: none; }
+    .pill-row { display: flex; gap: 10px; overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; scrollbar-width: none; touch-action: pan-x; }
     .pill-row::-webkit-scrollbar { display: none; }
     .pill {
       white-space: nowrap;
@@ -396,6 +396,10 @@
       box-shadow: 0 24px 44px rgba(37, 19, 57, .16); overflow: hidden; backdrop-filter: blur(22px);
       height: var(--sheet-h, 292px); min-height: 56px; max-height: calc(100% - 18px);
       transition: height .34s cubic-bezier(.22,.9,.24,1), transform .34s cubic-bezier(.22,.9,.24,1), box-shadow .25s ease;
+    }
+    /* touch-action ciblé uniquement sur la poignée + l'en-tête (zones de drag).
+       Le reste du sheet (pill-row, sheet-body) garde le scroll natif du navigateur. */
+    .sheet-handle, .sheet-header {
       touch-action: none;
     }
     .sheet-handle {
@@ -1019,6 +1023,19 @@
           <label style="display:flex;gap:6px;align-items:center;font-size:14px;font-weight:500;"><input type="checkbox" id="proModeSalon"> En salon</label>
         </div>
       </div>
+      <div class="field">
+        <label>Métier(s)</label>
+        <div id="proSpecialtyChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
+      </div>
+      <div class="field">
+        <label>Photo de profil <span class="muted">(URL)</span></label>
+        <input type="url" id="proEditAvatarUrl" placeholder="https://… ou laisse vide">
+      </div>
+      <div class="field">
+        <label>Instagram <span class="muted">(optionnel)</span></label>
+        <input type="text" id="proEditInstagram" placeholder="@tonpseudo" maxlength="80">
+      </div>
+      <div id="saveProProfileStatus" style="font-size:13px; margin-top:8px; display:none;"></div>
       <button class="primary-btn mt-16" id="saveProProfileBtn">Enregistrer le profil</button>
     </div>
   </div>
@@ -2335,6 +2352,7 @@ function syncGoogleUiVisibility(screenId) {
       if (statPros) statPros.innerHTML = `<strong>0</strong><span>Sur la carte</span>`;
       if (rdvCard) rdvCard.innerHTML = emptyCard("Connecte-toi", "Accède à ton espace pro en te connectant.", "Se connecter", "screen-login");
       if (convsCard) convsCard.innerHTML = "";
+      renderProSpecialtyChips([]);
       return;
     }
 
@@ -2402,6 +2420,11 @@ function syncGoogleUiVisibility(screenId) {
       set("proEditExperience", proProfile.yearsExperience);
       set("proEditSiret", proProfile.siret);
       set("proEditRadius", proProfile.serviceAreaKm);
+      set("proEditAvatarUrl", proProfile.avatarUrl);
+      set("proEditInstagram", proProfile.instagram);
+      // Spécialités
+      const activeSpecialties = (proProfile.specialties || []).map(s => s?.category?.name || s);
+      renderProSpecialtyChips(activeSpecialties);
       const chkHome = document.getElementById("proModeHome");
       const chkPro  = document.getElementById("proModeProLoc");
       const chkSalon = document.getElementById("proModeSalon");
@@ -2714,6 +2737,51 @@ function syncGoogleUiVisibility(screenId) {
     goTo("screen-home");
   }
 
+  // ── Chips spécialités dans l'onglet Profil ────────────────────────────────
+
+  // Rendu des chips de sélection de métier(s) dans l'onglet Profil
+  function renderProSpecialtyChips(activeKeys = []) {
+    const container = document.getElementById("proSpecialtyChips");
+    if (!container) return;
+    container.innerHTML = "";
+    categoriesFallback.forEach(cat => {
+      const isActive = activeKeys.includes(cat.key);
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.dataset.specialtyKey = cat.key;
+      chip.textContent = cat.label;
+      chip.style.cssText = [
+        "padding:8px 14px",
+        "border-radius:999px",
+        "font-size:13px",
+        "font-weight:600",
+        "border:1.5px solid var(--line)",
+        "cursor:pointer",
+        "transition:.2s ease",
+        isActive
+          ? "background:var(--glossy);color:#fff;border-color:transparent;box-shadow:0 6px 16px var(--glow);"
+          : "background:rgba(255,255,255,.82);color:var(--ink);"
+      ].join(";");
+      chip.onclick = () => {
+        chip.dataset.active = chip.dataset.active === "1" ? "0" : "1";
+        const on = chip.dataset.active === "1";
+        chip.style.background = on ? "var(--glossy)" : "rgba(255,255,255,.82)";
+        chip.style.color      = on ? "#fff" : "var(--ink)";
+        chip.style.borderColor = on ? "transparent" : "var(--line)";
+        chip.style.boxShadow   = on ? "0 6px 16px var(--glow)" : "none";
+      };
+      chip.dataset.active = isActive ? "1" : "0";
+      container.appendChild(chip);
+    });
+  }
+
+  function getSelectedSpecialties() {
+    const chips = document.querySelectorAll("#proSpecialtyChips [data-specialty-key]");
+    const selected = [];
+    chips.forEach(chip => { if (chip.dataset.active === "1") selected.push(chip.dataset.specialtyKey); });
+    return selected.length > 0 ? selected : undefined;
+  }
+
   function toggleProOnlineStatus() {
     state.proOnline = !state.proOnline;
     // Endpoint prêt à brancher : appApi.updateAvailability(state.proOnline)
@@ -2725,26 +2793,49 @@ function syncGoogleUiVisibility(screenId) {
     const get = (id) => document.getElementById(id)?.value.trim() || undefined;
     const getNum = (id) => { const v = document.getElementById(id)?.value; return v ? Number(v) : undefined; };
     const dto = {
-      displayName:        get("proEditDisplayName"),
-      businessName:       get("proEditBusinessName"),
-      phone:              get("proEditPhone"),
-      city:               get("proEditCity"),
-      bio:                get("proEditBio"),
-      yearsExperience:    getNum("proEditExperience"),
-      siret:              get("proEditSiret"),
-      serviceAreaKm:      getNum("proEditRadius"),
-      offersAtHome:       !!document.getElementById("proModeHome")?.checked,
+      displayName:         get("proEditDisplayName"),
+      businessName:        get("proEditBusinessName"),
+      phone:               get("proEditPhone"),
+      city:                get("proEditCity"),
+      bio:                 get("proEditBio"),
+      yearsExperience:     getNum("proEditExperience"),
+      siret:               get("proEditSiret"),
+      serviceAreaKm:       getNum("proEditRadius"),
+      avatarUrl:           get("proEditAvatarUrl"),
+      instagram:           get("proEditInstagram"),
+      offersAtHome:        !!document.getElementById("proModeHome")?.checked,
       offersAtProLocation: !!document.getElementById("proModeProLoc")?.checked,
-      offersAtSalon:      !!document.getElementById("proModeSalon")?.checked,
+      offersAtSalon:       !!document.getElementById("proModeSalon")?.checked,
+      specialties:         getSelectedSpecialties(),
     };
     // Retirer les undefined
     Object.keys(dto).forEach(k => dto[k] === undefined && delete dto[k]);
+    const btn    = document.getElementById("saveProProfileBtn");
+    const status = document.getElementById("saveProProfileStatus");
+    if (btn) { btn.disabled = true; btn.textContent = "Enregistrement…"; }
+    if (status) { status.style.display = "none"; }
     try {
       const updated = await appApi.updateProProfile(dto);
       if (state.authUser) state.authUser.proProfile = { ...(state.authUser.proProfile || {}), ...updated };
       notify("Profil enregistré avec succès.", "ok");
+      if (status) {
+        status.textContent = "✓ Profil enregistré.";
+        status.style.cssText = "display:block;color:var(--violet);font-size:13px;margin-top:8px;";
+      }
+      // Met à jour l'avatar affiché dans le header pro si renseigné
+      if (updated?.avatarUrl) {
+        const avatarEl = document.querySelector(".pro-avatar-lg");
+        if (avatarEl) avatarEl.src = updated.avatarUrl;
+      }
     } catch (error) {
-      notify(friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants."), "error");
+      const msg = friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants.");
+      notify(msg, "error");
+      if (status) {
+        status.textContent = "✗ " + msg;
+        status.style.cssText = "display:block;color:#e53935;font-size:13px;margin-top:8px;";
+      }
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Enregistrer le profil"; }
     }
   }
 

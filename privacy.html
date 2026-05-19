@@ -1,1 +1,73 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>UBODROP - Politique de confidentialité</title></head><body><main><h1>Politique de confidentialité UBODROP</h1><p>Dernière mise à jour : 12 mai 2026.</p><h2>Données collectées</h2><p>UBODROP collecte les données de compte (nom, email, téléphone), données de réservation, messages et informations techniques nécessaires au service.</p><h2>Géolocalisation</h2><p>La localisation est utilisée uniquement pour la recherche de professionnels à proximité si l'utilisateur l'autorise.</p><h2>Stockage et sécurité</h2><p>Les données sont stockées sur Railway avec PostgreSQL. L'authentification repose sur des JWT côté backend NestJS.</p><h2>Conservation</h2><p>Les données sont conservées pendant la durée du compte et selon les obligations légales applicables.</p><h2>Suppression du compte</h2><p>L'utilisateur peut demander la suppression via la page dédiée ou le support.</p><h2>Contact support</h2><p>Contact : support@ubodrop.com</p></main></body></html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UBODROP — Politique de confidentialité</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 0 auto; padding: 32px 20px; color: #1a1a2e; line-height: 1.7; }
+    h1 { font-size: 1.6rem; color: #5a228b; margin-bottom: 4px; }
+    h2 { font-size: 1.1rem; color: #5a228b; margin-top: 32px; }
+    p, li { font-size: 0.95rem; }
+    ul { padding-left: 20px; }
+    .updated { font-size: 0.85rem; color: #888; margin-bottom: 32px; }
+    a { color: #5a228b; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Politique de confidentialité UBODROP</h1>
+  <p class="updated">Dernière mise à jour : 19 mai 2026</p>
+
+  <h2>1. Responsable du traitement</h2>
+  <p>Le responsable du traitement des données est UBODROP (ci-après « nous »). Contact : <a href="mailto:support@ubodrop.com">support@ubodrop.com</a>.</p>
+
+  <h2>2. Données collectées</h2>
+  <ul>
+    <li><strong>Données de compte</strong> : adresse email (obligatoire), prénom, nom, numéro de téléphone (optionnels).</li>
+    <li><strong>Données de profil professionnel</strong> : nom d'affichage, spécialité(s), ville, biographie, SIRET (optionnel), portfolio photos, coordonnées bancaires chiffrées.</li>
+    <li><strong>Données de réservation</strong> : service choisi, date et heure, notes de rendez-vous, statut de la réservation.</li>
+    <li><strong>Données de messagerie</strong> : contenu des messages échangés entre clients et professionnels.</li>
+    <li><strong>Données techniques</strong> : logs d'accès, JWT (token d'authentification, durée de vie 15 minutes), adresse IP, navigateur/OS.</li>
+    <li><strong>Localisation</strong> : utilisée uniquement pour la recherche de professionnels à proximité, avec consentement préalable et jamais stockée en base.</li>
+  </ul>
+
+  <h2>3. Base légale des traitements (RGPD)</h2>
+  <ul>
+    <li><strong>Exécution du contrat</strong> : création de compte, gestion des réservations, messagerie.</li>
+    <li><strong>Intérêt légitime</strong> : logs de sécurité, prévention de la fraude.</li>
+    <li><strong>Consentement</strong> : géolocalisation.</li>
+    <li><strong>Obligation légale</strong> : conservation des données de facturation et paiement.</li>
+  </ul>
+
+  <h2>4. Durées de conservation</h2>
+  <ul>
+    <li>Données de compte actif : durée de vie du compte.</li>
+    <li>Après suppression du compte : 30 jours maximum, sauf obligation légale (ex. données comptables : 10 ans).</li>
+    <li>Logs techniques : 90 jours glissants.</li>
+    <li>JWT : expiration automatique après 15 minutes.</li>
+  </ul>
+
+  <h2>5. Sous-traitants (hébergement et infrastructure)</h2>
+  <ul>
+    <li><strong>Vercel Inc.</strong> (USA) — hébergement frontend, Edge Network. Conformité RGPD via DPA disponible sur vercel.com.</li>
+    <li><strong>Railway Corp.</strong> (USA) — hébergement backend NestJS. Données en transit chiffrées TLS.</li>
+    <li><strong>PostgreSQL sur Railway</strong> — base de données relationnelle, données au repos chiffrées.</li>
+  </ul>
+  <p>Des garanties appropriées encadrent les transferts hors UE (clauses contractuelles types ou Privacy Shield équivalent).</p>
+
+  <h2>6. Droits des utilisateurs</h2>
+  <p>Conformément au RGPD, vous disposez des droits suivants : accès, rectification, suppression, limitation du traitement, portabilité, opposition. Pour exercer ces droits : <a href="mailto:support@ubodrop.com">support@ubodrop.com</a> ou via la page <a href="./delete-account.html">Suppression de compte</a>.</p>
+  <p>Vous pouvez également introduire une réclamation auprès de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener">www.cnil.fr</a>).</p>
+
+  <h2>7. Sécurité</h2>
+  <p>Les mots de passe sont hashés avec Argon2. Les jetons d'authentification (JWT) ont une durée de vie limitée (15 min). Les connexions sont chiffrées en HTTPS/TLS. Aucune donnée de carte bancaire n'est stockée chez UBODROP.</p>
+
+  <h2>8. Cookies</h2>
+  <p>UBODROP n'utilise pas de cookies de tracking ou publicitaires. Les informations de session sont stockées en localStorage du navigateur pour le maintien de connexion.</p>
+
+  <h2>9. Contact</h2>
+  <p><a href="mailto:support@ubodrop.com">support@ubodrop.com</a></p>
+</main>
+</body>
+</html>

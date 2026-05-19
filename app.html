@@ -688,9 +688,36 @@
         bottom: calc(8px + env(safe-area-inset-bottom));
       }
     }
+
+  /* ── Toast notification ────────────────────────────────────── */
+  #ubo-toast {
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #1a1a2e;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    max-width: 320px;
+    width: calc(100% - 48px);
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease, transform .22s ease;
+    z-index: 9999;
+  }
+  #ubo-toast.show          { opacity: 1; transform: translateX(-50%) translateY(0); }
+  #ubo-toast.toast-error   { background: #c0392b; }
+  #ubo-toast.toast-ok      { background: #27ae60; }
   </style>
 </head>
 <body>
+  <div id="ubo-toast" role="status" aria-live="polite"></div>
+
   <div class="device">
     <div class="statusbar">
       
@@ -770,6 +797,7 @@
               </div>
               <button class="sheet-link" id="sheetCycle">Voir tout</button>
             </div>
+            <div class="pill-row" id="sheetCategoryRow" style="padding: 0 12px 10px;"></div>
             <div class="sheet-body" id="proList"></div>
           </div>
         </div>
@@ -1056,6 +1084,34 @@
     </div>
   </div>
 
+  <div class="overlay" id="bookingOverlay">
+    <div class="overlay-panel">
+      <div class="sheet-handle"></div>
+      <div class="row-between mt-12">
+        <div class="section-title">Confirmer la réservation</div>
+        <button class="icon-btn" id="closeBookingOverlayBtn">✕</button>
+      </div>
+      <div id="bookingServiceLabel" style="font-size:14px;font-weight:600;color:var(--violet);margin:8px 0 4px;"></div>
+      <div class="field" style="margin-top:14px">
+        <label>Date</label>
+        <input type="date" id="bookingDate" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+      </div>
+      <div class="field">
+        <label>Heure</label>
+        <input type="time" id="bookingTime" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+      </div>
+      <div class="field">
+        <label>Notes <span class="muted">(optionnel)</span></label>
+        <input type="text" id="bookingNotes" placeholder="Ex. : coupe dégradé haut, allergie au latex…" maxlength="200"
+          style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+      </div>
+      <div class="stack-12 mt-20">
+        <button class="primary-btn" id="confirmBookingBtn">Envoyer la demande</button>
+        <button class="secondary-btn" id="cancelBookingOverlayBtn">Annuler</button>
+      </div>
+    </div>
+  </div>
+
   <div class="overlay" id="filterOverlay">
     <div class="overlay-panel">
       <div class="sheet-handle"></div>
@@ -1161,7 +1217,9 @@
     proOnline: true,
     radius: 5,
     budget: null,
-    pricingData: {}
+    pricingData: {},
+    selectedServiceId: null,
+    selectedServiceName: null
   };
 
   const navIcons = {
@@ -1240,6 +1298,11 @@
         const message = Array.isArray(data?.message)
           ? data.message.join(" | ")
           : data?.message || (typeof data === "string" ? data : `Erreur API (${response.status})`);
+        if (response.status === 401) {
+          this.clearSession();
+          notify("Votre session a expirée. Veuillez vous reconnecter.", "error");
+          setTimeout(() => goTo("screen-login"), 120);
+        }
         throw new Error(message);
       }
 
@@ -1355,11 +1418,57 @@
         method: "PATCH",
         body: JSON.stringify({ isOnline })
       });
+    },
+
+    createBooking(serviceId, startsAt, notes) {
+      const body = { serviceId, startsAt };
+      if (notes) body.notes = notes;
+      return this.request("/bookings", {
+        method: "POST",
+        body: JSON.stringify(body)
+      });
+    },
+
+    cancelBooking(bookingId) {
+      return this.request(`/bookings/${bookingId}/cancel`, { method: "DELETE" });
     }
   };
 
-  function notify(message) {
-    window.alert(message);
+  // ── Toast ──────────────────────────────────────────────────────
+  let _toastTimer = null;
+  function notify(message, type = "info") {
+    const el = document.getElementById("ubo-toast");
+    if (!el) { console.warn("Toast:", message); return; }
+    if (_toastTimer) { clearTimeout(_toastTimer); el.classList.remove("show"); }
+    el.textContent = message;
+    el.className = type === "error" ? "toast-error" : type === "ok" ? "toast-ok" : "";
+    // Force reflow so transition plays even on rapid calls
+    void el.offsetWidth;
+    el.classList.add("show");
+    _toastTimer = setTimeout(() => {
+      el.classList.remove("show");
+      _toastTimer = null;
+    }, 4000);
+  }
+
+  /**
+   * Sanitise API error messages before showing them to the user.
+   * Passes through short, human-readable messages; replaces technical
+   * Prisma / NestJS internals with a generic fallback.
+   */
+  function friendlyApiError(error, fallback) {
+    const msg = error?.message || "";
+    const TECHNICAL = [
+      "prisma", "invalid `", "column", "relation '", "constraint",
+      "p2002", "p2003", "p2025", "internal server error",
+      "cannot read", "undefined", "null", "stack",
+    ];
+    const lc = msg.toLowerCase();
+    const isTechnical =
+      msg.length > 180 ||
+      msg.includes("\n") ||
+      TECHNICAL.some((t) => lc.includes(t));
+    return isTechnical ? fallback : (msg || fallback);
   }
 
   function extractArray(data) {
@@ -1588,14 +1697,21 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   function renderFilterCategories() {
-    const row = document.getElementById("filterCategoryRow");
-    row.innerHTML = "";
-    state.categories.forEach(cat => {
-      const btn = document.createElement("button");
-      btn.className = "pill" + (state.category === cat.key ? " active" : "");
-      btn.textContent = cat.label;
-      btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
-      row.appendChild(btn);
+    // Rend les pills métiers dans l'overlay filtre ET dans le bottom sheet (onglet du bas)
+    const targets = [
+      document.getElementById("filterCategoryRow"),
+      document.getElementById("sheetCategoryRow"),
+    ];
+    targets.forEach(row => {
+      if (!row) return;
+      row.innerHTML = "";
+      state.categories.forEach(cat => {
+        const btn = document.createElement("button");
+        btn.className = "pill" + (state.category === cat.key ? " active" : "");
+        btn.textContent = cat.label;
+        btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
+        row.appendChild(btn);
+      });
     });
   }
 
@@ -1869,6 +1985,8 @@ function syncGoogleUiVisibility(screenId) {
     } catch (_) {}
 
     state.selectedPro = detailed;
+    state.selectedServiceId = null;
+    state.selectedServiceName = null;
 
     document.getElementById("detailHero").src = detailed.gallery[0] || detailed.image || "assets/img/ubo-drop-logo.png";
     document.getElementById("detailName").textContent = detailed.name;
@@ -1889,7 +2007,8 @@ function syncGoogleUiVisibility(screenId) {
       services.innerHTML = emptyCard("Prestations bientôt disponibles", "Ce professionnel n'a pas encore publié ses prestations.");
     } else {
       services.innerHTML = detailed.services.map((service) => `
-        <div class="service-row">
+        <div class="service-row" data-service-id="${service.id}" data-service-name="${service.name}"
+          style="cursor:pointer;transition:background .15s;" onclick="selectService('${service.id}', '${service.name.replace(/'/g, "\\'")}', this)">
           <div>
             <h4>${service.name}</h4>
             <p>${service.meta}</p>
@@ -2031,9 +2150,9 @@ function syncGoogleUiVisibility(screenId) {
     try {
       const updated = await appApi.updateClientProfile(dto);
       if (state.authUser) state.authUser.clientProfile = { ...(state.authUser.clientProfile || {}), ...updated };
-      notify("Profil mis à jour.");
+      notify("Profil mis à jour.", "ok");
     } catch (error) {
-      notify(`Sauvegarde impossible : ${error.message}`);
+      notify(friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2091,7 +2210,7 @@ function syncGoogleUiVisibility(screenId) {
       const data = await appApi.messages(conversationId);
       renderChat(extractArray(data));
     } catch (error) {
-      renderChat([], `Impossible de charger les messages : ${error.message}`);
+      renderChat([], "Impossible de charger les messages. Réessaie plus tard.");
     }
   }
 
@@ -2350,7 +2469,7 @@ function syncGoogleUiVisibility(screenId) {
 
   async function handleLogin() {
     const inputs = document.querySelectorAll("#screen-login .field input");
-    const email = inputs[0]?.value.trim() || "";
+    const email = (inputs[0]?.value || "").trim().toLowerCase();
     const password = inputs[1]?.value || "";
     if (!email || !password) {
       notify("Renseigne ton email et ton mot de passe.");
@@ -2359,7 +2478,7 @@ function syncGoogleUiVisibility(screenId) {
     try {
       await handleAuthSuccess(await appApi.login(email, password));
     } catch (error) {
-      notify(`Connexion impossible : ${error.message}`);
+      notify(friendlyApiError(error, "Connexion impossible. Vérifie tes identifiants."), "error");
     }
   }
 
@@ -2367,15 +2486,15 @@ function syncGoogleUiVisibility(screenId) {
     const inputs = document.querySelectorAll("#screen-register-client .field input");
     const firstName = inputs[0]?.value.trim() || "";
     const lastName = inputs[1]?.value.trim() || "";
-    const email = inputs[2]?.value.trim() || "";
+    const email = (inputs[2]?.value || "").trim().toLowerCase();
     const phone = inputs[3]?.value.trim() || "";
     const password = inputs[4]?.value || "";
     if (!email || !password) {
       notify("Email et mot de passe obligatoires.");
       return;
     }
-    if (password.length < 6) {
-      notify("Le mot de passe doit faire au moins 6 caractères.");
+    if (password.length < 8) {
+      notify("Le mot de passe doit faire au moins 8 caractères.");
       return;
     }
     try {
@@ -2385,14 +2504,14 @@ function syncGoogleUiVisibility(screenId) {
       if (phone) payload.phone = phone;
       await handleAuthSuccess(await appApi.registerClient(payload));
     } catch (error) {
-      notify(`Inscription impossible : ${error.message}`);
+      notify(friendlyApiError(error, "Le compte n'a pas pu être créé. Réessaie dans quelques instants."), "error");
     }
   }
 
   async function handleRegisterProfessional() {
     const firstName  = document.getElementById("proRegFirstName")?.value.trim() || "";
     const lastName   = document.getElementById("proRegLastName")?.value.trim() || "";
-    const email      = document.getElementById("proRegEmail")?.value.trim() || "";
+    const email      = (document.getElementById("proRegEmail")?.value || "").trim().toLowerCase();
     const phone      = document.getElementById("proRegPhone")?.value.trim() || "";
     const specialty  = document.getElementById("proRegSpecialty")?.value || "";
     const experience = document.getElementById("proRegExperience")?.value.trim() || "";
@@ -2418,7 +2537,81 @@ function syncGoogleUiVisibility(screenId) {
       payload.offersAtHome = true; // mode par défaut
       await handleAuthSuccess(await appApi.registerProfessional(payload));
     } catch (error) {
-      notify(`Inscription pro impossible : ${error.message}`);
+      notify(friendlyApiError(error, "Le compte pro n'a pas pu être créé. Réessaie dans quelques instants."), "error");
+    }
+  }
+
+  function selectService(serviceId, serviceName, rowEl) {
+    state.selectedServiceId = serviceId;
+    state.selectedServiceName = serviceName;
+    // Highlight selected row
+    document.querySelectorAll("#detailServices .service-row").forEach(r => {
+      r.style.background = "";
+      r.style.outline = "";
+    });
+    if (rowEl) {
+      rowEl.style.background = "var(--violet-soft)";
+      rowEl.style.outline = "2px solid var(--violet)";
+      rowEl.style.borderRadius = "var(--radius-sm)";
+    }
+    // Update CTA text to invite confirmation
+    const cta = document.getElementById("detailCta");
+    if (cta && appApi.getToken()) cta.textContent = `Réserver — ${serviceName}`;
+  }
+
+  function openBookingOverlay() {
+    const overlay = document.getElementById("bookingOverlay");
+    if (!overlay) return;
+    // Min date = today
+    const today = new Date().toISOString().slice(0, 10);
+    const dateInput = document.getElementById("bookingDate");
+    const timeInput = document.getElementById("bookingTime");
+    if (dateInput) { dateInput.min = today; dateInput.value = ""; }
+    if (timeInput) timeInput.value = "";
+    const notesInput = document.getElementById("bookingNotes");
+    if (notesInput) notesInput.value = "";
+    // Show service name
+    const label = document.getElementById("bookingServiceLabel");
+    if (label) label.textContent = state.selectedServiceName ? `Prestation : ${state.selectedServiceName}` : "";
+    overlay.classList.add("open");
+  }
+
+  function closeBookingOverlay() {
+    document.getElementById("bookingOverlay")?.classList.remove("open");
+  }
+
+  async function confirmBooking() {
+    const date = document.getElementById("bookingDate")?.value;
+    const time = document.getElementById("bookingTime")?.value;
+    const notes = document.getElementById("bookingNotes")?.value.trim() || undefined;
+
+    if (!date || !time) {
+      notify("Choisis une date et une heure pour continuer.", "error");
+      return;
+    }
+
+    const serviceId = state.selectedServiceId;
+    if (!serviceId) {
+      notify("Aucune prestation sélectionnée.", "error");
+      return;
+    }
+
+    // Build ISO datetime in local timezone
+    const startsAt = new Date(`${date}T${time}`).toISOString();
+
+    const btn = document.getElementById("confirmBookingBtn");
+    if (btn) { btn.disabled = true; btn.textContent = "Envoi en cours…"; }
+
+    try {
+      await appApi.createBooking(serviceId, startsAt, notes);
+      closeBookingOverlay();
+      notify("Votre demande de réservation a bien été envoyée.", "ok");
+      await loadBookings();
+      goTo("screen-rdv");
+    } catch (error) {
+      notify(friendlyApiError(error, "La réservation n'a pas pu être confirmée. Veuillez réessayer."), "error");
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Envoyer la demande"; }
     }
   }
 
@@ -2432,9 +2625,12 @@ function syncGoogleUiVisibility(screenId) {
       notify("Aucun professionnel disponible pour le moment.");
       return;
     }
-    notify(`Prestataire sélectionné : ${state.selectedPro.name}. L'intégration complète de réservation peut maintenant être branchée sur le endpoint booking précis.`);
-    await loadBookings();
-    goTo("screen-rdv");
+    const hasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
+    if (hasServices && !state.selectedServiceId) {
+      notify("Sélectionne une prestation dans la liste pour continuer.");
+      return;
+    }
+    openBookingOverlay();
   }
 
   async function handleLogout() {
@@ -2481,9 +2677,9 @@ function syncGoogleUiVisibility(screenId) {
     try {
       const updated = await appApi.updateProProfile(dto);
       if (state.authUser) state.authUser.proProfile = { ...(state.authUser.proProfile || {}), ...updated };
-      notify("Profil enregistré avec succès.");
+      notify("Profil enregistré avec succès.", "ok");
     } catch (error) {
-      notify(`Impossible de sauvegarder : ${error.message}`);
+      notify(friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2504,7 +2700,7 @@ function syncGoogleUiVisibility(screenId) {
       document.getElementById("portfolioUrl").value = "";
       document.getElementById("portfolioCaption").value = "";
     } catch (error) {
-      notify(`Ajout impossible : ${error.message}`);
+      notify(friendlyApiError(error, "L'ajout a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2517,7 +2713,7 @@ function syncGoogleUiVisibility(screenId) {
         renderPortfolioGrid(state.authUser.proProfile.portfolioPhotos);
       }
     } catch (error) {
-      notify(`Suppression impossible : ${error.message}`);
+      notify(friendlyApiError(error, "La suppression a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2539,7 +2735,7 @@ function syncGoogleUiVisibility(screenId) {
       // Effacer les champs sensibles après sauvegarde
       ["bankIban", "bankBic"].forEach(id => { const el = document.getElementById(id); if (el) el.value = ""; });
     } catch (error) {
-      notify(`Sauvegarde impossible : ${error.message}`);
+      notify(friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2571,7 +2767,7 @@ function syncGoogleUiVisibility(screenId) {
       await loadMessages(state.currentConversationId);
       await loadConversations();
     } catch (error) {
-      notify(`Envoi impossible : ${error.message}`);
+      notify(friendlyApiError(error, "L'envoi a échoué. Réessaie dans quelques instants."), "error");
     }
   }
 
@@ -2656,6 +2852,12 @@ function syncGoogleUiVisibility(screenId) {
   })();
 
   document.getElementById("detailCta").onclick = handleReserveClick;
+  document.getElementById("closeBookingOverlayBtn").onclick = closeBookingOverlay;
+  document.getElementById("cancelBookingOverlayBtn").onclick = closeBookingOverlay;
+  document.getElementById("confirmBookingBtn").onclick = confirmBooking;
+  document.getElementById("bookingOverlay").addEventListener("click", (e) => {
+    if (e.target.id === "bookingOverlay") closeBookingOverlay();
+  });
   document.getElementById("loginClientBtn").onclick = handleLogin;
   document.getElementById("loginProBtn").onclick = handleLogin;
   document.getElementById("registerClientBtn").onclick = handleRegisterClient;

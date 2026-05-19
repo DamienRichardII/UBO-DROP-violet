@@ -1026,10 +1026,40 @@
   <!-- Onglet Portfolio -->
   <div class="pro-tab-panel" id="tab-portfolio" style="display:none;">
     <div class="card list-card mt-16">
-      <h4 style="font-size:1rem; font-weight:800; margin-bottom:12px;">Mon portfolio</h4>
-      <div class="field"><label>URL de la photo</label><input type="url" id="portfolioUrl" placeholder="https://…/ma-photo.jpg"></div>
-      <div class="field"><label>Légende <span class="muted">(optionnel)</span></label><input type="text" id="portfolioCaption" placeholder="Coupe dégradée — 2024"></div>
-      <button class="primary-btn" id="addPortfolioBtn" style="margin-bottom:16px;">Ajouter la photo</button>
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:14px;">Mon portfolio</h4>
+
+      <!-- Upload depuis galerie (mode principal — mobile) -->
+      <input type="file" id="portfolioFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;">
+      <button class="primary-btn" id="addPhotoFromGalleryBtn" style="margin-bottom:12px;">
+        📸 Ajouter une photo
+      </button>
+
+      <!-- Aperçu + légende + confirmation (affiché après sélection) -->
+      <div id="portfolioUploadPreview" style="display:none; margin-bottom:16px; text-align:center;">
+        <img id="portfolioPreviewImg" alt="Aperçu" style="max-width:140px; max-height:140px; border-radius:12px; object-fit:cover; box-shadow:var(--shadow-xs); margin-bottom:10px;">
+        <div class="field" style="text-align:left;">
+          <label>Légende <span class="muted">(optionnel)</span></label>
+          <input type="text" id="portfolioCaptionUpload" placeholder="Coupe dégradée — 2024" maxlength="200">
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="primary-btn" id="confirmUploadBtn" style="flex:1;">Envoyer</button>
+          <button class="secondary-btn" id="cancelUploadBtn" style="flex:1;">Annuler</button>
+        </div>
+        <div id="portfolioUploadStatus" style="font-size:12px; color:var(--muted); margin-top:8px;"></div>
+      </div>
+
+      <!-- Fallback : ajout par URL -->
+      <details style="margin-bottom:14px;">
+        <summary style="cursor:pointer; font-size:12px; color:var(--muted); padding:6px 0;">
+          Ajouter via URL à la place
+        </summary>
+        <div style="margin-top:10px;">
+          <div class="field"><label>URL de la photo</label><input type="url" id="portfolioUrl" placeholder="https://…/ma-photo.jpg"></div>
+          <div class="field"><label>Légende <span class="muted">(optionnel)</span></label><input type="text" id="portfolioCaption" placeholder="Coupe dégradée — 2024"></div>
+          <button class="primary-btn" id="addPortfolioBtn" style="margin-bottom:8px;">Ajouter la photo</button>
+        </div>
+      </details>
+
       <div id="portfolioGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;"></div>
     </div>
   </div>
@@ -1170,7 +1200,7 @@
   const emptyState = {
     pros: {
       title: "Aucun professionnel disponible",
-      text: "Les premiers prestataires arrivent bientôt sur UBODROP. Reviens plus tard ou crée déjà ton compte."
+      text: "Aucun professionnel ne correspond à ces critères pour le moment."
     },
     bookings: {
       title: "Aucune réservation",
@@ -1559,12 +1589,15 @@
 
   function normalizePros(data) {
     return extractArray(data).map((item, index) => {
+      // Déduire la catégorie depuis les spécialités d'abord (pros sans services),
+      // puis depuis les services, puis fallback sur COIFFEUSE.
       const categorySource =
         item?.category?.name ||
         item?.primaryCategory?.name ||
         item?.specialty ||
         item?.serviceCategory ||
         item?.profession ||
+        item?.specialties?.[0]?.category?.name ||
         item?.services?.[0]?.category?.name ||
         item?.services?.[0]?.name ||
         "COIFFEUSE";
@@ -1935,8 +1968,23 @@ function syncGoogleUiVisibility(screenId) {
     const visiblePros = getVisiblePros();
     updateFilterCount();
     if (!visiblePros.length) {
-      list.innerHTML = emptyCard(emptyState.pros.title, emptyState.pros.text, "Créer un compte", "screen-register-client");
-      bindGo();
+      list.innerHTML = `
+        <div class="soft-card" style="padding:18px; text-align:center;">
+          <div class="section-title" style="font-size:1.04rem;">${emptyState.pros.title}</div>
+          <div class="section-sub" style="margin-top:8px;">${emptyState.pros.text}</div>
+          <button class="secondary-btn" style="margin-top:16px;padding:10px 20px;font-size:13px;" id="resetFiltersBtn">Réinitialiser les filtres</button>
+        </div>`;
+      const resetBtn = document.getElementById("resetFiltersBtn");
+      if (resetBtn) {
+        resetBtn.onclick = () => {
+          state.category = state.categories[0]?.key || "BARBER";
+          state.place = "À domicile";
+          state.budget = null;
+          renderFilterCategories();
+          renderPlaceChips();
+          renderPros();
+        };
+      }
       renderMapMarkers();
       renderMapEmptyMessage();
       return;
@@ -1992,7 +2040,20 @@ function syncGoogleUiVisibility(screenId) {
     document.getElementById("detailName").textContent = detailed.name;
     document.getElementById("detailDesc").textContent = detailed.description || "Professionnel vérifié sur UBODROP.";
     document.getElementById("detailPrice").textContent = detailed.fromPrice ? `à partir de ${detailed.fromPrice}` : "Tarif sur demande";
-    document.getElementById("detailCta").textContent = appApi.getToken() ? `Réserver ${detailed.name.split(" ")[0]}` : "Se connecter pour réserver";
+    const hasServices = detailed.services && detailed.services.length > 0;
+    const ctaEl = document.getElementById("detailCta");
+    if (!appApi.getToken()) {
+      ctaEl.textContent = "Se connecter pour réserver";
+      ctaEl.disabled = false;
+    } else if (!hasServices) {
+      ctaEl.textContent = "Profil en cours de configuration";
+      ctaEl.disabled = true;
+      ctaEl.style.opacity = "0.5";
+    } else {
+      ctaEl.textContent = `Réserver ${detailed.name.split(" ")[0]}`;
+      ctaEl.disabled = false;
+      ctaEl.style.opacity = "";
+    }
     document.getElementById("detailMeta").innerHTML = [
       detailed.rating ? `<span>⭐ ${detailed.rating}${detailed.reviews ? ` (${detailed.reviews})` : ""}</span>` : "",
       detailed.distance ? `<span>• ${detailed.distance}</span>` : "",
@@ -2004,7 +2065,7 @@ function syncGoogleUiVisibility(screenId) {
 
     const services = document.getElementById("detailServices");
     if (!detailed.services.length) {
-      services.innerHTML = emptyCard("Prestations bientôt disponibles", "Ce professionnel n'a pas encore publié ses prestations.");
+      services.innerHTML = emptyCard("Prestations en cours", "Ce professionnel finalise encore ses prestations. Revenez bientôt !");
     } else {
       services.innerHTML = detailed.services.map((service) => `
         <div class="service-row" data-service-id="${service.id}" data-service-name="${service.name}"
@@ -2625,8 +2686,12 @@ function syncGoogleUiVisibility(screenId) {
       notify("Aucun professionnel disponible pour le moment.");
       return;
     }
-    const hasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
-    if (hasServices && !state.selectedServiceId) {
+    const proHasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
+    if (!proHasServices) {
+      notify("Ce professionnel finalise encore ses prestations. Revenez bientôt !");
+      return;
+    }
+    if (!state.selectedServiceId) {
       notify("Sélectionne une prestation dans la liste pour continuer.");
       return;
     }
@@ -2682,6 +2747,113 @@ function syncGoogleUiVisibility(screenId) {
       notify(friendlyApiError(error, "La sauvegarde a échoué. Réessaie dans quelques instants."), "error");
     }
   }
+
+  // ── Portfolio : upload depuis galerie (mobile) ─────────────────────────────
+
+  // Redimensionne une image File → data URI JPEG max 800px, qualité 0.78
+  function resizeImageToDataUrl(file, maxPx = 800, quality = 0.78) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const img = new Image();
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxPx || height > maxPx) {
+            if (width >= height) { height = Math.round(height * maxPx / width); width = maxPx; }
+            else { width = Math.round(width * maxPx / height); height = maxPx; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = width; canvas.height = height;
+          canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = reject;
+        img.src = evt.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  let _pendingUploadDataUrl = null;
+
+  function initPortfolioUpload() {
+    const fileInput    = document.getElementById("portfolioFileInput");
+    const galleryBtn   = document.getElementById("addPhotoFromGalleryBtn");
+    const previewBlock = document.getElementById("portfolioUploadPreview");
+    const previewImg   = document.getElementById("portfolioPreviewImg");
+    const statusEl     = document.getElementById("portfolioUploadStatus");
+    const confirmBtn   = document.getElementById("confirmUploadBtn");
+    const cancelBtn    = document.getElementById("cancelUploadBtn");
+    if (!fileInput || !galleryBtn) return;
+
+    galleryBtn.onclick = () => fileInput.click();
+
+    fileInput.onchange = async (e) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      const ACCEPTED = ["image/jpeg", "image/png", "image/webp"];
+      if (!ACCEPTED.includes(file.type)) {
+        notify("Format non supporté. Utilise un fichier JPG, PNG ou WEBP.", "error");
+        fileInput.value = "";
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        notify("La photo est trop lourde (max 5 Mo).", "error");
+        fileInput.value = "";
+        return;
+      }
+      statusEl.textContent = "Compression en cours…";
+      previewBlock.style.display = "";
+      try {
+        _pendingUploadDataUrl = await resizeImageToDataUrl(file);
+        previewImg.src = _pendingUploadDataUrl;
+        statusEl.textContent = "";
+      } catch (_) {
+        notify("Impossible de lire l'image.", "error");
+        previewBlock.style.display = "none";
+        fileInput.value = "";
+      }
+    };
+
+    confirmBtn.onclick = async () => {
+      if (!_pendingUploadDataUrl) return;
+      if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); return; }
+      const caption = document.getElementById("portfolioCaptionUpload")?.value.trim() || undefined;
+      confirmBtn.disabled = true;
+      confirmBtn.textContent = "Envoi…";
+      statusEl.textContent = "Envoi en cours…";
+      try {
+        const photo = await appApi.addPortfolioPhoto(_pendingUploadDataUrl, caption);
+        if (state.authUser?.proProfile) {
+          state.authUser.proProfile.portfolioPhotos = [
+            ...(state.authUser.proProfile.portfolioPhotos || []), photo
+          ];
+          renderPortfolioGrid(state.authUser.proProfile.portfolioPhotos);
+        }
+        notify("Photo ajoutée au portfolio.", "ok");
+        _pendingUploadDataUrl = null;
+        previewBlock.style.display = "none";
+        fileInput.value = "";
+        if (document.getElementById("portfolioCaptionUpload")) document.getElementById("portfolioCaptionUpload").value = "";
+      } catch (error) {
+        statusEl.textContent = "";
+        notify(friendlyApiError(error, "L'upload a échoué. Réessaie."), "error");
+      } finally {
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = "Envoyer";
+      }
+    };
+
+    cancelBtn.onclick = () => {
+      _pendingUploadDataUrl = null;
+      previewBlock.style.display = "none";
+      fileInput.value = "";
+      if (document.getElementById("portfolioCaptionUpload")) document.getElementById("portfolioCaptionUpload").value = "";
+    };
+  }
+
+  // ── Portfolio : ajout par URL (fallback desktop) ───────────────────────────
 
   async function handleAddPortfolioPhoto() {
     if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); return; }
@@ -2791,8 +2963,9 @@ function syncGoogleUiVisibility(screenId) {
   document.getElementById("addPortfolioBtn")?.addEventListener("click", handleAddPortfolioPhoto);
   document.getElementById("saveBankingBtn")?.addEventListener("click", handleSaveBankingInfo);
 
-  // Initialiser les onglets pro
+  // Initialiser les onglets pro + upload portfolio
   initProTabs();
+  initPortfolioUpload();
   document.getElementById("filterOverlay").addEventListener("click", (e) => {
     if (e.target.id === "filterOverlay") toggleFilter(false);
   });

@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>UBODROP</title>
+  <title>UBODROP — Beauté à domicile</title>
+  <meta name="description" content="Réservez les meilleurs barbiers, coiffeuses et pros de beauté près de chez vous.">
+  <link rel="icon" type="image/png" href="assets/img/ubo-drop-logo.png">
+  <link rel="apple-touch-icon" href="assets/img/ubo-drop-logo.png">
+  <meta property="og:title" content="UBODROP — Beauté à domicile">
+  <meta property="og:description" content="Réservez les meilleurs barbiers, coiffeuses et pros de beauté près de chez vous.">
+  <meta property="og:image" content="https://www.ubodrop.com/assets/img/ubo-drop-logo.png">
+  <meta property="og:url" content="https://www.ubodrop.com/app.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://www.ubodrop.com/assets/img/ubo-drop-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -693,6 +703,106 @@
       }
     }
 
+    /* ── Desktop plein écran (> 768px) ─────────────────────────── */
+    @media (min-width: 769px) {
+      body {
+        padding: 0;
+        display: block;
+        min-height: 100vh;
+        background: var(--bg);
+      }
+      .device {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+      .device::before { display: none; }
+      .statusbar { display: none; }
+      .app { min-height: 100vh; }
+      .screen {
+        min-height: 100vh;
+        padding: 24px 40px calc(var(--bottom-nav-h) + 20px);
+        max-width: 1200px;
+        margin: 0 auto;
+        box-sizing: border-box;
+      }
+      .screen-topbar {
+        max-width: 1120px;
+      }
+      /* Map stage — pleine hauteur desktop */
+      .map-stage {
+        height: calc(100vh - 160px);
+        border-radius: 20px;
+        margin-left: 0;
+        margin-right: 0;
+        margin-top: 0;
+      }
+      /* Pills : wrap sur desktop, pas de scroll horizontal */
+      .pill-row {
+        flex-wrap: wrap;
+        overflow: visible;
+        touch-action: auto;
+      }
+      /* Bottom sheet desktop */
+      .bottom-sheet { left: 20px; right: 20px; }
+      /* Overlay filtre desktop */
+      .overlay-panel {
+        max-width: 560px;
+        width: 100%;
+        margin: 0 auto;
+        border-radius: 24px;
+      }
+      /* Pro cards : grille 2 colonnes desktop */
+      #proList .pro-card {
+        break-inside: avoid;
+      }
+      /* Auth screens desktop */
+      .auth-shell {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        min-height: 100vh;
+        padding-top: 60px;
+      }
+      .auth-panel { max-width: 460px; width: 100%; }
+      /* Bottom nav desktop */
+      .bottom-nav {
+        left: 0; right: 0;
+        bottom: 0;
+        border-radius: 0;
+        width: 100%;
+        padding-bottom: 8px;
+      }
+      /* Pro dashboard desktop */
+      .pro-tabs { max-width: 800px; }
+      #screen-pro-dashboard .card { max-width: 900px; }
+    }
+
+    /* ── Filtre overlay : forcer couleur ink, pas bleu système ─── */
+    .overlay-panel,
+    .overlay-panel h4,
+    .overlay-panel label,
+    .overlay-panel .filter-group * {
+      color: var(--ink);
+    }
+    .overlay-panel .seg.active,
+    .overlay-panel .seg-small.active,
+    .overlay-panel .pill.active {
+      color: #fff;
+    }
+    .overlay-panel .sheet-link {
+      color: var(--violet);
+    }
+    .place-chip, .seg, .seg-small {
+      color: var(--ink);
+    }
+    .place-chip.active, .seg.active, .seg-small.active {
+      color: #fff;
+    }
+
   /* ── Toast notification ────────────────────────────────────── */
   #ubo-toast {
     position: fixed;
@@ -784,7 +894,7 @@
             <div class="map-floating">
               <div class="searchbar compact" style="flex:1;">
                 <span>⌕</span>
-                <input value="" placeholder="Indiquez un lieu" aria-label="Recherche" />
+                <input id="citySearchInput" value="" placeholder="Indiquez un lieu" aria-label="Recherche" />
                 <span style="color:#bbb2c2;">›</span>
               </div>
             </div>
@@ -886,8 +996,11 @@
           <div class="field"><label>Nom</label><input type="text" id="proRegLastName" placeholder="Benali" autocomplete="family-name"></div>
           <div class="field"><label>Email</label><input type="email" id="proRegEmail" placeholder="pro@email.com" autocomplete="email"></div>
           <div class="field"><label>Téléphone <span class="muted">(optionnel)</span></label><input type="tel" id="proRegPhone" placeholder="+33 6 00 00 00 00" autocomplete="tel"></div>
-          <div class="field"><label>Spécialité principale</label>
-            <select id="proRegSpecialty">
+          <div class="field"><label>Métier(s) <span class="muted">(1 à 5, obligatoire)</span></label>
+            <div id="proRegSpecialtyChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
+            <div id="proRegSpecialtyError" style="display:none; color:#e53935; font-size:12px; margin-top:4px;"></div>
+            <!-- Ancien select conservé masqué pour compatibilité avec handleRegisterProfessional() -->
+            <select id="proRegSpecialty" style="display:none;">
               <option value="">-- Choisir une spécialité --</option>
               <option value="BARBER">Barber</option>
               <option value="COIFFEUSE">Coiffeuse</option>
@@ -992,6 +1105,7 @@
   <!-- Onglets -->
   <div class="pro-tabs" id="proTabs" style="display:flex; gap:6px; margin:16px 0 0; overflow-x:auto; scrollbar-width:none;">
     <button class="pro-tab active" data-tab="tab-rdv">📅 RDV</button>
+    <button class="pro-tab" data-tab="tab-prestations">✂️ Prestations</button>
     <button class="pro-tab" data-tab="tab-profil">👤 Profil</button>
     <button class="pro-tab" data-tab="tab-portfolio">🖼 Portfolio</button>
     <button class="pro-tab" data-tab="tab-bancaire">🏦 Bancaire</button>
@@ -1001,6 +1115,38 @@
   <div class="pro-tab-panel" id="tab-rdv">
     <div class="card list-card mt-16" id="proRdvCard"></div>
     <div class="card list-card mt-16" id="proConvsCard"></div>
+  </div>
+
+  <!-- Onglet Prestations -->
+  <div class="pro-tab-panel" id="tab-prestations" style="display:none;">
+    <div class="card list-card mt-16">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Mes prestations</h4>
+      <div class="section-sub" style="margin-bottom:16px; font-size:.86rem;">Crée tes prestations pour qu'elles apparaissent sur ta fiche client.</div>
+
+      <!-- Formulaire création / édition -->
+      <div id="serviceFormWrap" style="border:1.5px solid var(--line); border-radius:16px; padding:16px; margin-bottom:20px;">
+        <div style="font-size:.9rem; font-weight:700; margin-bottom:12px;" id="serviceFormTitle">➕ Nouvelle prestation</div>
+        <input type="hidden" id="editServiceId" value="">
+        <div class="field">
+          <label>Métier / catégorie</label>
+          <select id="svcCategory" style="width:100%; padding:10px 12px; border-radius:10px; border:1.5px solid var(--line); font-size:14px; color:var(--ink); background:var(--surface-strong);"></select>
+        </div>
+        <div class="field"><label>Titre <span class="muted">(ex : Coupe + barbe)</span></label><input type="text" id="svcTitle" placeholder="Coupe + barbe" maxlength="120"></div>
+        <div class="field"><label>Description <span class="muted">(optionnel)</span></label><input type="text" id="svcDescription" placeholder="Inclut un soin du visage…" maxlength="400"></div>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <div class="field" style="flex:1; min-width:110px;"><label>Prix (€)</label><input type="number" id="svcPrice" placeholder="35" min="0" step="0.01"></div>
+          <div class="field" style="flex:1; min-width:110px;"><label>Durée (min)</label><input type="number" id="svcDuration" placeholder="45" min="5" max="1440"></div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:6px;">
+          <button class="primary-btn" id="saveServiceBtn" style="flex:1;">Enregistrer</button>
+          <button class="secondary-btn" id="cancelServiceEditBtn" style="display:none; flex:0 0 auto; padding:10px 16px;">Annuler</button>
+        </div>
+        <div id="serviceFormStatus" style="font-size:12px; color:var(--muted); margin-top:8px; display:none;"></div>
+      </div>
+
+      <!-- Liste des prestations existantes -->
+      <div id="servicesList"></div>
+    </div>
   </div>
 
   <!-- Onglet Profil -->
@@ -1203,7 +1349,7 @@
   const categoriesFallback = [
     { key: "BARBER",             label: "Barber" },
     { key: "MICRO_PIGMENTATION", label: "Micro-pigmentation" },
-    { key: "TATOUEUR",           label: "Tatoueur" },
+    { key: "TATOUEUR",           label: "Tatouage" },
     { key: "HENNE",              label: "Henné" },
     { key: "ESTHETICIENNE",      label: "Esthéticienne" },
     { key: "MAQUILLAGE",         label: "Maquillage" },
@@ -1367,6 +1513,10 @@
       return this.request("/auth/me");
     },
 
+    myProfile() {
+      return this.request("/profiles/me");
+    },
+
     registerClient(payload) {
       return this.request("/auth/register/client", {
         method: "POST",
@@ -1385,8 +1535,12 @@
       return this.request("/categories");
     },
 
-    searchProfessionals() {
-      return this.request("/search/professionals");
+    searchProfessionals(params = {}) {
+      const qs = Object.entries(params)
+        .filter(([, v]) => v !== undefined && v !== null && v !== "")
+        .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+        .join("&");
+      return this.request("/search/professionals" + (qs ? `?${qs}` : ""));
     },
 
     publicProfessional(id) {
@@ -1478,7 +1632,30 @@
 
     cancelBooking(bookingId) {
       return this.request(`/bookings/${bookingId}/cancel`, { method: "DELETE" });
-    }
+    },
+
+    // ── Services / Prestations ────────────────────────────────────
+    myServices() {
+      return this.request("/services/me");
+    },
+
+    createService(dto) {
+      return this.request("/services", {
+        method: "POST",
+        body: JSON.stringify(dto),
+      });
+    },
+
+    updateService(serviceId, dto) {
+      return this.request(`/services/${serviceId}`, {
+        method: "PATCH",
+        body: JSON.stringify(dto),
+      });
+    },
+
+    deleteService(serviceId) {
+      return this.request(`/services/${serviceId}`, { method: "DELETE" });
+    },
   };
 
   // ── Toast ──────────────────────────────────────────────────────
@@ -1592,14 +1769,19 @@
   }
 
   function normalizeService(service, index = 0) {
+    // Le backend retourne `title` et `durationMin` — compatibilité avec les deux formes
+    const dur = service?.durationMin ?? service?.durationMinutes;
     return {
       id: service?.id || `service-${index}`,
-      name: service?.name || service?.label || `Prestation ${index + 1}`,
+      name: service?.title || service?.name || service?.label || `Prestation ${index + 1}`,
+      description: service?.description || "",
       meta: [
-        service?.durationMinutes ? `${service.durationMinutes} min` : service?.meta,
-        service?.executionMode
-      ].filter(Boolean).join(" • ") || "Prestation disponible",
+        dur ? `${dur} min` : service?.meta,
+        service?.executionMode,
+        service?.category?.label || service?.category?.name || ""
+      ].filter(Boolean).join(" · ") || "Prestation disponible",
       price: euro(service?.priceAmount ?? service?.price),
+      durationMin: dur || 0,
       tags: []
     };
   }
@@ -1703,7 +1885,27 @@ function syncGoogleUiVisibility(screenId) {
     bindGo();
   }
 
+  // Écrans privés : accès réservé aux utilisateurs authentifiés
+  const PRIVATE_SCREENS = new Set([
+    "screen-rdv",
+    "screen-favs",
+    "screen-account",
+    "screen-pro-dashboard",
+    "screen-pro-messages",
+    "screen-chat",
+  ]);
+
   function goTo(screenId) {
+    // Guard auth : si l'écran est privé et l'utilisateur n'est pas connecté → login
+    if (PRIVATE_SCREENS.has(screenId) && !state.session?.accessToken) {
+      state.returnToScreen = screenId;
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById("screen-login")?.classList.add("active");
+      renderNav("screen-login");
+      syncGoogleUiVisibility("screen-login");
+      notify("Connecte-toi pour accéder à cette section.", "info");
+      return;
+    }
     document.querySelectorAll(".screen").forEach(screen => screen.classList.remove("active"));
     document.getElementById(screenId)?.classList.add("active");
     renderNav(screenId);
@@ -2087,9 +2289,10 @@ function syncGoogleUiVisibility(screenId) {
       services.innerHTML = detailed.services.map((service) => `
         <div class="service-row" data-service-id="${service.id}" data-service-name="${service.name}"
           style="cursor:pointer;transition:background .15s;" onclick="selectService('${service.id}', '${service.name.replace(/'/g, "\\'")}', this)">
-          <div>
+          <div style="flex:1;">
             <h4>${service.name}</h4>
-            <p>${service.meta}</p>
+            ${service.description ? `<p style="font-size:.82rem; color:var(--muted); margin-top:2px;">${service.description.slice(0, 80)}${service.description.length > 80 ? "…" : ""}</p>` : ""}
+            <p style="font-size:.82rem; color:var(--muted);">${service.meta}</p>
           </div>
           <div class="service-price"><strong>${service.price}</strong></div>
         </div>
@@ -2463,6 +2666,13 @@ function syncGoogleUiVisibility(screenId) {
       const me = await appApi.me();
       state.authUser = me;
       state.userMode = mapRoleToMode(me);
+      // Charger le profil complet (avec proProfile si pro)
+      const fullProfile = await appApi.myProfile();
+      state.authUser = { ...state.authUser, ...fullProfile };
+      // Synchroniser le toggle En ligne / Hors ligne depuis la DB
+      if (fullProfile.proProfile?.isOnline !== undefined) {
+        state.proOnline = fullProfile.proProfile.isOnline;
+      }
     } catch (_) {
       appApi.clearSession();
       state.session = null;
@@ -2483,9 +2693,29 @@ function syncGoogleUiVisibility(screenId) {
     renderFilterCategories();
   }
 
+  // Mapping place UI → enum backend
+  const PLACE_TO_MODE = {
+    "À domicile": "HOME",
+    "Chez le pro": "PRO_PLACE",
+    "En salon": "SALON",
+  };
+
   async function loadPros() {
     try {
-      state.pros = normalizePros(await appApi.searchProfessionals());
+      // Construire les paramètres de recherche depuis l'état des filtres
+      const params = {};
+      if (state.category)  params.category = state.category;
+      // Ville : depuis la searchLocation ou la saisie manuelle
+      const city = state.searchLocation?.label;
+      if (city && city !== "Paris") params.city = city; // Paris = défaut, pas de filtre ville
+      // Rayon (info documentaire uniquement, le backend filtre par ville exacte)
+      // Mode de prestation
+      const mode = PLACE_TO_MODE[state.place];
+      if (mode) params.mode = mode;
+      // Budget
+      if (state.budget) params.maxPrice = state.budget;
+
+      state.pros = normalizePros(await appApi.searchProfessionals(params));
     } catch (_) {
       state.pros = [];
     }
@@ -2545,10 +2775,32 @@ function syncGoogleUiVisibility(screenId) {
     state.session = authResponse;
     state.authUser = await appApi.me();
     state.userMode = mapRoleToMode(state.authUser);
+    // Charger le profil complet (proProfile, roles, etc.)
+    try {
+      const fullProfile = await appApi.myProfile();
+      state.authUser = { ...state.authUser, ...fullProfile };
+      if (fullProfile.proProfile?.isOnline !== undefined) {
+        state.proOnline = fullProfile.proProfile.isOnline;
+      }
+    } catch (_) { /* non bloquant */ }
     await Promise.all([loadBookings(), loadNotifications(), loadConversations()]);
     renderAccount();
     renderProDashboard();
-    goTo(state.userMode === "pro" ? "screen-pro-dashboard" : "screen-account");
+    // Rediriger vers l'écran demandé avant le login, si compatible avec le rôle
+    const returnTo = state.returnToScreen;
+    state.returnToScreen = null;
+    const defaultScreen = state.userMode === "pro" ? "screen-pro-dashboard" : "screen-account";
+    const proScreens = new Set(["screen-pro-dashboard", "screen-pro-messages"]);
+    const clientScreens = new Set(["screen-account", "screen-rdv", "screen-favs", "screen-chat"]);
+    let destination = defaultScreen;
+    if (returnTo) {
+      const isProReturn = proScreens.has(returnTo);
+      const isClientReturn = clientScreens.has(returnTo);
+      if ((state.userMode === "pro" && !isClientReturn) || (state.userMode !== "pro" && !isProReturn)) {
+        destination = returnTo;
+      }
+    }
+    goTo(destination);
   }
 
   async function handleLogin() {
@@ -2597,27 +2849,33 @@ function syncGoogleUiVisibility(screenId) {
     const lastName   = document.getElementById("proRegLastName")?.value.trim() || "";
     const email      = (document.getElementById("proRegEmail")?.value || "").trim().toLowerCase();
     const phone      = document.getElementById("proRegPhone")?.value.trim() || "";
-    const specialty  = document.getElementById("proRegSpecialty")?.value || "";
     const experience = document.getElementById("proRegExperience")?.value.trim() || "";
     const city       = document.getElementById("proRegCity")?.value.trim() || "";
     const siret      = document.getElementById("proRegSiret")?.value.trim() || "";
     const bio        = document.getElementById("proRegBio")?.value.trim() || "";
     const password   = document.getElementById("proRegPassword")?.value || "";
 
+    // Lire les chips sélectionnés
+    const specialtyChips = document.querySelectorAll("#proRegSpecialtyChips [data-reg-specialty]");
+    const specialties = [];
+    specialtyChips.forEach(chip => { if (chip.dataset.active === "1") specialties.push(chip.dataset.regSpecialty); });
+
     if (!email) { notify("L'email est obligatoire."); return; }
     if (!password || password.length < 8) { notify("Le mot de passe doit faire au moins 8 caractères."); return; }
-    if (!specialty) { notify("Choisis une spécialité pour continuer."); return; }
+    if (!specialties.length) { notify("Choisis au moins un métier pour continuer."); return; }
 
     try {
       const payload = { email, password };
-      if (firstName)              payload.firstName = firstName;
-      if (lastName)               payload.lastName = lastName;
-      if (phone)                  payload.phone = phone;
-      if (specialty)              payload.specialty = specialty;
-      if (experience)             payload.yearsExperience = Number(experience) || undefined;
-      if (city)                   payload.city = city;
-      if (siret)                  payload.siret = siret;
-      if (bio)                    payload.bio = bio;
+      if (firstName)       payload.firstName = firstName;
+      if (lastName)        payload.lastName = lastName;
+      if (phone)           payload.phone = phone;
+      // specialty (compat legacy) + specialties (nouveau)
+      payload.specialty    = specialties[0];
+      payload.specialties  = specialties;
+      if (experience)      payload.yearsExperience = Number(experience) || undefined;
+      if (city)            payload.city = city;
+      if (siret)           payload.siret = siret;
+      if (bio)             payload.bio = bio;
       payload.offersAtHome = true; // mode par défaut
       await handleAuthSuccess(await appApi.registerProfessional(payload));
     } catch (error) {
@@ -3002,6 +3260,194 @@ function syncGoogleUiVisibility(screenId) {
     }
   }
 
+  // ── Prestations (services) ─────────────────────────────────────
+
+  // Mémoriser la liste locale des services chargés
+  let _myServices = [];
+  // Catégories avec leurs IDs backend (nécessaires pour créer un service)
+  let _backendCategories = [];
+
+  async function loadMyServices() {
+    if (!state.session?.accessToken) return;
+    try {
+      const raw = await appApi.myServices();
+      _myServices = Array.isArray(raw) ? raw : (raw?.items ?? []);
+    } catch (_) { _myServices = []; }
+    renderServicesTab();
+  }
+
+  async function ensureBackendCategories() {
+    if (_backendCategories.length) return _backendCategories;
+    try {
+      const raw = await appApi.categories();
+      _backendCategories = Array.isArray(raw) ? raw : (raw?.items ?? []);
+    } catch (_) { _backendCategories = []; }
+    return _backendCategories;
+  }
+
+  function populateServiceCategorySelect() {
+    const sel = document.getElementById("svcCategory");
+    if (!sel) return;
+    sel.innerHTML = _backendCategories.length
+      ? _backendCategories.map(c => `<option value="${c.id}">${c.label || c.name}</option>`).join("")
+      : categoriesFallback.map(c => `<option value="${c.key}">${c.label}</option>`).join("");
+  }
+
+  function renderServicesTab() {
+    const list = document.getElementById("servicesList");
+    if (!list) return;
+    if (!_myServices.length) {
+      list.innerHTML = `<div class="section-sub" style="padding:12px 0; text-align:center;">Aucune prestation pour l'instant. Crée ta première ci-dessus !</div>`;
+      return;
+    }
+
+    const statusLabel = { ACTIVE: "Actif", DRAFT: "Brouillon", INACTIVE: "Inactif" };
+    const statusColor = { ACTIVE: "var(--green-ink)", DRAFT: "var(--muted)", INACTIVE: "var(--danger)" };
+
+    list.innerHTML = _myServices.map(svc => {
+      const catLabel = svc.category?.label || svc.category?.name || "";
+      const price = svc.price !== undefined ? `${Number(svc.price).toFixed(2)} €` : "—";
+      const dur = svc.durationMin ? `${svc.durationMin} min` : "—";
+      const st = svc.status || "DRAFT";
+      return `
+        <div class="soft-card" style="padding:14px 16px; margin-bottom:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div style="flex:1;">
+              <div style="font-weight:700; font-size:.95rem;">${svc.title}</div>
+              <div class="section-sub" style="font-size:.8rem; margin-top:2px;">${catLabel}${svc.description ? " · " + svc.description.slice(0, 60) + (svc.description.length > 60 ? "…" : "") : ""}</div>
+              <div style="display:flex; gap:10px; margin-top:6px; flex-wrap:wrap;">
+                <span style="font-size:.84rem; font-weight:600;">${price}</span>
+                <span class="section-sub" style="font-size:.82rem;">${dur}</span>
+                <span style="font-size:.8rem; font-weight:600; color:${statusColor[st]};">${statusLabel[st] || st}</span>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
+              ${st !== "ACTIVE"
+                ? `<button class="secondary-btn svc-activate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px; white-space:nowrap;">Activer</button>`
+                : `<button class="secondary-btn svc-deactivate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px; white-space:nowrap;">Désactiver</button>`}
+              <button class="secondary-btn svc-edit-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Modifier</button>
+              <button class="secondary-btn svc-delete-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px; color:var(--danger);">Supprimer</button>
+            </div>
+          </div>
+        </div>`;
+    }).join("");
+
+    // Boutons Activer / Désactiver
+    list.querySelectorAll(".svc-activate-btn").forEach(btn => {
+      btn.onclick = () => handleServiceStatusChange(btn.dataset.id, "ACTIVE");
+    });
+    list.querySelectorAll(".svc-deactivate-btn").forEach(btn => {
+      btn.onclick = () => handleServiceStatusChange(btn.dataset.id, "INACTIVE");
+    });
+    // Boutons Modifier
+    list.querySelectorAll(".svc-edit-btn").forEach(btn => {
+      btn.onclick = () => openServiceEditForm(btn.dataset.id);
+    });
+    // Boutons Supprimer
+    list.querySelectorAll(".svc-delete-btn").forEach(btn => {
+      btn.onclick = () => handleDeleteService(btn.dataset.id);
+    });
+  }
+
+  function openServiceEditForm(serviceId) {
+    const svc = _myServices.find(s => s.id === serviceId);
+    if (!svc) return;
+    document.getElementById("editServiceId").value = svc.id;
+    document.getElementById("serviceFormTitle").textContent = "✏️ Modifier la prestation";
+    document.getElementById("svcTitle").value = svc.title || "";
+    document.getElementById("svcDescription").value = svc.description || "";
+    document.getElementById("svcPrice").value = svc.price !== undefined ? Number(svc.price) : "";
+    document.getElementById("svcDuration").value = svc.durationMin || "";
+    // Sélectionner la catégorie dans le select
+    const sel = document.getElementById("svcCategory");
+    if (sel && svc.category?.id) sel.value = svc.category.id;
+    document.getElementById("cancelServiceEditBtn").style.display = "inline-block";
+    document.getElementById("serviceFormWrap").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function resetServiceForm() {
+    document.getElementById("editServiceId").value = "";
+    document.getElementById("serviceFormTitle").textContent = "➕ Nouvelle prestation";
+    document.getElementById("svcTitle").value = "";
+    document.getElementById("svcDescription").value = "";
+    document.getElementById("svcPrice").value = "";
+    document.getElementById("svcDuration").value = "";
+    document.getElementById("cancelServiceEditBtn").style.display = "none";
+    const statusEl = document.getElementById("serviceFormStatus");
+    if (statusEl) statusEl.style.display = "none";
+  }
+
+  async function handleSaveService() {
+    const editId = document.getElementById("editServiceId").value.trim();
+    const categoryId = document.getElementById("svcCategory")?.value?.trim();
+    const title = document.getElementById("svcTitle").value.trim();
+    const description = document.getElementById("svcDescription").value.trim();
+    const priceRaw = document.getElementById("svcPrice").value.trim();
+    const durationRaw = document.getElementById("svcDuration").value.trim();
+    const statusEl = document.getElementById("serviceFormStatus");
+
+    if (!title || !priceRaw || !durationRaw || !categoryId) {
+      if (statusEl) { statusEl.textContent = "Remplis le métier, le titre, le prix et la durée."; statusEl.style.display = "block"; }
+      return;
+    }
+    const price = parseFloat(priceRaw);
+    const durationMin = parseInt(durationRaw, 10);
+    if (isNaN(price) || price < 0) { if (statusEl) { statusEl.textContent = "Prix invalide."; statusEl.style.display = "block"; } return; }
+    if (isNaN(durationMin) || durationMin < 5) { if (statusEl) { statusEl.textContent = "Durée minimale : 5 minutes."; statusEl.style.display = "block"; } return; }
+
+    const dto = { categoryId, title, price, durationMin };
+    if (description) dto.description = description;
+
+    const saveBtn = document.getElementById("saveServiceBtn");
+    if (saveBtn) saveBtn.disabled = true;
+    try {
+      if (editId) {
+        await appApi.updateService(editId, dto);
+        notify("Prestation mise à jour ✓", "ok");
+      } else {
+        await appApi.createService(dto);
+        notify("Prestation créée ✓", "ok");
+      }
+      resetServiceForm();
+      await loadMyServices();
+    } catch (err) {
+      notify(friendlyApiError(err, "Impossible d'enregistrer la prestation."), "error");
+    } finally {
+      if (saveBtn) saveBtn.disabled = false;
+    }
+  }
+
+  async function handleServiceStatusChange(serviceId, newStatus) {
+    try {
+      await appApi.updateService(serviceId, { status: newStatus });
+      await loadMyServices();
+      notify(newStatus === "ACTIVE" ? "Prestation activée ✓" : "Prestation désactivée", "ok");
+    } catch (err) {
+      notify(friendlyApiError(err, "Mise à jour impossible."), "error");
+    }
+  }
+
+  async function handleDeleteService(serviceId) {
+    if (!confirm("Supprimer cette prestation ?")) return;
+    try {
+      await appApi.deleteService(serviceId);
+      await loadMyServices();
+      notify("Prestation supprimée.", "ok");
+    } catch (err) {
+      notify(friendlyApiError(err, "Suppression impossible."), "error");
+    }
+  }
+
+  async function initServicesTab() {
+    await ensureBackendCategories();
+    populateServiceCategorySelect();
+    await loadMyServices();
+    const saveBtn = document.getElementById("saveServiceBtn");
+    if (saveBtn) saveBtn.onclick = handleSaveService;
+    const cancelBtn = document.getElementById("cancelServiceEditBtn");
+    if (cancelBtn) cancelBtn.onclick = resetServiceForm;
+  }
+
   function initProTabs() {
     const tabBtns = document.querySelectorAll("#proTabs .pro-tab");
     const panels  = document.querySelectorAll("#screen-pro-dashboard .pro-tab-panel");
@@ -3012,6 +3458,11 @@ function syncGoogleUiVisibility(screenId) {
         btn.classList.add("active");
         const target = document.getElementById(btn.dataset.tab);
         if (target) target.style.display = "block";
+        // Charger les prestations à la première ouverture de l'onglet
+        if (btn.dataset.tab === "tab-prestations" && !btn.dataset.loaded) {
+          btn.dataset.loaded = "1";
+          initServicesTab();
+        }
       });
     });
   }
@@ -3035,12 +3486,17 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   document.getElementById("filterBtn").onclick = () => toggleFilter(true);
-  document.getElementById("applyFilters").onclick = () => { toggleFilter(false); renderPros(); };
+  // "Voir les résultats" : ferme le filtre ET relance la recherche backend avec les filtres actifs
+  document.getElementById("applyFilters").onclick = () => { toggleFilter(false); loadPros(); };
   document.getElementById("resetFilters").onclick = () => {
-    state.category = state.categories[0]?.key || "COIFFEUSE";
+    state.category = state.categories[0]?.key || "BARBER";
     state.place = "À domicile";
     state.radius = 5;
     state.budget = null;
+    state.searchLocation = { lat: 48.8566, lng: 2.3522, label: "Paris" };
+    // Remettre à vide le champ ville
+    const cityInput = document.querySelector(".searchbar.compact input");
+    if (cityInput) cityInput.value = "";
     renderFilterCategories();
     renderPlaceChips();
     renderRadiusOptions();
@@ -3048,6 +3504,30 @@ function syncGoogleUiVisibility(screenId) {
     updateFilterCount();
     renderPros();
   };
+
+  // Barre recherche ville → met à jour state.searchLocation.label + recharge les pros
+  (function initCitySearch() {
+    const cityInput = document.getElementById("citySearchInput");
+    if (!cityInput) return;
+    let cityDebounce;
+    cityInput.addEventListener("input", () => {
+      clearTimeout(cityDebounce);
+      cityDebounce = setTimeout(() => {
+        const val = cityInput.value.trim();
+        state.searchLocation = { ...state.searchLocation, label: val || "Paris" };
+        loadPros();
+      }, 500);
+    });
+    cityInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        clearTimeout(cityDebounce);
+        const val = cityInput.value.trim();
+        state.searchLocation = { ...state.searchLocation, label: val || "Paris" };
+        loadPros();
+        cityInput.blur();
+      }
+    });
+  })();
 
   // Boutons de l'espace pro
   document.getElementById("saveProProfileBtn")?.addEventListener("click", handleSaveProProfile);
@@ -3057,6 +3537,42 @@ function syncGoogleUiVisibility(screenId) {
   // Initialiser les onglets pro + upload portfolio
   initProTabs();
   initPortfolioUpload();
+
+  // ── Chips multi-métiers formulaire inscription pro ─────────────────────────
+  (function initProRegSpecialtyChips() {
+    const container = document.getElementById("proRegSpecialtyChips");
+    if (!container) return;
+    categoriesFallback.forEach(cat => {
+      const chip = document.createElement("button");
+      chip.type = "button";
+      chip.dataset.regSpecialty = cat.key;
+      chip.dataset.active = "0";
+      chip.textContent = cat.label;
+      chip.style.cssText = "padding:9px 14px;border-radius:999px;font-size:13px;font-weight:600;border:1.5px solid var(--line);cursor:pointer;transition:.2s;background:rgba(255,255,255,.82);color:var(--ink);";
+      chip.onclick = () => {
+        const isActive = chip.dataset.active === "1";
+        if (!isActive) {
+          const selected = container.querySelectorAll("[data-active='1']");
+          if (selected.length >= 5) {
+            const errEl = document.getElementById("proRegSpecialtyError");
+            if (errEl) {
+              errEl.textContent = "Tu peux sélectionner jusqu'à 5 métiers.";
+              errEl.style.display = "block";
+              setTimeout(() => { errEl.style.display = "none"; }, 3000);
+            }
+            return;
+          }
+        }
+        chip.dataset.active = isActive ? "0" : "1";
+        const on = chip.dataset.active === "1";
+        chip.style.background    = on ? "var(--glossy)" : "rgba(255,255,255,.82)";
+        chip.style.color         = on ? "#fff" : "var(--ink)";
+        chip.style.borderColor   = on ? "transparent" : "var(--line)";
+        chip.style.boxShadow     = on ? "0 6px 16px var(--glow)" : "none";
+      };
+      container.appendChild(chip);
+    });
+  })();
   document.getElementById("filterOverlay").addEventListener("click", (e) => {
     if (e.target.id === "filterOverlay") toggleFilter(false);
   });

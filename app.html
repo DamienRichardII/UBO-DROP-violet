@@ -1425,8 +1425,8 @@
   };
 
   const state = {
-    category: "COIFFEUSE",
-    place: "À domicile",
+    category: null,
+    place: null,
     userMode: "guest",
     sheetState: 1,
     categories: [...categoriesFallback],
@@ -1978,13 +1978,13 @@ function syncGoogleUiVisibility(screenId) {
       const chip = document.createElement("button");
       chip.className = "place-chip" + (state.place === place ? " active" : "");
       chip.textContent = place;
-      chip.onclick = () => { state.place = place; renderPlaceChips(); };
+      chip.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); };
       row.appendChild(chip);
 
       const seg = document.createElement("button");
       seg.className = "seg" + (state.place === place ? " active" : "");
       seg.textContent = place;
-      seg.onclick = () => { state.place = place; renderPlaceChips(); };
+      seg.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); };
       filterGrid.appendChild(seg);
     });
   }
@@ -2002,7 +2002,12 @@ function syncGoogleUiVisibility(screenId) {
         const btn = document.createElement("button");
         btn.className = "pill" + (state.category === cat.key ? " active" : "");
         btn.textContent = cat.label;
-        btn.onclick = () => { state.category = cat.key; renderFilterCategories(); renderPros(); };
+        btn.onclick = () => {
+          // Toggle : cliquer sur la catégorie active la désélectionne
+          state.category = state.category === cat.key ? null : cat.key;
+          renderFilterCategories();
+          loadPros();
+        };
         row.appendChild(btn);
       });
     });
@@ -2258,12 +2263,12 @@ function syncGoogleUiVisibility(screenId) {
       const resetBtn = document.getElementById("resetFiltersBtn");
       if (resetBtn) {
         resetBtn.onclick = () => {
-          state.category = state.categories[0]?.key || "BARBER";
-          state.place = "À domicile";
+          state.category = null;
+          state.place = null;
           state.budget = null;
           renderFilterCategories();
           renderPlaceChips();
-          renderPros();
+          loadPros();
         };
       }
       renderMapMarkers();
@@ -2760,8 +2765,9 @@ function syncGoogleUiVisibility(screenId) {
     } catch (_) {
       state.categories = [...categoriesFallback];
     }
-    if (!state.categories.some((cat) => cat.key === state.category)) {
-      state.category = state.categories[0]?.key || "COIFFEUSE";
+    // Ne forcer une catégorie que si state.category est défini mais invalide
+    if (state.category && !state.categories.some((cat) => cat.key === state.category)) {
+      state.category = null;
     }
     renderFilterCategories();
   }
@@ -3490,13 +3496,15 @@ function syncGoogleUiVisibility(screenId) {
   document.getElementById("filterBtn").onclick = () => toggleFilter(true);
   document.getElementById("applyFilters").onclick = () => { toggleFilter(false); loadPros(); };
   document.getElementById("resetFilters").onclick = () => {
-    state.category = state.categories[0]?.key || "BARBER";
-    state.place = "À domicile";
+    state.category = null;
+    state.place = null;
     state.radius = 5;
     state.budget = null;
     state.searchLocation = { lat: 48.8566, lng: 2.3522, label: "Paris" };
     const cityInput = document.querySelector(".searchbar.compact input");
     if (cityInput) cityInput.value = "";
+    const citySearchInput = document.getElementById("citySearchInput");
+    if (citySearchInput) citySearchInput.value = "";
     renderFilterCategories();
     renderPlaceChips();
     renderRadiusOptions();

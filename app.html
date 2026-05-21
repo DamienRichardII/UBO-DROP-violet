@@ -980,6 +980,11 @@
           <div class="stack-12 mt-20">
             <button class="primary-btn" id="loginClientBtn">Se connecter</button>
             <button class="secondary-btn" id="loginProBtn">Connexion pro</button>
+            <div style="display:flex;align-items:center;gap:10px;margin:4px 0;"><hr style="flex:1;border:none;border-top:1px solid var(--line);"><span style="color:var(--muted);font-size:.8rem;white-space:nowrap;">ou</span><hr style="flex:1;border:none;border-top:1px solid var(--line);"></div>
+            <button class="secondary-btn" id="loginGoogleBtn" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+              <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M44.5 20H24v8.5h11.7C34.2 33.6 29.6 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 5.1 29.6 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21c10.5 0 20-7.5 20-21 0-1.4-.2-2.7-.5-4z"/></svg>
+              Continuer avec Google
+            </button>
           </div>
           <div class="inline-note">Pas encore de compte ? <button class="switch-link" data-go="screen-register-client">Créer un compte</button></div>
         </div>
@@ -1178,6 +1183,7 @@
       <div class="field"><label>Nom commercial <span class="muted">(optionnel)</span></label><input type="text" id="proEditBusinessName" placeholder="Ex : Studio K."></div>
       <div class="field"><label>Téléphone</label><input type="tel" id="proEditPhone" placeholder="+33 6 00 00 00 00"></div>
       <div class="field"><label>Ville</label><input type="text" id="proEditCity" placeholder="Paris"></div>
+      <div class="field"><label>Adresse <span class="muted">(optionnel)</span></label><input type="text" id="proEditAddress" placeholder="12 rue de la Paix, Paris" autocomplete="street-address"></div>
       <div class="field"><label>Description</label><input type="text" id="proEditBio" placeholder="Spécialiste beauté…"></div>
       <div class="field"><label>Années d’expérience</label><input type="number" id="proEditExperience" placeholder="8" min="0" max="60"></div>
       <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" id="proEditSiret" placeholder="000 000 000 00000" maxlength="17"></div>
@@ -1220,6 +1226,22 @@
       </div>
       <div id="saveProProfileStatus" style="font-size:13px; margin-top:8px; display:none;"></div>
       <button class="primary-btn mt-16" id="saveProProfileBtn">Enregistrer le profil</button>
+      <hr style="margin:20px 0 14px;border:none;border-top:1px solid var(--line);">
+      <h4 style="font-size:.95rem;font-weight:700;margin-bottom:10px;">Changer mon mot de passe</h4>
+      <div class="field"><label>Mot de passe actuel</label>
+        <div style="position:relative;">
+          <input type="password" id="proCurPwd" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'Afficher':'Masquer';" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--violet);">Afficher</button>
+        </div>
+      </div>
+      <div class="field"><label>Nouveau mot de passe <span class="muted">(8 min.)</span></label>
+        <input type="password" id="proNewPwd" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div class="field"><label>Confirmer</label>
+        <input type="password" id="proConfPwd" placeholder="••••••••" autocomplete="new-password">
+      </div>
+      <div id="proChangePwdStatus" style="display:none;font-size:13px;margin-top:4px;"></div>
+      <button class="secondary-btn" id="proChangePwdBtn" style="margin-top:6px;">Changer le mot de passe</button>
     </div>
   </div>
 
@@ -1585,7 +1607,7 @@
     },
 
     publicProfessional(id) {
-      return this.request(`/profiles/pro/public/${id}`);
+      return this.request(`/profiles/pro/public/${id}?t=${Date.now()}`);
     },
 
     myBookings() {
@@ -1652,6 +1674,13 @@
       return this.request("/profiles/pro/banking-info", {
         method: "PATCH",
         body: JSON.stringify(dto)
+      });
+    },
+
+    changePassword(currentPassword, newPassword) {
+      return this.request("/auth/change-password", {
+        method: "PATCH",
+        body: JSON.stringify({ currentPassword, newPassword })
       });
     },
 
@@ -2482,7 +2511,46 @@ function syncGoogleUiVisibility(screenId) {
           <div class="setting-row"><span><strong>Catégorie active</strong><br>${state.categories.find((c) => c.key === state.category)?.label || "Beauté"}</span><span class="muted">Filtre carte</span></div>
           <div class="setting-row"><span><strong>Notifications</strong><br>${state.notifications.length ? state.notifications.length + " non lue(s)" : "Aucune nouvelle"}</span><span class="setting-chip">Actif</span></div>
         </div>
+        <hr style="margin:14px 0;border:none;border-top:1px solid var(--line);">
+        <h4>Changer mon mot de passe</h4>
+        <div class="field"><label>Mot de passe actuel</label>
+          <div style="position:relative;">
+            <input type="password" id="clientCurPwd" placeholder="••••••••" autocomplete="current-password">
+            <button type="button" onclick="var i=this.previousElementSibling;i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'Afficher':'Masquer';" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:.75rem;color:var(--violet);">Afficher</button>
+          </div>
+        </div>
+        <div class="field"><label>Nouveau mot de passe <span class="muted">(8 min.)</span></label>
+          <input type="password" id="clientNewPwd" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div class="field"><label>Confirmer</label>
+          <input type="password" id="clientConfPwd" placeholder="••••••••" autocomplete="new-password">
+        </div>
+        <div id="changePwdStatus" style="display:none;font-size:13px;margin-top:4px;"></div>
+        <button class="primary-btn" style="margin-top:8px;" id="changePwdBtn">Changer le mot de passe</button>
       `;
+      document.getElementById("changePwdBtn")?.addEventListener("click", handleChangePassword);
+    }
+  }
+
+  async function handleChangePassword() {
+    var currentPwd = document.getElementById("clientCurPwd")?.value || "";
+    var newPwd     = document.getElementById("clientNewPwd")?.value || "";
+    var confPwd    = document.getElementById("clientConfPwd")?.value || "";
+    var statusEl   = document.getElementById("changePwdStatus");
+    var btn        = document.getElementById("changePwdBtn");
+    var setStatus  = (msg, ok) => { if (!statusEl) return; statusEl.style.display="block"; statusEl.style.color=ok?"var(--violet)":"#e53935"; statusEl.textContent=msg; };
+    if (!currentPwd || !newPwd || !confPwd) { setStatus("Tous les champs sont requis.", false); return; }
+    if (newPwd.length < 8) { setStatus("Le nouveau mot de passe doit contenir au moins 8 caractères.", false); return; }
+    if (newPwd !== confPwd) { setStatus("Les deux mots de passe ne correspondent pas.", false); return; }
+    if (btn) { btn.disabled = true; btn.textContent = "Mise à jour..."; }
+    try {
+      await appApi.changePassword(currentPwd, newPwd);
+      setStatus("Mot de passe mis à jour avec succès.", true);
+      ["clientCurPwd","clientNewPwd","clientConfPwd"].forEach(id => { var el=document.getElementById(id); if(el) el.value=""; });
+    } catch (err) {
+      setStatus(friendlyApiError(err, "Echec du changement de mot de passe."), false);
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = "Changer le mot de passe"; }
     }
   }
 
@@ -2693,6 +2761,7 @@ function syncGoogleUiVisibility(screenId) {
       set("proEditBusinessName", proProfile.businessName);
       set("proEditPhone", proProfile.phone);
       set("proEditCity", proProfile.city);
+      set("proEditAddress", proProfile.address);
       set("proEditBio", proProfile.bio);
       set("proEditExperience", proProfile.yearsExperience);
       set("proEditSiret", proProfile.siret);
@@ -2785,6 +2854,11 @@ function syncGoogleUiVisibility(screenId) {
       if (state.category)  params.category = state.category;
       const city = state.searchLocation?.label;
       if (city && city !== "Paris") params.city = city;
+      if (state.searchLocation?.lat && state.searchLocation?.lng) {
+        params.lat    = state.searchLocation.lat;
+        params.lng    = state.searchLocation.lng;
+        params.radius = state.radius || 15;
+      }
       const mode = PLACE_TO_MODE[state.place];
       if (mode) params.mode = mode;
       if (state.budget) params.maxPrice = state.budget;
@@ -2878,6 +2952,34 @@ function syncGoogleUiVisibility(screenId) {
     } catch (error) {
       notify(friendlyApiError(error, "Connexion impossible. Vérifie tes identifiants."), "error");
     }
+  }
+
+  function handleGoogleLogin() {
+    var backendUrl = "https://ubodrop-backend-production.up.railway.app";
+    window.location.href = backendUrl + "/api/v1/auth/google";
+  }
+
+  function handleGoogleCallback() {
+    var hash = window.location.hash;
+    if (!hash.includes("google-token=")) return;
+    var params = new URLSearchParams(hash.replace("#", "?"));
+    var token = params.get("google-token");
+    var error = params.get("google-error");
+    history.replaceState(null, "", window.location.pathname);
+    if (error || !token) {
+      notify("Connexion Google échouée. Réessaie ou utilise ton email.", "error");
+      goTo("screen-login");
+      return;
+    }
+    appApi.saveSession({ accessToken: token });
+    appApi.myProfile().then(function(profile) {
+      var roles = profile.roles || ["CLIENT"];
+      var authResp = Object.assign({ accessToken: token }, { user: Object.assign({}, profile, { roles: roles }) });
+      handleAuthSuccess(authResp);
+    }).catch(function() {
+      notify("Connecté via Google !", "ok");
+      goTo("screen-account");
+    });
   }
 
   async function handleLogout() {
@@ -3085,12 +3187,30 @@ function syncGoogleUiVisibility(screenId) {
       serviceAreaKm:       getNum("proEditRadius"),
       avatarUrl:           get("proEditAvatarUrl"),
       instagram:           get("proEditInstagram"),
+      address:             get("proEditAddress"),
       offersAtHome:        !!document.getElementById("proModeHome")?.checked,
       offersAtProLocation: !!document.getElementById("proModeProLoc")?.checked,
       offersAtSalon:       !!document.getElementById("proModeSalon")?.checked,
       specialties:         getSelectedSpecialties(),
     };
     Object.keys(dto).forEach(k => dto[k] === undefined && delete dto[k]);
+
+    // Geocodage : ville/adresse -> lat/lng pour la carte
+    var locationStr = dto.address || dto.city;
+    if (locationStr && window.google?.maps?.Geocoder) {
+      try {
+        await new Promise((resolve) => {
+          new google.maps.Geocoder().geocode({ address: locationStr }, (results, gstatus) => {
+            if (gstatus === "OK" && results[0]?.geometry?.location) {
+              dto.latitude  = results[0].geometry.location.lat();
+              dto.longitude = results[0].geometry.location.lng();
+            }
+            resolve();
+          });
+        });
+      } catch (_) { /* geocodage non bloquant */ }
+    }
+
     const btn    = document.getElementById("saveProProfileBtn");
     const status = document.getElementById("saveProProfileStatus");
     if (btn) { btn.disabled = true; btn.textContent = "Enregistrement…"; }
@@ -3100,6 +3220,7 @@ function syncGoogleUiVisibility(screenId) {
       if (state.authUser) state.authUser.proProfile = { ...(state.authUser.proProfile || {}), ...updated };
       notify("Profil enregistré avec succès.", "ok");
       if (status) { status.textContent = "✓ Profil enregistré."; status.style.cssText = "display:block;color:var(--violet);font-size:13px;margin-top:8px;"; }
+      loadPros();
       const savedAvatar = updated?.avatarUrl || dto.avatarUrl;
       if (savedAvatar) {
         document.querySelectorAll(".pro-avatar-lg").forEach(el => { el.src = savedAvatar; });
@@ -3156,11 +3277,12 @@ function syncGoogleUiVisibility(screenId) {
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         notify("Format non supporté. Utilise JPG, PNG ou WEBP.", "error"); fileInput.value = ""; return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        notify("La photo est trop lourde (max 5 Mo).", "error"); fileInput.value = ""; return;
+      const MAX_AVATAR_UPLOAD_SIZE = 15 * 1024 * 1024;
+      if (file.size > MAX_AVATAR_UPLOAD_SIZE) {
+        notify("La photo dépasse 15 Mo. Choisis une image plus légère.", "error"); fileInput.value = ""; return;
       }
       try {
-        const dataUrl = await resizeImageToDataUrl(file, 400, 0.85);
+        const dataUrl = await resizeImageToDataUrl(file, 800, 0.82);
         _pendingAvatarDataUrl = dataUrl;
         if (preview) preview.src = dataUrl;
         const hiddenInput = document.getElementById("proEditAvatarUrl");
@@ -3188,8 +3310,9 @@ function syncGoogleUiVisibility(screenId) {
       if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
         notify("Format non supporté. Utilise un fichier JPG, PNG ou WEBP.", "error"); fileInput.value = ""; return;
       }
-      if (file.size > 5 * 1024 * 1024) {
-        notify("La photo est trop lourde (max 5 Mo).", "error"); fileInput.value = ""; return;
+      const MAX_PORTFOLIO_UPLOAD_SIZE = 15 * 1024 * 1024;
+      if (file.size > MAX_PORTFOLIO_UPLOAD_SIZE) {
+        notify("La photo dépasse 15 Mo. Choisis une image plus légère.", "error"); fileInput.value = ""; return;
       }
       statusEl.textContent = "Compression en cours…";
       previewBlock.style.display = "";
@@ -3473,6 +3596,24 @@ function syncGoogleUiVisibility(screenId) {
     });
     // Wiring formulaires
     document.getElementById("saveProProfileBtn")?.addEventListener("click", handleSaveProProfile);
+    document.getElementById("proChangePwdBtn")?.addEventListener("click", async () => {
+      var curPwd=document.getElementById("proCurPwd")?.value||"";
+      var newPwd=document.getElementById("proNewPwd")?.value||"";
+      var confPwd=document.getElementById("proConfPwd")?.value||"";
+      var statusEl=document.getElementById("proChangePwdStatus");
+      var btn=document.getElementById("proChangePwdBtn");
+      var setS=(m,ok)=>{if(!statusEl)return;statusEl.style.display="block";statusEl.style.color=ok?"var(--violet)":"#e53935";statusEl.textContent=m;};
+      if(!curPwd||!newPwd||!confPwd){setS("Tous les champs sont requis.",false);return;}
+      if(newPwd.length<8){setS("8 caractères minimum.",false);return;}
+      if(newPwd!==confPwd){setS("Les mots de passe ne correspondent pas.",false);return;}
+      if(btn){btn.disabled=true;btn.textContent="Mise à jour...";}
+      try{
+        await appApi.changePassword(curPwd,newPwd);
+        setS("Mot de passe mis à jour avec succès.",true);
+        ["proCurPwd","proNewPwd","proConfPwd"].forEach(id=>{var el=document.getElementById(id);if(el)el.value="";});
+      }catch(err){setS(friendlyApiError(err,"Echec."),false);}
+      finally{if(btn){btn.disabled=false;btn.textContent="Changer le mot de passe";}}
+    });
     document.getElementById("addPortfolioBtn")?.addEventListener("click", handleAddPortfolioPhoto);
     document.getElementById("saveBankingBtn")?.addEventListener("click", handleSaveBankingInfo);
     initPortfolioUpload();
@@ -3595,6 +3736,8 @@ function syncGoogleUiVisibility(screenId) {
 
   document.getElementById("loginClientBtn").onclick = () => { state.loginMode = "client"; handleLogin(); };
   document.getElementById("loginProBtn").onclick = () => { state.loginMode = "professional"; handleLogin(); };
+  document.getElementById("loginGoogleBtn").onclick = handleGoogleLogin;
+  handleGoogleCallback();
   document.getElementById("registerClientBtn").onclick = handleRegisterClient;
   document.getElementById("registerProBtn").onclick = handleRegisterProfessional;
   document.querySelector("#screen-chat .send-btn").onclick = handleSendMessage;

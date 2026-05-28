@@ -2391,7 +2391,7 @@ function syncGoogleUiVisibility(screenId) {
       ctaEl.textContent = "Se connecter pour réserver";
       ctaEl.disabled = false;
     } else if (!hasServices) {
-      ctaEl.textContent = "Profil en cours de configuration";
+      ctaEl.textContent = "Ce professionnel n'a pas encore publié de prestation.";
       ctaEl.disabled = true;
       ctaEl.style.opacity = "0.5";
     } else {
@@ -2410,7 +2410,7 @@ function syncGoogleUiVisibility(screenId) {
 
     const services = document.getElementById("detailServices");
     if (!detailed.services.length) {
-      services.innerHTML = emptyCard("Prestations en cours", "Ce professionnel finalise encore ses prestations. Revenez bientôt !");
+      services.innerHTML = emptyCard("Aucune prestation publiée", "Ce professionnel configure encore ses prestations. Revenez bientôt !");
     } else {
       services.innerHTML = detailed.services.map((service) => `
         <div class="service-row" data-service-id="${service.id}" data-service-name="${service.name}"
@@ -2448,10 +2448,10 @@ function syncGoogleUiVisibility(screenId) {
       <div class="list-item">
         <img src="${state.selectedPro?.image || 'assets/img/ubo-drop-logo.png'}" alt="Réservation">
         <div style="flex:1;">
-          <strong>${booking?.professional?.displayName || booking?.professional?.name || "Prestataire"}</strong>
-          <p>${booking?.service?.name || "Prestation"} • ${booking?.scheduledAt ? new Date(booking.scheduledAt).toLocaleString("fr-FR") : "Date à confirmer"} • ${euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount)}</p>
+          <strong>${booking?.proProfile?.displayName || booking?.proProfile?.businessName || "Prestataire"}</strong>
+          <p>${booking?.service?.title || booking?.service?.name || "Prestation"} • ${booking?.startsAt || booking?.scheduledAt ? new Date(booking.startsAt || booking.scheduledAt).toLocaleString("fr-FR") : "Date à confirmer"} • ${euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount)}</p>
         </div>
-        <div class="avail">${booking?.status || "Confirmé"}</div>
+        <div class="avail">${{PENDING:"En attente",CONFIRMED:"Confirmé",IN_PROGRESS:"En cours",COMPLETED:"Terminé",CANCELLED:"Annulé"}[booking?.status] || booking?.status || "En attente"}</div>
       </div>
     `).join("");
   }
@@ -3158,7 +3158,7 @@ function syncGoogleUiVisibility(screenId) {
     if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); goTo("screen-login"); return; }
     if (!state.selectedPro) { notify("Aucun professionnel disponible pour le moment."); return; }
     const proHasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
-    if (!proHasServices) { notify("Ce professionnel finalise encore ses prestations. Revenez bientôt !"); return; }
+    if (!proHasServices) { notify("Ce professionnel n'a pas encore publié de prestation."); return; }
     if (!state.selectedServiceId) { notify("Sélectionne une prestation dans la liste pour continuer."); return; }
     openBookingOverlay();
   }
@@ -3201,9 +3201,14 @@ function syncGoogleUiVisibility(screenId) {
     return selected.length > 0 ? selected : undefined;
   }
 
-  function toggleProOnlineStatus() {
+  async function toggleProOnlineStatus() {
     state.proOnline = !state.proOnline;
     renderProDashboard();
+    try {
+      await appApi.updateAvailability(state.proOnline);
+    } catch (err) {
+      notify(friendlyApiError(err, "Mise à jour du statut impossible."), "error");
+    }
   }
 
   function syncModeChips() {
@@ -3513,8 +3518,8 @@ function syncGoogleUiVisibility(screenId) {
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
               ${st !== "ACTIVE"
-                ? `<button class="secondary-btn svc-activate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Activer</button>`
-                : `<button class="secondary-btn svc-deactivate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Désactiver</button>`}
+                ? `<button class="secondary-btn svc-activate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Publier</button>`
+                : `<button class="secondary-btn svc-deactivate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Dépublier</button>`}
               <button class="secondary-btn svc-edit-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Modifier</button>
               <button class="secondary-btn svc-delete-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px; color:#e53935;">Supprimer</button>
             </div>
@@ -3522,7 +3527,7 @@ function syncGoogleUiVisibility(screenId) {
         </div>`;
     }).join("");
     list.querySelectorAll(".svc-activate-btn").forEach(btn => { btn.onclick = () => handleServiceStatusChange(btn.dataset.id, "ACTIVE"); });
-    list.querySelectorAll(".svc-deactivate-btn").forEach(btn => { btn.onclick = () => handleServiceStatusChange(btn.dataset.id, "INACTIVE"); });
+    list.querySelectorAll(".svc-deactivate-btn").forEach(btn => { btn.onclick = () => handleServiceStatusChange(btn.dataset.id, "DRAFT"); });
     list.querySelectorAll(".svc-edit-btn").forEach(btn => { btn.onclick = () => openServiceEditForm(btn.dataset.id); });
     list.querySelectorAll(".svc-delete-btn").forEach(btn => { btn.onclick = () => handleDeleteService(btn.dataset.id); });
   }
@@ -3592,7 +3597,7 @@ function syncGoogleUiVisibility(screenId) {
     try {
       await appApi.updateService(serviceId, { status: newStatus });
       await loadMyServices();
-      notify(newStatus === "ACTIVE" ? "Prestation activée ✓" : "Prestation désactivée", "ok");
+      notify(newStatus === "ACTIVE" ? "Prestation publiée." : "Prestation repassée en brouillon.", "ok");
     } catch (err) {
       notify(friendlyApiError(err, "Mise à jour impossible."), "error");
     }

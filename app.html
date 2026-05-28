@@ -1284,30 +1284,15 @@
 
   <!-- Onglet Bancaire -->
   <div class="pro-tab-panel" id="tab-bancaire" style="display:none;">
-
-    <!-- Stripe Connect -->
-    <div class="card list-card mt-16" id="stripeConnectCard">
-      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">💳 Paiements en ligne (Stripe)</h4>
-      <div class="section-sub" style="margin-bottom:12px; font-size:.86rem;">
-        Connecte ton compte Stripe pour recevoir les paiements UBODROP directement sur ton compte bancaire. UBODROP prélève une commission de 10 %.
-      </div>
-      <div id="stripeConnectStatus" style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:12px; background:rgba(0,0,0,.05);">
-        Vérification…
-      </div>
-      <button class="primary-btn" id="stripeConnectBtn" style="display:none;">Connecter mon compte Stripe</button>
-      <button class="secondary-btn" id="stripeResumeBtn" style="display:none; margin-top:8px;">Reprendre l'inscription Stripe</button>
-      <div class="section-sub" style="margin-top:10px; font-size:.78rem;">🔒 Stripe gère l'ensemble des paiements en toute sécurité. Tes données bancaires ne transitent jamais par UBODROP.</div>
-    </div>
-
-    <!-- IBAN / BIC (optionnel) -->
     <div class="card list-card mt-16">
-      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Coordonnées bancaires (optionnel)</h4>
-      <div class="section-sub" style="margin-bottom:16px; font-size:.86rem;">Tes coordonnées bancaires sont utilisées pour recevoir tes paiements. Les données sensibles sont masquées à l'affichage.</div>
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">Informations bancaires</h4>
+      <div class="section-sub" style="margin-bottom:16px; font-size:.86rem;">Tes coordonnées bancaires sont utilisées pour recevoir tes paiements. Les données sensibles sont masquées à l’affichage.</div>
       <div class="field"><label>Titulaire du compte</label><input type="text" id="bankHolder" placeholder="Karim Benali" autocomplete="name"></div>
       <div class="field"><label>IBAN</label><input type="text" id="bankIban" placeholder="FR76 3000 1007 9400 0000 0000 000" maxlength="34" autocomplete="off"></div>
       <div class="field"><label>BIC / SWIFT</label><input type="text" id="bankBic" placeholder="BNPAFRPP" maxlength="11" autocomplete="off"></div>
       <div id="bankingStatus" class="soft-card" style="padding:12px 14px; font-size:.86rem; margin-bottom:12px; display:none;"></div>
       <button class="primary-btn" id="saveBankingBtn">Enregistrer les coordonnées</button>
+      <div class="section-sub" style="margin-top:10px; font-size:.78rem;">🔒 Ces informations ne sont jamais partagées et sont stockées de façon sécurisée. L’intégration Stripe Connect permettra le virement automatique.</div>
     </div>
   </div>
 </section>
@@ -1770,23 +1755,6 @@
 
     deleteService(serviceId) {
       return this.request(`/services/${serviceId}`, { method: "DELETE" });
-    },
-
-    // ── Stripe Connect ────────────────────────────────────────────────────
-    createCheckoutSession(bookingId) {
-      return this.request(`/payments/bookings/${bookingId}/checkout-session`, { method: "POST" });
-    },
-
-    connectStripeAccount() {
-      return this.request("/payments/connect/account", { method: "POST" });
-    },
-
-    getStripeOnboardingLink() {
-      return this.request("/payments/connect/onboarding-link", { method: "POST" });
-    },
-
-    getStripeConnectStatus() {
-      return this.request("/payments/connect/status");
     },
   };
 
@@ -2396,34 +2364,18 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   async function openPro(id) {
-    // Cherche d'abord dans le cache local (peut être null si hors listing)
-    const cached = state.pros.find((item) => String(item.id) === String(id)) || null;
-    let detailed = cached;
-
-    try {
-      console.log("[UBODROP] opening fresh pro detail", id);
-      const detail = await appApi.publicProfessional(id);
-      const normalized = normalizePros([detail]);
-      if (normalized.length) {
-        detailed = cached ? { ...cached, ...normalized[0] } : normalized[0];
-        // Mettre à jour le cache local avec les données fraîches
-        if (state.pros.some((p) => String(p.id) === String(id))) {
-          state.pros = state.pros.map((p) => String(p.id) === String(id) ? detailed : p);
-        }
-        console.log("[UBODROP] fresh services count", detailed.services?.length ?? 0);
-      }
-    } catch (err) {
-      console.warn("[UBODROP] publicProfessional fetch failed, using cached data", err);
-      if (!detailed) {
-        notify("Impossible de charger la fiche du professionnel.", "error");
-        return;
-      }
-    }
-
-    if (!detailed) {
+    const pro = state.pros.find((item) => String(item.id) === String(id));
+    if (!pro) {
       notify("Aucun professionnel réel disponible pour le moment.");
       return;
     }
+
+    let detailed = pro;
+    try {
+      const detail = await appApi.publicProfessional(pro.id);
+      const normalized = normalizePros([detail]);
+      if (normalized.length) detailed = { ...pro, ...normalized[0] };
+    } catch (_) {}
 
     state.selectedPro = detailed;
     state.selectedServiceId = null;
@@ -3188,20 +3140,21 @@ function syncGoogleUiVisibility(screenId) {
     if (!serviceId) { notify("Aucune prestation sélectionnée.", "error"); return; }
     const startsAt = new Date(`${date}T${time}`).toISOString();
     const btn = document.getElementById("confirmBookingBtn");
-    if (btn) { btn.disabled = true; btn.textContent = "Création de la réservation…"; }
+    if (btn) { btn.disabled = true; btn.textContent = "Envoi en cours…"; }
     try {
-      const booking = await appApi.createBooking(serviceId, startsAt, notes);
-      if (btn) btn.textContent = "Redirection vers le paiement…";
-      const { checkoutUrl } = await appApi.createCheckoutSession(booking.id);
+      await appApi.createBooking(serviceId, startsAt, notes);
       closeBookingOverlay();
-      window.location.href = checkoutUrl;
+      notify("Votre demande de réservation a bien été envoyée.", "ok");
+      await loadBookings();
+      goTo("screen-rdv");
     } catch (error) {
       notify(friendlyApiError(error, "La réservation n'a pas pu être confirmée. Veuillez réessayer."), "error");
+    } finally {
       if (btn) { btn.disabled = false; btn.textContent = "Envoyer la demande"; }
     }
   }
 
-    async function handleReserveClick() {
+  async function handleReserveClick() {
     if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); goTo("screen-login"); return; }
     if (!state.selectedPro) { notify("Aucun professionnel disponible pour le moment."); return; }
     const proHasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
@@ -3633,8 +3586,6 @@ function syncGoogleUiVisibility(screenId) {
       }
       resetServiceForm();
       await loadMyServices();
-      // Rafraîchir la liste publique côté client en arrière-plan
-      loadPros().catch((e) => console.warn("[UBODROP] loadPros after save service failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Impossible d'enregistrer la prestation."), "error");
     } finally {
@@ -3647,8 +3598,6 @@ function syncGoogleUiVisibility(screenId) {
       await appApi.updateService(serviceId, { status: newStatus });
       await loadMyServices();
       notify(newStatus === "ACTIVE" ? "Prestation publiée." : "Prestation repassée en brouillon.", "ok");
-      // Rafraîchir la liste publique côté client en arrière-plan
-      loadPros().catch((e) => console.warn("[UBODROP] loadPros after status change failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Mise à jour impossible."), "error");
     }
@@ -3660,8 +3609,6 @@ function syncGoogleUiVisibility(screenId) {
       await appApi.deleteService(serviceId);
       await loadMyServices();
       notify("Prestation supprimée.", "ok");
-      // Rafraîchir la liste publique côté client en arrière-plan
-      loadPros().catch((e) => console.warn("[UBODROP] loadPros after delete service failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Suppression impossible."), "error");
     }
@@ -3717,14 +3664,6 @@ function syncGoogleUiVisibility(screenId) {
     });
     document.getElementById("addPortfolioBtn")?.addEventListener("click", handleAddPortfolioPhoto);
     document.getElementById("saveBankingBtn")?.addEventListener("click", handleSaveBankingInfo);
-  document.getElementById("stripeConnectBtn")?.addEventListener("click", handleStripeConnect);
-  document.getElementById("stripeResumeBtn")?.addEventListener("click", handleStripeConnect);
-
-  // Charger statut Stripe quand l'onglet bancaire est ouvert
-  const _bancaireTrigger = document.querySelector('[data-tab="tab-bancaire"]');
-  if (_bancaireTrigger) {
-    _bancaireTrigger.addEventListener("click", () => setTimeout(loadStripeConnectStatus, 80));
-  }
     initPortfolioUpload();
   }
 
@@ -3827,76 +3766,7 @@ function syncGoogleUiVisibility(screenId) {
     window.addEventListener("touchcancel", end);
   })();
 
-  // ── Détection retour Stripe (payment-success, payment-cancel, stripe-return, stripe-refresh) ──
-  (async function detectPaymentReturn() {
-    const hash = window.location.hash;
-    if (hash.startsWith("#payment-success=")) {
-      const bookingId = hash.replace("#payment-success=", "");
-      window.location.hash = "";
-      await loadBookings();
-      goTo("screen-rdv");
-      notify("🎉 Réservation confirmée ! Retrouve ton rendez-vous dans l'onglet RDV.", "ok");
-      console.log("[Stripe] Paiement réussi — bookingId=" + bookingId);
-    } else if (hash.startsWith("#payment-cancel=")) {
-      window.location.hash = "";
-      notify("Paiement annulé. Tu peux recommencer à tout moment.", "error");
-    } else if (hash === "#stripe-return") {
-      window.location.hash = "";
-      notify("✅ Compte Stripe connecté ! Retourne dans l'onglet Bancaire pour vérifier ton statut.", "ok");
-    } else if (hash === "#stripe-refresh") {
-      window.location.hash = "";
-      notify("Le lien Stripe a expiré. Clique à nouveau sur “Connecter mon compte Stripe”.", "error");
-    }
-  })();
-
-  // ── Stripe Connect : fonctions ──
-  async function loadStripeConnectStatus() {
-    if (!appApi.getToken() || state.userMode !== "pro") return;
-    const statusEl = document.getElementById("stripeConnectStatus");
-    const connectBtn = document.getElementById("stripeConnectBtn");
-    const resumeBtn = document.getElementById("stripeResumeBtn");
-    if (!statusEl) return;
-    try {
-      const s = await appApi.getStripeConnectStatus();
-      if (!s.connected) {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⏳ Compte Stripe non connecté";
-        if (connectBtn) connectBtn.style.display = "block";
-        if (resumeBtn) resumeBtn.style.display = "none";
-      } else if (!s.stripeOnboardingComplete) {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⚠️ Inscription Stripe en cours — clique sur 'Reprendre' pour terminer";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "block";
-      } else if (s.stripeChargesEnabled) {
-        statusEl.style.background = "rgba(0,200,100,.12)";
-        statusEl.innerHTML = "✅ Stripe actif — tu peux recevoir des paiements";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "none";
-      } else {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⏳ Stripe connecté — paiements en attente d'activation par Stripe";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "block";
-      }
-    } catch (err) {
-      statusEl.innerHTML = "Impossible de vérifier le statut Stripe.";
-    }
-  }
-
-  async function handleStripeConnect() {
-    const btn = document.getElementById("stripeConnectBtn") || document.getElementById("stripeResumeBtn");
-    if (btn) { btn.disabled = true; btn.textContent = "Connexion…"; }
-    try {
-      const { url } = await appApi.getStripeOnboardingLink();
-      window.location.href = url;
-    } catch (err) {
-      notify(friendlyApiError(err, "Impossible de créer le lien Stripe. Réessaie."), "error");
-      if (btn) { btn.disabled = false; btn.textContent = btn.id === "stripeConnectBtn" ? "Connecter mon compte Stripe" : "Reprendre l'inscription Stripe"; }
-    }
-  }
-
-    document.getElementById("detailCta").onclick = handleReserveClick;
+  document.getElementById("detailCta").onclick = handleReserveClick;
   document.getElementById("closeBookingOverlayBtn").onclick = closeBookingOverlay;
   document.getElementById("cancelBookingOverlayBtn").onclick = closeBookingOverlay;
   document.getElementById("confirmBookingBtn").onclick = confirmBooking;

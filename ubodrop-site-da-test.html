@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UBODROP — Nouvelle DA (Test Site)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream:       #EAE4D8;
+    --cream-dark:  #DDD6C8;
+    --bordeaux:    #5C1A18;
+    --bordeaux-mid:#7A2420;
+    --bordeaux-light: #9B3B36;
+    --white:       #FFFFFF;
+    --text:        #1A0A08;
+    --text-muted:  #6B4B48;
+    --sand:        #C8C0B5;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ── LOGO SVG ────────────────────────────────────────────────────────────── */
+  .logo-svg {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    text-decoration: none;
+  }
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+  }
+  .logo-wordmark {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: 0.08em;
+    color: var(--bordeaux);
+    text-transform: uppercase;
+  }
+  .logo-svg.on-dark .logo-wordmark { color: var(--white); }
+
+  /* ── NAV ─────────────────────────────────────────────────────────────────── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--cream);
+    border-bottom: 1px solid var(--cream-dark);
+    padding: 0 5vw;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-links {
+    display: flex;
+    gap: 36px;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--bordeaux); }
+  .nav-cta {
+    background: var(--bordeaux);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    padding: 10px 22px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--bordeaux-mid); }
+
+  /* ── HERO ────────────────────────────────────────────────────────────────── */
+  .hero {
+    min-height: 92vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    padding: 80px 5vw 60px;
+    gap: 60px;
+  }
+  .hero-content { max-width: 560px; }
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--bordeaux);
+    border: 1.5px solid var(--bordeaux);
+    padding: 5px 14px;
+    margin-bottom: 32px;
+  }
+  .hero h1 {
+    font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    margin-bottom: 24px;
+  }
+  .hero h1 span { color: var(--bordeaux); }
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 40px;
+    max-width: 420px;
+  }
+  .hero-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .btn-primary {
+    background: var(--bordeaux);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.06em;
+    padding: 14px 30px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--bordeaux-mid); }
+  .btn-outline {
+    background: transparent;
+    color: var(--bordeaux);
+    font-weight: 600;
+    font-size: 0.92rem;
+    letter-spacing: 0.06em;
+    padding: 13px 28px;
+    border: 1.5px solid var(--bordeaux);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: var(--bordeaux); color: var(--white); }
+
+  /* Hero visual */
+  .hero-visual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    height: 480px;
+  }
+  .hero-card {
+    background: var(--bordeaux);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-card.light {
+    background: var(--cream-dark);
+    border: 1px solid var(--sand);
+  }
+  .hero-card.tall { grid-row: span 2; }
+  .hero-card-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--white);
+    letter-spacing: 0.04em;
+  }
+  .hero-card.light .hero-card-name { color: var(--text); }
+  .hero-card-job {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.65);
+    margin-top: 3px;
+  }
+  .hero-card.light .hero-card-job { color: var(--text-muted); }
+  .hero-badge {
+    display: inline-block;
+    background: var(--cream);
+    color: var(--bordeaux);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    align-self: flex-start;
+  }
+  .hero-card.light .hero-badge { background: var(--bordeaux); color: var(--white); }
+  .hero-icon {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.25;
+  }
+  .hero-stars { color: var(--cream); font-size: 0.75rem; margin-bottom: 6px; }
+  .hero-card.light .hero-stars { color: var(--bordeaux); }
+  .hero-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+  }
+  .hero-card .hero-avatar { background: rgba(255,255,255,0.15); color: var(--white); }
+  .hero-card.light .hero-avatar { background: var(--bordeaux); color: var(--white); }
+
+  /* ── STRIP ───────────────────────────────────────────────────────────────── */
+  .strip {
+    background: var(--bordeaux);
+    color: var(--white);
+    padding: 18px 5vw;
+    display: flex;
+    gap: 60px;
+    align-items: center;
+    overflow: hidden;
+  }
+  .strip-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .strip-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .strip-label {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .strip-sep { width: 1px; height: 40px; background: rgba(255,255,255,0.2); flex-shrink: 0; }
+
+  /* ── HOW IT WORKS ────────────────────────────────────────────────────────── */
+  .section { padding: 100px 5vw; }
+  .section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--bordeaux);
+    margin-bottom: 16px;
+  }
+  .section-title {
+    font-size: clamp(1.8rem, 3vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 60px;
+    max-width: 540px;
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .step {
+    background: var(--cream-dark);
+    padding: 40px 32px;
+    position: relative;
+  }
+  .step:nth-child(2) { background: var(--bordeaux); color: var(--white); }
+  .step-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--bordeaux);
+    letter-spacing: 0.1em;
+    margin-bottom: 28px;
+  }
+  .step:nth-child(2) .step-num { color: rgba(255,255,255,0.5); }
+  .step-icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 20px;
+  }
+  .step h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .step p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .step:nth-child(2) p { color: rgba(255,255,255,0.75); }
+  .step:nth-child(2) h3 { color: var(--white); }
+
+  /* ── METIERS ─────────────────────────────────────────────────────────────── */
+  .metiers-section {
+    background: var(--bordeaux);
+    padding: 100px 5vw;
+    color: var(--white);
+  }
+  .metiers-section .section-label { color: rgba(255,255,255,0.55); }
+  .metiers-section .section-title { color: var(--white); max-width: 100%; margin-bottom: 50px; }
+  .metiers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2px;
+  }
+  .metier-card {
+    background: rgba(255,255,255,0.06);
+    padding: 28px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .metier-card:hover { background: rgba(255,255,255,0.14); }
+  .metier-emoji { font-size: 1.8rem; margin-bottom: 12px; }
+  .metier-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--white);
+  }
+  .metier-count {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 4px;
+  }
+
+  /* ── PROS ────────────────────────────────────────────────────────────────── */
+  .pros-section { padding: 100px 5vw; }
+  .pros-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 48px;
+  }
+  .pros-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .pro-card {
+    background: var(--cream-dark);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .pro-card:hover { transform: translateY(-4px); }
+  .pro-card-image {
+    height: 200px;
+    background: var(--bordeaux);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .pro-card-image .avatar-letter {
+    font-size: 3rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.25);
+  }
+  .pro-card-image .verified-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: var(--cream);
+    color: var(--bordeaux);
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 4px 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .pro-card-body { padding: 18px 18px 20px; }
+  .pro-card-name { font-weight: 700; font-size: 1rem; margin-bottom: 3px; }
+  .pro-card-job { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px; }
+  .pro-card-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .pro-card-city {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pro-card-price {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--bordeaux);
+  }
+  .pro-card-stars { color: var(--bordeaux); font-size: 0.72rem; margin-bottom: 8px; }
+
+  /* ── SPLIT CTA ───────────────────────────────────────────────────────────── */
+  .split-cta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 400px;
+  }
+  .split-half {
+    padding: 70px 6vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .split-half.dark { background: var(--bordeaux); color: var(--white); }
+  .split-half.light { background: var(--cream-dark); }
+  .split-half h2 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+  .split-half p {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 32px;
+    max-width: 380px;
+    opacity: 0.8;
+  }
+  .split-half.dark .btn-primary { background: var(--white); color: var(--bordeaux); }
+  .split-half.dark .btn-primary:hover { background: var(--cream); }
+
+  /* ── TESTIMONIALS ────────────────────────────────────────────────────────── */
+  .testimonials { padding: 100px 5vw; }
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    margin-top: 50px;
+  }
+  .testimonial {
+    background: var(--cream-dark);
+    padding: 36px 30px;
+  }
+  .testimonial-text {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--text);
+    margin-bottom: 24px;
+    font-style: italic;
+  }
+  .testimonial-text::before { content: '"'; font-size: 2rem; color: var(--bordeaux); line-height: 0; vertical-align: -0.5em; margin-right: 4px; }
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .testimonial-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bordeaux);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+  .testimonial-name { font-weight: 600; font-size: 0.88rem; }
+  .testimonial-role { font-size: 0.75rem; color: var(--text-muted); }
+
+  /* ── FOOTER ──────────────────────────────────────────────────────────────── */
+  footer {
+    background: var(--bordeaux);
+    color: var(--white);
+    padding: 70px 5vw 30px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 60px;
+    margin-bottom: 60px;
+  }
+  .footer-brand-desc {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    margin-top: 18px;
+    max-width: 280px;
+  }
+  .footer-col h4 {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: rgba(255,255,255,0.5);
+  }
+  .footer-col ul { list-style: none; }
+  .footer-col li {
+    margin-bottom: 10px;
+  }
+  .footer-col a {
+    font-size: 0.88rem;
+    color: rgba(255,255,255,0.75);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--white); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,0.15);
+    padding-top: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-bottom-text {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.4);
+  }
+  .footer-tag {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.35);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 4px 10px;
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGO SVG COMPONENT (réutilisable) ─────────────────────────────────────── -->
+<template id="logo-tpl">
+  <svg viewBox="0 0 40 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="2" width="22" height="22" rx="3" stroke="currentColor" stroke-width="3.5" fill="none"/>
+    <rect x="16" y="12" width="22" height="22" rx="3" stroke="currentColor" stroke-width="3.5" fill="none" opacity="0.6"/>
+  </svg>
+</template>
+
+<!-- ── NAV ────────────────────────────────────────────────────────────────────── -->
+<nav>
+  <a href="#" class="logo-svg">
+    <svg class="logo-icon" viewBox="0 0 40 36" fill="none">
+      <rect x="2" y="2" width="22" height="22" rx="3" stroke="#5C1A18" stroke-width="3.5"/>
+      <rect x="16" y="12" width="22" height="22" rx="3" stroke="#5C1A18" stroke-width="3.5" opacity="0.6"/>
+    </svg>
+    <span class="logo-wordmark">UBODROP</span>
+  </a>
+
+  <ul class="nav-links">
+    <li><a href="#comment">Comment ça marche</a></li>
+    <li><a href="#metiers">Nos métiers</a></li>
+    <li><a href="#professionnels">Trouver un pro</a></li>
+    <li><a href="#pros-cta">Je suis professionnel</a></li>
+  </ul>
+
+  <a href="app.html" class="nav-cta">Accéder à l'app →</a>
+</nav>
+
+<!-- ── HERO ───────────────────────────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="hero-content">
+    <span class="hero-tag">Beauté à domicile · Salon · Déplacement</span>
+    <h1>Trouvez le <span>professionnel</span> beauté qui vient à vous</h1>
+    <p class="hero-desc">UBODROP met en relation les prestataires capillaires et beauté avec leurs clients. Coiffeurs, barbiers, esthéticiennes, tatoueurs — réservez en quelques secondes.</p>
+    <div class="hero-actions">
+      <a href="#professionnels" class="btn-primary">Trouver un professionnel</a>
+      <a href="#pros-cta" class="btn-outline">Je suis professionnel</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-card tall">
+      <svg class="hero-icon" viewBox="0 0 40 36" fill="none">
+        <rect x="2" y="2" width="22" height="22" rx="3" stroke="white" stroke-width="3"/>
+        <rect x="16" y="12" width="22" height="22" rx="3" stroke="white" stroke-width="3"/>
+      </svg>
+      <div class="hero-avatar">A</div>
+      <div class="hero-stars">★★★★★</div>
+      <span class="hero-badge">Coiffeuse</span>
+      <div class="hero-card-name">Amina K.</div>
+      <div class="hero-card-job">Paris 11e · 12 ans d'expérience</div>
+    </div>
+    <div class="hero-card light">
+      <div class="hero-avatar">M</div>
+      <div class="hero-stars">★★★★★</div>
+      <span class="hero-badge">Barber</span>
+      <div class="hero-card-name">Marcus T.</div>
+      <div class="hero-card-job">Paris 9e</div>
+    </div>
+    <div class="hero-card" style="background: var(--bordeaux-light);">
+      <div class="hero-avatar" style="background: rgba(0,0,0,0.15);">S</div>
+      <div class="hero-stars">★★★★☆</div>
+      <span class="hero-badge">Esthéticienne</span>
+      <div class="hero-card-name">Sofia L.</div>
+      <div class="hero-card-job">Aubervilliers</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── STRIP STATS ────────────────────────────────────────────────────────────── -->
+<div class="strip">
+  <div class="strip-item">
+    <div class="strip-num">9</div>
+    <div class="strip-label">Métiers<br>représentés</div>
+  </div>
+  <div class="strip-sep"></div>
+  <div class="strip-item">
+    <div class="strip-num">100%</div>
+    <div class="strip-label">Pros<br>vérifiés</div>
+  </div>
+  <div class="strip-sep"></div>
+  <div class="strip-item">
+    <div class="strip-num">3 modes</div>
+    <div class="strip-label">Domicile · Salon<br>Déplacement</div>
+  </div>
+  <div class="strip-sep"></div>
+  <div class="strip-item">
+    <div class="strip-num">Gratuit</div>
+    <div class="strip-label">Pour les<br>clients</div>
+  </div>
+</div>
+
+<!-- ── COMMENT ÇA MARCHE ──────────────────────────────────────────────────────── -->
+<section class="section" id="comment">
+  <div class="section-label">Simple &amp; rapide</div>
+  <h2 class="section-title">Comment ça marche ?</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01 —</div>
+      <svg class="step-icon" viewBox="0 0 42 42" fill="none">
+        <circle cx="21" cy="16" r="9" stroke="#5C1A18" stroke-width="2.5"/>
+        <path d="M6 38c0-8.284 6.716-15 15-15s15 6.716 15 15" stroke="#5C1A18" stroke-width="2.5" stroke-linecap="square"/>
+      </svg>
+      <h3>Créez votre compte</h3>
+      <p>Inscrivez-vous en quelques secondes. Pas de carte de crédit nécessaire pour commencer.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02 —</div>
+      <svg class="step-icon" viewBox="0 0 42 42" fill="none">
+        <circle cx="21" cy="21" r="15" stroke="rgba(255,255,255,0.7)" stroke-width="2.5"/>
+        <circle cx="21" cy="21" r="5" stroke="white" stroke-width="2.5"/>
+        <path d="M21 6v4M21 32v4M6 21h4M32 21h4" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+      </svg>
+      <h3>Trouvez votre professionnel</h3>
+      <p>Filtrez par métier, ville ou distance. Consultez les profils, avis et prestations disponibles.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03 —</div>
+      <svg class="step-icon" viewBox="0 0 42 42" fill="none">
+        <rect x="6" y="8" width="30" height="26" rx="3" stroke="#5C1A18" stroke-width="2.5"/>
+        <path d="M14 21l5 5 9-9" stroke="#5C1A18" stroke-width="2.5" stroke-linecap="square"/>
+      </svg>
+      <h3>Réservez en un clic</h3>
+      <p>Sélectionnez la prestation, choisissez votre créneau et réservez directement dans l'application.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── METIERS ────────────────────────────────────────────────────────────────── -->
+<section class="metiers-section" id="metiers">
+  <div class="section-label">Tous les métiers beauté</div>
+  <h2 class="section-title">9 métiers, une seule plateforme</h2>
+  <div class="metiers-grid">
+    <div class="metier-card">
+      <div class="metier-emoji">✂️</div>
+      <div class="metier-name">Coiffeuse</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">🪒</div>
+      <div class="metier-name">Barber</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">💄</div>
+      <div class="metier-name">Maquilleuse</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">🌿</div>
+      <div class="metier-name">Henné</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">🎨</div>
+      <div class="metier-name">Tatoueur</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">💅</div>
+      <div class="metier-name">Manucure</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">🖊️</div>
+      <div class="metier-name">Micro-pigmentation</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">💆</div>
+      <div class="metier-name">Massage</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card">
+      <div class="metier-emoji">✨</div>
+      <div class="metier-name">Esthéticienne</div>
+      <div class="metier-count">Disponibles</div>
+    </div>
+    <div class="metier-card" style="background:rgba(255,255,255,0.03); cursor: default; display:flex; align-items:center; justify-content:center;">
+      <div style="text-align:center; opacity:0.4; font-size:0.8rem; letter-spacing:0.05em;">+ bientôt<br>davantage</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── PROS ───────────────────────────────────────────────────────────────────── -->
+<section class="pros-section" id="professionnels">
+  <div class="pros-header">
+    <div>
+      <div class="section-label">Professionnels vérifiés</div>
+      <h2 class="section-title" style="margin-bottom:0;">Découvrez nos experts</h2>
+    </div>
+    <a href="app.html" class="btn-outline">Voir tous les pros →</a>
+  </div>
+  <div class="pros-grid">
+    <div class="pro-card">
+      <div class="pro-card-image" style="background: #7A2420;">
+        <span class="avatar-letter">A</span>
+        <span class="verified-badge">✓ Vérifié</span>
+      </div>
+      <div class="pro-card-body">
+        <div class="pro-card-stars">★★★★★</div>
+        <div class="pro-card-name">Amina Kouyaté</div>
+        <div class="pro-card-job">Coiffeuse · Lissage, tresses, extensions</div>
+        <div class="pro-card-meta">
+          <span class="pro-card-city">📍 Paris 11e</span>
+          <span class="pro-card-price">à partir de 45€</span>
+        </div>
+      </div>
+    </div>
+    <div class="pro-card">
+      <div class="pro-card-image" style="background: #5C1A18;">
+        <span class="avatar-letter">M</span>
+        <span class="verified-badge">✓ Vérifié</span>
+      </div>
+      <div class="pro-card-body">
+        <div class="pro-card-stars">★★★★★</div>
+        <div class="pro-card-name">Marcus Thiaw</div>
+        <div class="pro-card-job">Barber · Dégradé, rasage classique</div>
+        <div class="pro-card-meta">
+          <span class="pro-card-city">📍 Paris 9e</span>
+          <span class="pro-card-price">à partir de 25€</span>
+        </div>
+      </div>
+    </div>
+    <div class="pro-card">
+      <div class="pro-card-image" style="background: #8B3A2A;">
+        <span class="avatar-letter">S</span>
+        <span class="verified-badge">✓ Vérifié</span>
+      </div>
+      <div class="pro-card-body">
+        <div class="pro-card-stars">★★★★☆</div>
+        <div class="pro-card-name">Sofia Ladidi</div>
+        <div class="pro-card-job">Esthéticienne · Soins visage, épilation</div>
+        <div class="pro-card-meta">
+          <span class="pro-card-city">📍 Aubervilliers</span>
+          <span class="pro-card-price">à partir de 35€</span>
+        </div>
+      </div>
+    </div>
+    <div class="pro-card">
+      <div class="pro-card-image" style="background: #4A1510;">
+        <span class="avatar-letter">K</span>
+        <span class="verified-badge">✓ Vérifié</span>
+      </div>
+      <div class="pro-card-body">
+        <div class="pro-card-stars">★★★★★</div>
+        <div class="pro-card-name">Khadija M.</div>
+        <div class="pro-card-job">Tatoueur · Henné naturel, motifs berbères</div>
+        <div class="pro-card-meta">
+          <span class="pro-card-city">📍 Saint-Denis</span>
+          <span class="pro-card-price">à partir de 20€</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SPLIT CTA ───────────────────────────────────────────────────────────────── -->
+<section class="split-cta" id="pros-cta">
+  <div class="split-half dark">
+    <div style="margin-bottom:28px;">
+      <svg width="44" height="40" viewBox="0 0 44 40" fill="none">
+        <rect x="2" y="2" width="24" height="24" rx="3.5" stroke="rgba(255,255,255,0.9)" stroke-width="3"/>
+        <rect x="18" y="14" width="24" height="24" rx="3.5" stroke="rgba(255,255,255,0.5)" stroke-width="3"/>
+      </svg>
+    </div>
+    <h2>Vous êtes professionnel&nbsp;?</h2>
+    <p>Créez votre profil gratuitement, ajoutez vos prestations et commencez à recevoir des réservations dès aujourd'hui.</p>
+    <a href="app.html" class="btn-primary">Créer mon compte pro →</a>
+  </div>
+  <div class="split-half light">
+    <div style="width:44px;height:44px;background:var(--bordeaux);margin-bottom:28px;display:flex;align-items:center;justify-content:center;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="8" r="4" stroke="white" stroke-width="2"/>
+        <path d="M4 20c0-4.418 3.582-8 8-8s8 3.582 8 8" stroke="white" stroke-width="2" stroke-linecap="square"/>
+      </svg>
+    </div>
+    <h2>Vous êtes client&nbsp;?</h2>
+    <p>Trouvez le professionnel beauté qui vous correspond, consultez son profil et réservez en quelques clics.</p>
+    <a href="app.html" class="btn-primary">Trouver un professionnel →</a>
+  </div>
+</section>
+
+<!-- ── TESTIMONIALS ───────────────────────────────────────────────────────────── -->
+<section class="testimonials">
+  <div class="section-label">Ce qu'ils en disent</div>
+  <h2 class="section-title">Ils utilisent UBODROP</h2>
+  <div class="testimonials-grid">
+    <div class="testimonial">
+      <p class="testimonial-text">J'ai trouvé ma coiffeuse en 2 minutes. Elle est venue chez moi le lendemain. Je ne cherche plus ailleurs.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">L</div>
+        <div>
+          <div class="testimonial-name">Laura D.</div>
+          <div class="testimonial-role">Cliente · Paris 12e</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial" style="background:var(--bordeaux); color:white;">
+      <p class="testimonial-text" style="color:rgba(255,255,255,0.85);">Depuis que je suis sur UBODROP, mon planning est rempli. Les clients sont sérieux et la plateforme est simple à utiliser.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar" style="background:rgba(255,255,255,0.15);">J</div>
+        <div>
+          <div class="testimonial-name" style="color:white;">Jean-Paul M.</div>
+          <div class="testimonial-role" style="color:rgba(255,255,255,0.6);">Barber · Professionnel</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <p class="testimonial-text">Enfin une application pensée pour nos métiers. Le profil pro est complet, les réservations sont claires.</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">N</div>
+        <div>
+          <div class="testimonial-name">Nadia B.</div>
+          <div class="testimonial-role">Esthéticienne · Professionnelle</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────────────────────────── -->
+<footer>
+  <div class="footer-grid">
+    <div>
+      <a href="#" class="logo-svg on-dark">
+        <svg class="logo-icon" viewBox="0 0 40 36" fill="none">
+          <rect x="2" y="2" width="22" height="22" rx="3" stroke="white" stroke-width="3.5"/>
+          <rect x="16" y="12" width="22" height="22" rx="3" stroke="white" stroke-width="3.5" opacity="0.6"/>
+        </svg>
+        <span class="logo-wordmark">UBODROP</span>
+      </a>
+      <p class="footer-brand-desc">La marketplace beauté qui connecte les prestataires capillaires et beauté avec leurs clients.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Produit</h4>
+      <ul>
+        <li><a href="#">Comment ça marche</a></li>
+        <li><a href="#">Nos métiers</a></li>
+        <li><a href="#">Tarifs</a></li>
+        <li><a href="#">Application</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Professionnels</h4>
+      <ul>
+        <li><a href="#">Créer un compte</a></li>
+        <li><a href="#">Gérer mes prestations</a></li>
+        <li><a href="#">Paiements</a></li>
+        <li><a href="#">Support pro</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Légal</h4>
+      <ul>
+        <li><a href="#">CGU</a></li>
+        <li><a href="#">Confidentialité</a></li>
+        <li><a href="#">Cookies</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-bottom-text">© 2026 UBODROP — Tous droits réservés</span>
+    <span class="footer-tag">VERSION TEST DA · Ne pas diffuser</span>
+  </div>
+</footer>
+
+</body>
+</html>

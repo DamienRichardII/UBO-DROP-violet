@@ -2396,18 +2396,34 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   async function openPro(id) {
-    const pro = state.pros.find((item) => String(item.id) === String(id));
-    if (!pro) {
+    // Cherche d'abord dans le cache local (peut être null si hors listing)
+    const cached = state.pros.find((item) => String(item.id) === String(id)) || null;
+    let detailed = cached;
+
+    try {
+      console.log("[UBODROP] opening fresh pro detail", id);
+      const detail = await appApi.publicProfessional(id);
+      const normalized = normalizePros([detail]);
+      if (normalized.length) {
+        detailed = cached ? { ...cached, ...normalized[0] } : normalized[0];
+        // Mettre à jour le cache local avec les données fraîches
+        if (state.pros.some((p) => String(p.id) === String(id))) {
+          state.pros = state.pros.map((p) => String(p.id) === String(id) ? detailed : p);
+        }
+        console.log("[UBODROP] fresh services count", detailed.services?.length ?? 0);
+      }
+    } catch (err) {
+      console.warn("[UBODROP] publicProfessional fetch failed, using cached data", err);
+      if (!detailed) {
+        notify("Impossible de charger la fiche du professionnel.", "error");
+        return;
+      }
+    }
+
+    if (!detailed) {
       notify("Aucun professionnel réel disponible pour le moment.");
       return;
     }
-
-    let detailed = pro;
-    try {
-      const detail = await appApi.publicProfessional(pro.id);
-      const normalized = normalizePros([detail]);
-      if (normalized.length) detailed = { ...pro, ...normalized[0] };
-    } catch (_) {}
 
     state.selectedPro = detailed;
     state.selectedServiceId = null;
@@ -3617,6 +3633,8 @@ function syncGoogleUiVisibility(screenId) {
       }
       resetServiceForm();
       await loadMyServices();
+      // Rafraîchir la liste publique côté client en arrière-plan
+      loadPros().catch((e) => console.warn("[UBODROP] loadPros after save service failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Impossible d'enregistrer la prestation."), "error");
     } finally {
@@ -3629,6 +3647,8 @@ function syncGoogleUiVisibility(screenId) {
       await appApi.updateService(serviceId, { status: newStatus });
       await loadMyServices();
       notify(newStatus === "ACTIVE" ? "Prestation publiée." : "Prestation repassée en brouillon.", "ok");
+      // Rafraîchir la liste publique côté client en arrière-plan
+      loadPros().catch((e) => console.warn("[UBODROP] loadPros after status change failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Mise à jour impossible."), "error");
     }
@@ -3640,6 +3660,8 @@ function syncGoogleUiVisibility(screenId) {
       await appApi.deleteService(serviceId);
       await loadMyServices();
       notify("Prestation supprimée.", "ok");
+      // Rafraîchir la liste publique côté client en arrière-plan
+      loadPros().catch((e) => console.warn("[UBODROP] loadPros after delete service failed", e));
     } catch (err) {
       notify(friendlyApiError(err, "Suppression impossible."), "error");
     }

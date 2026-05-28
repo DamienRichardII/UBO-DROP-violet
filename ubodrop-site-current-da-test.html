@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UBO DROP</title>
+    <meta name="description" content="UBO DROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
+    <link rel="icon" type="image/jpeg" href="/assets/logo-ubodrop.jpeg">
+    <link rel="apple-touch-icon" href="/assets/logo-ubodrop.jpeg">
+
+    <meta property="og:title" content="UBO DROP">
+    <meta property="og:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ubo-drop-violet.vercel.app/">
+    <meta property="og:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UBO DROP">
+    <meta name="twitter:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
+    <meta name="twitter:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --violet-deep: #6C3FA0;
+            --violet-neon: #A855F7;
+            --violet-light: #D4B8E8;
+            --violet-medium: #B48ED0;
+            --violet-soft: #EDE4F3;
+            --violet-pale: #F3ECF8;
+            --noir: #111111;
+            --noir-soft: #1A1A2E;
+            --blanc-casse: #F5F0EB;
+            --blanc: #FFFFFF;
+            --gold: #D4AF37;
+            --glass-bg: rgba(212, 184, 232, 0.15);
+            --glass-border: rgba(212, 184, 232, 0.25);
+            --shadow-sm: 0 2px 8px rgba(17, 17, 17, 0.06);
+            --shadow-md: 0 4px 20px rgba(17, 17, 17, 0.08);
+            --shadow-lg: 0 8px 40px rgba(17, 17, 17, 0.12);
+            --shadow-glow: 0 0 30px rgba(168, 85, 247, 0.3);
+            --radius-sm: 10px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+        body {
+            font-family: 'DM Sans', -apple-system, sans-serif;
+            background: var(--violet-pale);
+            color: var(--noir);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        img { max-width: 100%; display: block; }
+        a { text-decoration: none; color: inherit; }
+
+        /* ===== HEADER ===== */
+        .header {
+            position: fixed; top: 28px; left: 0; right: 0; z-index: 1000;
+            background: rgba(243, 236, 248, 0.88);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .header-top {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 20px; max-width: 1200px; margin: 0 auto;
+        }
+        .header-logo { display: flex; align-items: center; gap: 10px; }
+        .header-logo img {
+            width: 38px; height: 38px; border-radius: 10px; object-fit: contain;
+            background: transparent;
+        }
+        .header-logo span {
+            font-family: 'Playfair Display', serif; font-weight: 800;
+            font-size: 1.15rem; color: var(--noir); letter-spacing: 1px;
+        }
+        .btn-open-app,
+        .hero-cta {
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+            background: linear-gradient(135deg, #eadcf5 0%, #dcc4ee 45%, #cfafe8 100%);
+            color: var(--noir);
+            border: 1px solid rgba(108, 63, 160, 0.12);
+            box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
+            transition: transform 0.35s ease, box-shadow 0.35s ease, background 0.35s ease, color 0.35s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-open-app::before,
+        .hero-cta::before {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: linear-gradient(180deg, rgba(255,255,255,0.46), rgba(255,255,255,0));
+            pointer-events: none;
+            z-index: -1;
+        }
+        .btn-open-app::after,
+        .hero-cta::after {
+            content: '';
+            position: absolute;
+            top: -120%; left: -30%;
+            width: 42%; height: 300%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 48%, transparent 100%);
+            transform: rotate(18deg);
+            opacity: 0;
+            transition: transform 0.6s ease, opacity 0.35s ease;
+            pointer-events: none;
+        }
+        .btn-open-app {
+            padding: 10px 20px; border-radius: 50px;
+            font-size: 0.82rem; font-weight: 600; letter-spacing: 0.2px;
+            cursor: pointer;
+        }
+        .btn-open-app:hover,
+        .hero-cta:hover {
+            background: linear-gradient(135deg, var(--violet-medium) 0%, var(--violet-neon) 55%, var(--violet-deep) 100%);
+            color: var(--blanc);
+            transform: translateY(-1px);
+            box-shadow: 0 14px 32px rgba(108, 63, 160, 0.24), 0 0 28px rgba(168, 85, 247, 0.22);
+        }
+        .btn-open-app:hover::after,
+        .hero-cta:hover::after {
+            opacity: 1;
+            transform: translateX(220%) rotate(18deg);
+        }
+        .btn-open-app svg { width: 16px; height: 16px; }
+
+        /* ===== SCROLLING BANNER ===== */
+        .providers-banner {
+            position: relative;
+            z-index: 4;
+            background: rgba(255, 255, 255, 0.62);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-top: 1px solid rgba(180, 142, 208, 0.16);
+            border-bottom: 1px solid rgba(180, 142, 208, 0.22);
+            overflow: hidden;
+            padding: 14px 0;
+        }
+        .banner-track {
+            display: flex;
+            animation: scrollBanner 25s linear infinite;
+            width: max-content;
+        }
+        .banner-track:hover { animation-play-state: paused; }
+        .banner-item {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 6px 22px;
+            font-size: 0.9rem; font-weight: 600;
+            font-family: 'Playfair Display', serif;
+            color: var(--noir);
+            white-space: nowrap;
+            transition: color 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+        }
+        .banner-item:hover { color: var(--violet-deep); opacity: 1; }
+        .banner-item .b-icon {
+            width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center;
+            color: var(--violet-deep);
+            opacity: 0.9;
+        }
+        .banner-item .b-icon svg { width: 16px; height: 16px; stroke: currentColor; }
+        .banner-sep {
+            color: rgba(180, 142, 208, 0.6);
+            padding: 0 4px;
+            font-size: 0.7rem;
+            display: inline-flex; align-items: center;
+        }
+        @keyframes scrollBanner {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            position: relative; width: 100%; height: 100vh;
+            min-height: 650px; max-height: 1000px;
+            overflow: hidden; display: flex;
+            align-items: center; justify-content: center;
+        }
+        .hero-bands {
+            position: absolute; inset: 0;
+            display: flex; width: 140%; left: -20%;
+            transform: skewX(-12deg);
+        }
+        .hero-band {
+            flex: 1; height: 100%;
+            background-size: cover; background-position: center;
+            position: relative;
+            filter: brightness(0.95) contrast(1.05);
+        }
+        .hero-band::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg,
+                rgba(212,184,232,0.2) 0%,
+                rgba(212,184,232,0.1) 40%,
+                rgba(212,184,232,0.4) 80%,
+                rgba(243,236,248,0.95) 100%);
+        }
+        .hero-band:nth-child(1) { background-image: url('assets/img/hero-nails.jpeg'); }
+        .hero-band:nth-child(2) { background-image: url('assets/img/hero-barber.jpeg'); }
+        .hero-band:nth-child(3) { background-image: url('assets/img/hero-scalpcare.webp'); }
+        .hero-band:nth-child(4) { background-image: url('assets/img/hero-beauty.jpg'); }
+        .hero-band + .hero-band { margin-left: 4px; }
+
+        .hero-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg,
+                rgba(243,236,248,0.3) 0%,
+                rgba(243,236,248,0.0) 30%,
+                rgba(243,236,248,0.5) 70%,
+                rgba(243,236,248,1) 100%);
+            z-index: 2;
+        }
+        .hero-content {
+            position: relative; z-index: 3;
+            text-align: center; padding: 0 24px; margin-top: 42px;
+            max-width: 720px;
+        }
+        .hero-title {
+            font-family: Calibri, 'Trebuchet MS', 'Segoe UI', sans-serif;
+            font-size: clamp(2.4rem, 5vw, 4.5rem);
+            font-weight: 700;
+            color: var(--noir);
+            letter-spacing: 0;
+            line-height: 1.08;
+            margin-bottom: 30px;
+            text-transform: none;
+            white-space: nowrap;
+        }
+        .hero-title span {
+            color: var(--noir);
+            background: none;
+            -webkit-background-clip: border-box;
+            -webkit-text-fill-color: currentColor;
+            background-clip: border-box;
+        }
+        .hero-cta {
+            padding: 16px 36px; border-radius: 50px;
+            font-size: 1rem; font-weight: 600; letter-spacing: 0.2px;
+        }
+        .hero-cta svg { width: 18px; height: 18px; }
+
+        /* ===== SECTIONS GLOBAL ===== */
+        .section {
+            padding: 100px 20px; max-width: 1100px; margin: 0 auto;
+        }
+        .section-label {
+            display: inline-block;
+            background: var(--violet-light);
+            color: var(--noir); padding: 6px 18px; border-radius: 50px;
+            font-size: 0.75rem; font-weight: 600;
+            letter-spacing: 1.5px; text-transform: uppercase;
+            margin-bottom: 16px;
+            border: 1px solid rgba(180, 142, 208, 0.4);
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 5vw, 2.6rem);
+            font-weight: 800; color: var(--noir);
+            margin-bottom: 12px; line-height: 1.2;
+        }
+        .section-desc {
+            font-size: 1rem; color: var(--noir); opacity: 0.55;
+            max-width: 550px; margin-bottom: 48px; line-height: 1.7;
+        }
+
+        /* ===== UBO DROP C'EST QUOI ===== */
+        .concept-section {
+            padding: 100px 20px;
+            background: linear-gradient(180deg, var(--violet-pale) 0%, var(--violet-soft) 50%, var(--violet-pale) 100%);
+            overflow: hidden;
+        }
+        .concept-inner { max-width: 1200px; margin: 0 auto; }
+        .concept-top { text-align: center; margin-bottom: 60px; }
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        .concept-text h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; font-weight: 700;
+            color: var(--noir); margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .concept-text h3 span { color: var(--violet-deep); }
+        .concept-text p {
+            font-size: 1rem; color: var(--noir); opacity: 0.7;
+            line-height: 1.8; margin-bottom: 16px;
+        }
+        .concept-features {
+            list-style: none; margin-top: 28px;
+        }
+        .concept-features li {
+            display: flex; align-items: flex-start; gap: 12px;
+            padding: 12px 0;
+            font-size: 0.95rem; color: var(--noir); opacity: 0.8;
+        }
+        .concept-features li .feat-icon {
+            width: 36px; height: 36px; min-width: 36px;
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--noir);
+        }
+        .concept-features li .feat-icon svg {
+            width: 18px; height: 18px;
+            stroke: currentColor;
+        }
+
+        /* Phone Mockups */
+        .phones-showcase {
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 500px;
+        }
+        .phone-mockup {
+            width: 240px;
+            border-radius: 32px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(108,63,160,0.25), 0 0 40px rgba(168,85,247,0.1);
+            border: 3px solid rgba(180,142,208,0.3);
+            position: relative;
+            transition: transform 0.5s ease;
+            background: var(--blanc);
+        }
+        .phone-mockup img { width: 100%; height: auto; display: block; }
+        .phone-mockup:first-child {
+            transform: rotate(-8deg) translateX(20px);
+            z-index: 1;
+        }
+        .phone-mockup:last-child {
+            transform: rotate(8deg) translateX(-20px);
+            z-index: 2;
+        }
+        .phones-showcase:hover .phone-mockup:first-child {
+            transform: rotate(-3deg) translateX(10px) translateY(-10px);
+        }
+        .phones-showcase:hover .phone-mockup:last-child {
+            transform: rotate(3deg) translateX(-10px) translateY(-10px);
+        }
+        .phone-glow {
+            position: absolute;
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            animation: pulseGlow 3s ease-in-out infinite;
+        }
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+        }
+
+        /* ===== NOS SERVICES CAROUSEL ===== */
+        .services-section {
+            padding: 100px 0;
+            overflow: hidden;
+            background: var(--violet-pale);
+        }
+        .services-header {
+            max-width: 1100px; margin: 0 auto;
+            padding: 0 20px 48px;
+        }
+        .services-track-wrapper {
+            position: relative; overflow: hidden; width: 100%;
+        }
+        .services-track {
+            display: flex; gap: 20px;
+            animation: scrollServices 35s linear infinite;
+            width: max-content;
+        }
+        .services-track:hover { animation-play-state: paused; }
+        .service-card {
+            position: relative;
+            width: 340px; height: 450px;
+            border-radius: var(--radius-lg);
+            overflow: hidden; flex-shrink: 0; cursor: pointer;
+        }
+        .service-card img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+        .service-card:hover img { transform: scale(1.08); }
+        .service-card-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(180deg,
+                transparent 30%, rgba(17,17,17,0.3) 60%, rgba(17,17,17,0.85) 100%);
+            display: flex; align-items: flex-end;
+            padding: 28px;
+            transition: background 0.3s;
+        }
+        .service-card:hover .service-card-overlay {
+            background: linear-gradient(180deg,
+                transparent 20%, rgba(108,63,160,0.2) 50%, rgba(17,17,17,0.9) 100%);
+        }
+        .service-card-label {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; font-weight: 800;
+            color: var(--blanc);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.6);
+        }
+        .service-card-label .label-emoji {
+            display: block; font-size: 1.8rem; margin-bottom: 6px;
+        }
+        @keyframes scrollServices {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===== COMMENT ÇA MARCHE ===== */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+        .step-card {
+            background: var(--blanc);
+            border-radius: var(--radius-lg);
+            padding: 32px 28px;
+            border: 1px solid rgba(212,184,232,0.3);
+            transition: all 0.3s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(168,85,247,0.12);
+            border-color: var(--violet-medium);
+        }
+        .step-num {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
+            color: var(--blanc); border-radius: 14px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 800; font-size: 1.1rem; margin-bottom: 18px;
+        }
+        .step-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--noir); margin-bottom: 8px; }
+        .step-card p { font-size: 0.9rem; color: var(--noir); opacity: 0.55; line-height: 1.6; }
+
+        /* ===== AVANTAGES ===== */
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .advantage-card {
+            background: var(--blanc);
+            border-radius: var(--radius-lg);
+            padding: 36px 28px;
+            color: var(--noir);
+            border: 1px solid rgba(212,184,232,0.3);
+            transition: all 0.3s ease;
+        }
+        .advantage-card:hover {
+            border-color: var(--violet-medium);
+            transform: translateY(-4px);
+        }
+        .advantage-card .adv-icon {
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
+            border-radius: 14px; display: flex;
+            align-items: center; justify-content: center; margin-bottom: 20px;
+        }
+        .advantage-card .adv-icon svg { width: 24px; height: 24px; stroke: var(--blanc); }
+        .advantage-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: var(--noir);
+        }
+        .advantage-card p { font-size: 0.9rem; opacity: 0.6; line-height: 1.6; }
+
+        /* ===== CTA ===== */
+        .cta-section { text-align: center; padding: 80px 20px 100px; }
+        .cta-box {
+            background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-neon) 50%, var(--violet-deep) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 6s ease infinite;
+            border-radius: var(--radius-xl); padding: 60px 32px;
+            max-width: 700px; margin: 0 auto; position: relative; overflow: hidden;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .cta-box::before {
+            content: ''; position: absolute; top: -50%; right: -30%;
+            width: 300px; height: 300px;
+            background: rgba(255,255,255,0.08); border-radius: 50%;
+        }
+        .cta-box h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 4vw, 2.2rem);
+            font-weight: 800; color: var(--blanc);
+            margin-bottom: 16px; position: relative;
+        }
+        .cta-box p {
+            font-size: 1rem; color: var(--blanc); opacity: 0.8;
+            margin-bottom: 28px; position: relative;
+        }
+        .btn-cta-white {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: var(--blanc); color: var(--noir);
+            padding: 16px 40px; border-radius: 50px;
+            font-size: 1rem; font-weight: 600; letter-spacing: 0.5px;
+            transition: all 0.3s ease; position: relative;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .btn-cta-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .btn-cta-white svg { width: 16px; height: 16px; }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            background: var(--noir-soft);
+            border-top: 1px solid rgba(180,142,208,0.2);
+            color: var(--blanc-casse);
+            padding: 48px 20px 40px; text-align: center;
+        }
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; font-weight: 800;
+            letter-spacing: 2px; margin-bottom: 12px;
+        }
+        .footer p { font-size: 0.85rem; opacity: 0.4; }
+        .footer-links { display: flex; gap: 24px; justify-content: center; margin-top: 20px; }
+        .footer-links a { font-size: 0.82rem; opacity: 0.4; transition: opacity 0.2s; }
+        .footer-links a:hover { opacity: 1; }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .hero-content > * { opacity: 0; animation: fadeInUp 0.8s ease forwards; }
+        .hero-content > *:nth-child(1) { animation-delay: 0.2s; }
+        .hero-content > *:nth-child(2) { animation-delay: 0.4s; }
+        .hero-content > *:nth-child(3) { animation-delay: 0.6s; }
+        .hero-content > *:nth-child(4) { animation-delay: 0.8s; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .concept-grid { grid-template-columns: 1fr; gap: 40px; }
+            .phones-showcase { min-height: 380px; }
+            .phone-mockup { width: 180px; }
+        }
+        @media (max-width: 768px) {
+            .hero { min-height: 550px; max-height: 750px; }
+            .providers-banner { padding: 12px 0; }
+            .banner-item { padding: 6px 18px; font-size: 0.82rem; }
+            .hero-content { margin-top: 36px; padding: 0 18px; }
+            .hero-title { font-size: clamp(2rem, 7.2vw, 3.2rem); letter-spacing: 0; margin-bottom: 26px; white-space: nowrap; }
+            .btn-open-app { padding: 10px 16px; font-size: 0.78rem; }
+            .hero-cta { padding: 15px 28px; }
+            .hero-bands { display: flex; gap: 0; width: 100%; left: 0; transform: none; }
+            .hero-band {
+                flex: 1 1 50%;
+                width: 50%;
+                height: 100%;
+                border-radius: 0;
+                transform: none;
+                margin: 0;
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+            .hero-band:nth-child(1) { background-image: url('assets/img/hero-barber.jpeg'); background-position: center; }
+            .hero-band:nth-child(2) { background-image: url('assets/img/hero-beauty.jpg'); background-position: center top; }
+            .hero-band:nth-child(3),
+            .hero-band:nth-child(4) { display: none; }
+            .hero-band + .hero-band { margin-left: 0; }
+            .hero-logo { width: 80px; height: 80px; border-radius: 20px; }
+            .section { padding: 60px 16px; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .service-card { width: 280px; height: 370px; }
+            .service-card-label { font-size: 1.3rem; }
+            .concept-section { padding: 60px 16px; }
+            .services-section { padding: 60px 0; }
+        }
+        @media (max-width: 480px) {
+            .header-top { padding: 10px 14px; }
+            .header-logo { gap: 8px; }
+            .header-logo img { width: 34px; height: 34px; }
+            .header-logo span { font-size: 1rem; letter-spacing: 0.06em; }
+            .btn-open-app { padding: 9px 14px; font-size: 0.74rem; }
+            .hero-content { margin-top: 30px; }
+            .hero-title { font-size: clamp(1.5rem, 6.4vw, 2.25rem); letter-spacing: 0; white-space: nowrap; }
+            .phone-mockup { width: 150px; }
+            .service-card { width: 240px; height: 320px; }
+        }
+    </style>
+
+<style>
+/* ════════════════════════════════════════════════════
+   UBODROP — INJECTION DA TEST · Cream / Bordeaux
+   Ce bloc override la palette violet → cream/bordeaux
+   Sans toucher à la structure ni aux fonctionnalités
+════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Remapping violet → bordeaux */
+  --violet-deep:   #5C1A18 !important;
+  --violet-neon:   #7A2420 !important;
+  --violet-light:  #DDD6C8 !important;
+  --violet-medium: #9B3B37 !important;
+  --violet-soft:   #EAE4D8 !important;
+  --violet-pale:   #F3EEE6 !important;
+  --noir-soft:     #3A0F0C !important;
+  --glass-bg:      rgba(92,26,24,0.07) !important;
+  --glass-border:  rgba(92,26,24,0.12) !important;
+  --shadow-glow:   0 0 30px rgba(92,26,24,0.18) !important;
+}
+
+/* Fond global */
+body {
+  background: #F3EEE6 !important;
+  font-family: 'Space Grotesk', 'DM Sans', sans-serif !important;
+}
+
+/* Header */
+.header {
+  background: rgba(243,238,230,0.92) !important;
+  border-bottom-color: rgba(92,26,24,0.12) !important;
+}
+
+/* Bouton Ouvrir l'app + CTA hero */
+.btn-open-app,
+.hero-cta {
+  background: linear-gradient(135deg, #DDD6C8 0%, #C8C0B5 45%, #BDB5A8 100%) !important;
+  border-color: rgba(92,26,24,0.14) !important;
+  color: #3A0F0C !important;
+  box-shadow: 0 10px 24px rgba(92,26,24,0.10), inset 0 1px 0 rgba(255,255,255,0.75) !important;
+}
+.btn-open-app:hover,
+.hero-cta:hover {
+  background: linear-gradient(135deg, #9B3B37 0%, #7A2420 55%, #5C1A18 100%) !important;
+  color: #EAE4D8 !important;
+  box-shadow: 0 14px 32px rgba(92,26,24,0.28), 0 0 28px rgba(92,26,24,0.18) !important;
+}
+
+/* Banner déroulante */
+.providers-banner {
+  background: rgba(255,255,255,0.75) !important;
+  border-color: rgba(92,26,24,0.12) !important;
+}
+.banner-item:hover { color: #5C1A18 !important; }
+.banner-item .b-icon { color: #5C1A18 !important; }
+.banner-sep { color: rgba(92,26,24,0.35) !important; }
+
+/* Hero overlay */
+.hero-overlay {
+  background: linear-gradient(180deg,
+    rgba(243,238,230,0.3) 0%,
+    rgba(243,238,230,0.0) 30%,
+    rgba(243,238,230,0.5) 70%,
+    rgba(243,238,230,1) 100%) !important;
+}
+.hero-band::after {
+  background: linear-gradient(180deg,
+    rgba(220,214,200,0.15) 0%,
+    rgba(220,214,200,0.08) 40%,
+    rgba(220,214,200,0.35) 80%,
+    rgba(243,238,230,0.95) 100%) !important;
+}
+
+/* Section labels */
+.section-label {
+  background: #DDD6C8 !important;
+  border-color: rgba(92,26,24,0.25) !important;
+  color: #5C1A18 !important;
+}
+
+/* Titres colorés */
+.concept-text h3 span { color: #5C1A18 !important; }
+
+/* Features icons */
+.concept-features li .feat-icon {
+  background: rgba(92,26,24,0.08) !important;
+  border-color: rgba(92,26,24,0.15) !important;
+}
+
+/* Phone glow */
+.phone-glow {
+  background: radial-gradient(circle, rgba(92,26,24,0.15) 0%, transparent 70%) !important;
+}
+.phone-mockup {
+  box-shadow: 0 20px 60px rgba(92,26,24,0.2), 0 0 40px rgba(92,26,24,0.08) !important;
+  border-color: rgba(92,26,24,0.18) !important;
+}
+
+/* Section services */
+.services-section { background: #F3EEE6 !important; }
+.service-card:hover .service-card-overlay {
+  background: linear-gradient(180deg, transparent 20%, rgba(92,26,24,0.25) 50%, rgba(17,17,17,0.9) 100%) !important;
+}
+
+/* Step cards */
+.step-num {
+  background: linear-gradient(135deg, #7A2420, #5C1A18) !important;
+}
+.step-card:hover {
+  box-shadow: 0 8px 30px rgba(92,26,24,0.12) !important;
+  border-color: #9B3B37 !important;
+}
+
+/* Advantage cards */
+.advantage-card .adv-icon {
+  background: linear-gradient(135deg, #7A2420, #5C1A18) !important;
+}
+.advantage-card:hover { border-color: #9B3B37 !important; }
+
+/* CTA box */
+.cta-box {
+  background: linear-gradient(135deg, #5C1A18 0%, #7A2420 50%, #5C1A18 100%) !important;
+  background-size: 200% 200% !important;
+}
+
+/* Concept section background */
+.concept-section {
+  background: linear-gradient(180deg, #F3EEE6 0%, #EAE4D8 50%, #F3EEE6 100%) !important;
+}
+
+/* Footer */
+.footer {
+  background: #3A0F0C !important;
+  border-top-color: rgba(92,26,24,0.3) !important;
+}
+
+/* Titres section */
+.section-title {
+  font-family: 'Space Grotesk', 'Playfair Display', serif !important;
+}
+</style>
+
+</head>
+<body>
+<div style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#3A0F0C;color:#EAE4D8;font-family:'Space Grotesk',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;text-align:center;padding:6px 16px;border-bottom:1px solid rgba(234,228,216,.18);">⚠ VERSION TEST DA — Ne pas diffuser · Prod inchangée · ubodrop-site-current-da-test.html</div>
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-top">
+            <a href="index.html" class="header-logo">
+                <svg width="28" height="26" viewBox="0 0 36 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;">
+  <rect x="1" y="1" width="22" height="22" rx="5" stroke="#5C1A18" stroke-width="3" fill="none"/>
+  <rect x="13" y="11" width="22" height="22" rx="5" stroke="#9B3B37" stroke-width="3" fill="none"/>
+</svg>
+                <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.1rem;letter-spacing:.12em;color:#5C1A18;text-transform:uppercase;">UBODROP</span>
+            </a>
+            <a href="./ubodrop-app-current-da-test.html" class="btn-open-app">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
+                Ouvrir l'app
+            </a>
+        </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-bands">
+            <div class="hero-band"></div>
+            <div class="hero-band"></div>
+            <div class="hero-band"></div>
+            <div class="hero-band"></div>
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Bienvenue chez UBO <span>DROP</span></h1>
+            <a href="./ubodrop-app-current-da-test.html" class="hero-cta">
+                Découvrir l'app
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- BANDE DÉROULANTE PRESTATAIRES -->
+    <div class="providers-banner">
+        <div class="banner-track">
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/><path d="M7 9V5"/><path d="M17 15v4"/></svg></span>Barber</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18c2.5-5 11.5-5 14 0"/><path d="M7 9h10"/><path d="M9 6h6"/><path d="M8 13h8"/></svg></span>Manucure</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4-4 6-7.3 6-10a6 6 0 1 0-12 0c0 2.7 2 6 6 10Z"/><path d="M12 9c1.4 0 2.5 1.1 2.5 2.5"/></svg></span>Henné</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c0-4 2.2-7 5-7s5 3 5 7"/><path d="M8.5 10a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0Z"/></svg></span>Esthéticienne</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l8 8"/><path d="M16 6l-8 8"/><path d="M12 14v5"/></svg></span>Perceur</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13c1.2 1.5 2.8 2.2 5 2.2s3.8-.7 5-2.2"/><path d="M8 9c.8-1 2.1-1.5 4-1.5S15.2 8 16 9"/><path d="M5 15c1.3 2.4 3.8 4 7 4s5.7-1.6 7-4"/></svg></span>Blanchiment Dentaire</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><path d="M9.5 10.5c.8 1 1.7 1.5 2.5 1.5s1.7-.5 2.5-1.5"/></svg></span>Masso-Thérapeute</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 2 5.5 4.9 5.5 8.4 0 4.5-3 7.8-5.5 9.6-2.5-1.8-5.5-5.1-5.5-9.6C6.5 7.9 8.5 5 12 3Z"/><path d="M10 11c.6-.7 1.2-1 2-1 1 0 1.8.5 2.4 1.5"/></svg></span>Micro-Pigmentation</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="7" cy="12" r="3"/><circle cx="17" cy="12" r="3"/><path d="M10 12h4"/><path d="M7 9V5"/><path d="M17 15v4"/></svg></span>Barber</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v8"/><path d="M8 7c0 2.5 1.8 4.5 4 4.5S16 9.5 16 7"/><path d="M6 21c.8-3.2 3-5 6-5s5.2 1.8 6 5"/></svg></span>Coiffeuse</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18c2.5-5 11.5-5 14 0"/><path d="M7 9h10"/><path d="M9 6h6"/><path d="M8 13h8"/></svg></span>Manucure</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21c4-4 6-7.3 6-10a6 6 0 1 0-12 0c0 2.7 2 6 6 10Z"/><path d="M12 9c1.4 0 2.5 1.1 2.5 2.5"/></svg></span>Henné</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17c1.2-4.8 5.3-8 10-8h4"/><path d="M13 7l6 2-2 6"/><path d="M6 19c2-.5 4-.5 6 0"/></svg></span>Maquillage</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21c0-4 2.2-7 5-7s5 3 5 7"/><path d="M8.5 10a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0Z"/></svg></span>Esthéticienne</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l8 8"/><path d="M16 6l-8 8"/><path d="M12 14v5"/></svg></span>Perceur</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13c1.2 1.5 2.8 2.2 5 2.2s3.8-.7 5-2.2"/><path d="M8 9c.8-1 2.1-1.5 4-1.5S15.2 8 16 9"/><path d="M5 15c1.3 2.4 3.8 4 7 4s5.7-1.6 7-4"/></svg></span>Blanchiment Dentaire</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><path d="M9.5 10.5c.8 1 1.7 1.5 2.5 1.5s1.7-.5 2.5-1.5"/></svg></span>Masso-Thérapeute</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7l10 10"/><path d="M17 7L7 17"/><path d="M5 19l3-3"/><path d="M16 5l3 3"/></svg></span>Tatoueur</a>
+            <span class="banner-sep">•</span>
+            <a href="./ubodrop-app-current-da-test.html" class="banner-item"><span class="b-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3.5 2 5.5 4.9 5.5 8.4 0 4.5-3 7.8-5.5 9.6-2.5-1.8-5.5-5.1-5.5-9.6C6.5 7.9 8.5 5 12 3Z"/><path d="M10 11c.6-.7 1.2-1 2-1 1 0 1.8.5 2.4 1.5"/></svg></span>Micro-Pigmentation</a>
+            <span class="banner-sep">•</span>
+        </div>
+    </div>
+
+    <!-- UBO DROP C'EST QUOI ? -->
+    <section class="concept-section">
+        <div class="concept-inner">
+            <div class="concept-top">
+                <span class="section-label">Le concept</span>
+                <h2 class="section-title">UBO DROP, c'est quoi ?</h2>
+            </div>
+            <div class="concept-grid">
+                <div class="concept-text">
+                    <h3>Avec <span>UBO Drop</span>, réserve facilement un service beauté parmi une large sélection de métiers.</h3>
+                    <p>Coiffeurs, barbiers, nail artists, maquilleurs, tatoueurs, et bien plus encore : tous les profils essentiels de la beauté sont réunis dans une seule application, pensée pour t’aider à comparer et choisir rapidement.</p>
+                    <p>Choisis le mode qui te convient, selon ton besoin du moment et les professionnels disponibles autour de toi.</p>
+                    <ul class="concept-features">
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M3 10.5 12 3l9 7.5"></path>
+                                    <path d="M5 9.5V21h14V9.5"></path>
+                                    <path d="M9 21v-6h6v6"></path>
+                                </svg>
+                            </span>
+                            <span><strong>À domicile</strong> : le professionnel se déplace chez toi.</span>
+                        </li>
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M8 7V5a4 4 0 1 1 8 0v2"></path>
+                                    <path d="M6 7h12v12H6z"></path>
+                                    <path d="M10 12h4"></path>
+                                </svg>
+                            </span>
+                            <span><strong>Chez le professionnel</strong> : directement dans son espace de travail.</span>
+                        </li>
+                        <li>
+                            <span class="feat-icon" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 10h16"></path>
+                                    <path d="M6 10V6h12v4"></path>
+                                    <path d="M7 10v8"></path>
+                                    <path d="M17 10v8"></path>
+                                    <path d="M7 18h10"></path>
+                                </svg>
+                            </span>
+                            <span><strong>En salon</strong> : pour une prestation sur place.</span>
+                        </li>
+                    </ul>
+                    <p>UBO Drop te permet de comparer, choisir et réserver en toute simplicité, avec des professionnels disponibles autour de toi en temps réel.</p>
+                </div>
+                <div class="phones-showcase">
+                    <div class="phone-glow"></div>
+                    <div class="phone-mockup">
+                        <img src="assets/img/phone-screens.jpeg" alt="UBO DROP - Recherche de professionnels">
+                    </div>
+                    <div class="phone-mockup">
+                        <img src="assets/img/phone-home.jpeg" alt="UBO DROP - Accueil application">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NOS SERVICES — CAROUSEL -->
+    <section class="services-section">
+        <div class="services-header">
+            <span class="section-label">Nos services</span>
+            <h2 class="section-title">Tous les métiers</h2>
+            <p class="section-desc">Des professionnels certifiés dans chaque discipline — défilez pour découvrir.</p>
+        </div>
+        <div class="services-track-wrapper">
+            <div class="services-track" id="servicesTrack">
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-barber.jpeg" alt="Barber">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">✂️</span>Barber</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-coiffeuse.jpg" alt="Coiffeuse">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💇</span>Coiffeuse</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-manucure.jpg" alt="Manucure">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💅</span>Manucure</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-henne.jpeg" alt="Henné">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌿</span>Henné</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-maquillage.jpg" alt="Maquillage">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💄</span>Maquillage</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-estheticienne.jpg" alt="Esthéticienne">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌸</span>Esthéticienne</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-tatoueur.jpg" alt="Tatoueur">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🖋️</span>Tatoueur</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-massage.jpg" alt="Masso-Thérapeute">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💆</span>Massage</div></div>
+                </a>
+                <!-- Duplicate set for infinite scroll -->
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-barber.jpeg" alt="Barber">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">✂️</span>Barber</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-coiffeuse.jpg" alt="Coiffeuse">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💇</span>Coiffeuse</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-manucure.jpg" alt="Manucure">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💅</span>Manucure</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-henne.jpeg" alt="Henné">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌿</span>Henné</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-maquillage.jpg" alt="Maquillage">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💄</span>Maquillage</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-estheticienne.jpg" alt="Esthéticienne">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🌸</span>Esthéticienne</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-tatoueur.jpg" alt="Tatoueur">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">🖋️</span>Tatoueur</div></div>
+                </a>
+                <a href="./ubodrop-app-current-da-test.html" class="service-card">
+                    <img src="assets/img/service-massage.jpg" alt="Masso-Thérapeute">
+                    <div class="service-card-overlay"><div class="service-card-label"><span class="label-emoji">💆</span>Massage</div></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMMENT ÇA MARCHE -->
+    <section class="section">
+        <span class="section-label">Simple & rapide</span>
+        <h2 class="section-title">Comment ça marche ?</h2>
+        <p class="section-desc">Trouvez un professionnel certifié en quelques secondes, où que vous soyez.</p>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-num">1</div>
+                <h3>Choisissez votre prestation</h3>
+                <p>Barber, coiffeuse, manucure, henné, maquillage… Plus de 10 catégories disponibles.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">2</div>
+                <h3>Trouvez un professionnel</h3>
+                <p>Localisez les prestataires autour de vous : à domicile, chez le pro ou en salon.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-num">3</div>
+                <h3>Réservez facilement</h3>
+                <p>Consultez les profils, les avis et demandez votre créneau directement depuis l'application.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- AVANTAGES -->
+    <section class="section">
+        <span class="section-label">Pourquoi UBO DROP</span>
+        <h2 class="section-title">La plateforme de confiance</h2>
+        <p class="section-desc">Des professionnels vérifiés, une expérience fluide, un service premium.</p>
+        <div class="advantages-grid">
+            <div class="advantage-card">
+                <div class="adv-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Professionnels partenaires sélectionnés</h3>
+                <p>Chaque prestataire passe par un processus de sélection avant d'intégrer la plateforme.</p>
+            </div>
+            <div class="advantage-card">
+                <div class="adv-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </div>
+                <h3>Prise de rendez-vous simplifiée</h3>
+                <p>Envoyez votre demande de rendez-vous en quelques secondes, selon les disponibilités du professionnel.</p>
+            </div>
+            <div class="advantage-card">
+                <div class="adv-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </div>
+                <h3>À domicile ou en salon</h3>
+                <p>Vous choisissez : chez vous, chez le professionnel ou en salon partenaire.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+        <div class="cta-box">
+            <h2>Prêt à réserver ?</h2>
+            <p>Rejoignez les premiers membres de la communauté UBODROP et découvrez des professionnels près de chez vous.</p>
+            <a href="./ubodrop-app-current-da-test.html" class="btn-cta-white">
+                Ouvrir l'application
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-logo" style="display:flex;align-items:center;justify-content:center;gap:10px;">
+  <svg width="22" height="20" viewBox="0 0 36 34" fill="none"><rect x="1" y="1" width="22" height="22" rx="5" stroke="#EAE4D8" stroke-width="3" fill="none"/><rect x="13" y="11" width="22" height="22" rx="5" stroke="rgba(234,228,216,.6)" stroke-width="3" fill="none"/></svg>
+  <span style="font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.12em;font-size:1.2rem;">UBODROP</span>
+</div>
+        <p>&copy; 2026 UBO DROP. Tous droits réservés.</p>
+        <div class="footer-links">
+            <a href="#">Mentions légales</a>
+            <a href="#">CGU</a>
+            <a href="#">Contact</a>
+        </div>
+    </footer>
+
+    <script src="assets/js/config.js"></script>
+<script>
+        // Scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.step-card, .advantage-card, .concept-features li').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        document.querySelectorAll('.steps-grid, .advantages-grid, .concept-features').forEach(grid => {
+            grid.querySelectorAll(':scope > *').forEach((child, i) => {
+                child.style.transitionDelay = `${i * 0.08}s`;
+            });
+        });
+    </script>
+</body>
+</html>

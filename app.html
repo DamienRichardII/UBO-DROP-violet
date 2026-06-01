@@ -3563,8 +3563,8 @@ function syncGoogleUiVisibility(screenId) {
       list.innerHTML = `<div class="section-sub" style="padding:12px 0; text-align:center;">Aucune prestation pour l'instant. Crée ta première ci-dessus !</div>`;
       return;
     }
-    const statusLabel = { ACTIVE: "Actif", DRAFT: "Brouillon", INACTIVE: "Inactif" };
-    const statusColor = { ACTIVE: "var(--violet)", DRAFT: "var(--muted)", INACTIVE: "#e53935" };
+    const statusLabel = { ACTIVE: "Publié — visible côté client", DRAFT: "Brouillon — invisible côté client", INACTIVE: "Désactivé" };
+    const statusColor = { ACTIVE: "var(--green-ink, #1f8f62)", DRAFT: "var(--muted)", INACTIVE: "#e53935" };
     list.innerHTML = _myServices.map(svc => {
       const catLabel = svc.category?.label || svc.category?.name || "";
       const price = svc.price !== undefined ? `${Number(svc.price).toFixed(2)} €` : "—";
@@ -3584,8 +3584,8 @@ function syncGoogleUiVisibility(screenId) {
             </div>
             <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end;">
               ${st !== "ACTIVE"
-                ? `<button class="secondary-btn svc-activate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Publier</button>`
-                : `<button class="secondary-btn svc-deactivate-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Dépublier</button>`}
+                ? `<button class="primary-btn svc-activate-btn" data-id="${svc.id}" style="font-size:11px; padding:6px 12px;">📢 Publier</button>`
+                : `<button class="secondary-btn svc-deactivate-btn" data-id="${svc.id}" style="font-size:11px; padding:6px 12px; color:var(--muted);">Dépublier</button>`}
               <button class="secondary-btn svc-edit-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px;">Modifier</button>
               <button class="secondary-btn svc-delete-btn" data-id="${svc.id}" style="font-size:11px; padding:5px 10px; color:#e53935;">Supprimer</button>
             </div>
@@ -3663,13 +3663,20 @@ function syncGoogleUiVisibility(screenId) {
 
   async function handleServiceStatusChange(serviceId, newStatus) {
     try {
-      await appApi.updateService(serviceId, { status: newStatus });
+      const updated = await appApi.updateService(serviceId, { status: newStatus });
+      console.log(`[UBODROP] service ${serviceId} → ${newStatus}`, updated);
       await loadMyServices();
-      notify(newStatus === "ACTIVE" ? "Prestation publiée." : "Prestation repassée en brouillon.", "ok");
+      notify(
+        newStatus === "ACTIVE"
+          ? "✅ Prestation publiée — visible côté client maintenant."
+          : "Prestation dépubliée. Elle n'est plus visible côté client.",
+        "ok"
+      );
       // Rafraîchir la liste publique côté client en arrière-plan
       loadPros().catch((e) => console.warn("[UBODROP] loadPros after status change failed", e));
     } catch (err) {
-      notify(friendlyApiError(err, "Mise à jour impossible."), "error");
+      console.error("[UBODROP] handleServiceStatusChange error", err);
+      notify(friendlyApiError(err, "Mise à jour impossible. Vérifiez votre connexion."), "error");
     }
   }
 

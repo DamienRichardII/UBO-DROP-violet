@@ -1783,6 +1783,10 @@
       return this.request(`/payments/bookings/${bookingId}/checkout-session`, { method: "POST" });
     },
 
+    debugProServices(proProfileId) {
+      return this.request(`/profiles/pro/public/${proProfileId}/services`);
+    },
+
     submitFeedback(bookingId, rating, comment) {
       return this.request(`/bookings/${bookingId}/feedback`, {
         method: "POST",
@@ -1914,8 +1918,29 @@
   }
 
   function normalizeService(service, index = 0) {
-    // Le backend retourne `title` et `durationMin` — compatibilité avec les deux formes
-    const dur = service?.durationMin ?? service?.durationMinutes;
+    // Le backend retourne `title` et `durationMin` — compatibilité avec toutes les formes
+    const dur = service?.durationMin ?? service?.durationMinutes ?? service?.duration ?? 0;
+    // price peut être un Decimal Prisma sérialisé en string (ex: "20.00") ou un number
+    const rawPrice = service?.priceAmount ?? service?.price ?? service?.priceCents;
+    let priceNum = 0;
+    if (rawPrice !== undefined && rawPrice !== null) {
+      // Prisma Decimal → string "20.00", ou number 20, ou cents 2000
+      const n = typeof rawPrice === 'string' ? parseFloat(rawPrice) : Number(rawPrice);
+      priceNum = isNaN(n) ? 0 : (service?.priceCents ? n / 100 : n);
+    }
+    const priceDisplay = priceNum > 0
+      ? priceNum.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+      : (rawPrice != null ? String(rawPrice) + ' €' : 'Tarif sur demande');
+
+    console.log('[UBODROP] normalizeService', {
+      id: service?.id,
+      title: service?.title,
+      status: service?.status,
+      rawPrice,
+      priceNum,
+      dur,
+    });
+
     return {
       id: service?.id || `service-${index}`,
       name: service?.title || service?.name || service?.label || `Prestation ${index + 1}`,
@@ -1925,8 +1950,10 @@
         service?.executionMode,
         service?.category?.label || service?.category?.name || ""
       ].filter(Boolean).join(" · ") || "Prestation disponible",
-      price: euro(service?.priceAmount ?? service?.price),
-      durationMin: dur || 0,
+      price: priceDisplay,
+      priceNum,
+      durationMin: dur,
+      status: service?.status || "ACTIVE",
       tags: []
     };
   }
@@ -2414,8 +2441,15 @@ function syncGoogleUiVisibility(screenId) {
     let detailed = cached;
 
     try {
-      console.log("[UBODROP] opening fresh pro detail", id);
+      console.log("[UBODROP] → GET public profile", id);
       const detail = await appApi.publicProfessional(id);
+      console.log("[UBODROP] ← raw public profile", JSON.stringify({
+        id: detail?.id,
+        isVisible: detail?.isVisible,
+        isOnline: detail?.isOnline,
+        servicesCount: detail?.services?.length ?? 0,
+        servicesRaw: (detail?.services ?? []).map(s => ({ id: s.id, title: s.title, status: s.status, price: s.price })),
+      }));
       const normalized = normalizePros([detail]);
       if (normalized.length) {
         detailed = cached ? { ...cached, ...normalized[0] } : normalized[0];
@@ -2423,10 +2457,11 @@ function syncGoogleUiVisibility(screenId) {
         if (state.pros.some((p) => String(p.id) === String(id))) {
           state.pros = state.pros.map((p) => String(p.id) === String(id) ? detailed : p);
         }
-        console.log("[UBODROP] fresh services count", detailed.services?.length ?? 0);
+        console.log("[UBODROP] ← normalized services", detailed.services?.length ?? 0,
+          (detailed.services || []).map(s => ({ name: s.name, price: s.price, priceNum: s.priceNum })));
       }
     } catch (err) {
-      console.warn("[UBODROP] publicProfessional fetch failed, using cached data", err);
+      console.error("[UBODROP] ✗ publicProfessional failed", err);
       if (!detailed) {
         notify("Impossible de charger la fiche du professionnel.", "error");
         return;
@@ -3662,9 +3697,16 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   async function handleServiceStatusChange(serviceId, newStatus) {
+    // Vérifier la session avant de tenter la publication
+    if (!appApi.getToken()) {
+      notify("⚠ Session expirée — reconnecte-toi d'abord puis réessaie.", "error");
+      goTo("screen-login");
+      return;
+    }
     try {
+      console.log(`[UBODROP] → PATCH service ${serviceId} status=${newStatus}`);
       const updated = await appApi.updateService(serviceId, { status: newStatus });
-      console.log(`[UBODROP] service ${serviceId} → ${newStatus}`, updated);
+      console.log(`[UBODROP] ← PATCH service response`, updated);
       await loadMyServices();
       notify(
         newStatus === "ACTIVE"

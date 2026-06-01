@@ -1459,9 +1459,7 @@
       <!-- Récap prestation -->
       <div id="bookingServiceLabel" style="font-size:13px;font-weight:700;color:var(--violet);margin:10px 0 2px;letter-spacing:.02em;text-transform:uppercase;"></div>
       <div id="bookingServiceMeta" style="font-size:.84rem;color:var(--muted);margin-bottom:14px;"></div>
-      <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(92,26,24,.05);border-radius:10px;">
-        ⚡ UBODROP fonctionne comme Uber : réservation dans les 3 prochaines heures.
-      </div>
+
 
       <!-- Créneaux rapides -->
       <div style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">Quand souhaites-tu réserver ?</div>
@@ -2615,6 +2613,49 @@ function syncGoogleUiVisibility(screenId) {
     goTo("screen-detail");
   }
 
+
+  // ── Traduction statuts booking / paiement ──────────────────────────────────
+
+  function formatBookingStatus(status) {
+    const s = String(status || "").toUpperCase();
+    if (s === "PENDING" || s === "AWAITING_PAYMENT") return "Réservation en attente de paiement";
+    if (s === "CONFIRMED") return "Réservation confirmée";
+    if (s === "IN_PROGRESS") return "Prestation en cours";
+    if (s === "COMPLETED") return "Prestation terminée";
+    if (s === "CANCELLED") return "Réservation annulée";
+    if (s === "NO_SHOW") return "Absence signalée";
+    if (s === "REFUNDED") return "Remboursé";
+    return "Réservation en cours";
+  }
+
+  function formatPaymentStatus(paymentStatus) {
+    const s = String(paymentStatus || "").toUpperCase();
+    if (s === "PAID" || s === "SUCCEEDED") return "Paiement confirmé";
+    if (s === "FAILED") return "Paiement échoué";
+    if (s === "REFUNDED" || s === "PARTIALLY_REFUNDED") return "Remboursé";
+    if (s === "CANCELLED") return "Paiement annulé";
+    return "Paiement en attente";
+  }
+
+  function formatBookingDate(booking) {
+    const raw = booking?.startsAt || booking?.scheduledAt || booking?.date;
+    if (!raw) return "Date à confirmer";
+    const d = new Date(raw);
+    const today = new Date();
+    const isToday = d.toDateString() === today.toDateString();
+    const timeStr = d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
+    if (isToday) return `Aujourd'hui à ${timeStr}`;
+    return d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" }) + " à " + timeStr;
+  }
+
+  function extractClientName(booking) {
+    const u = booking?.clientUser;
+    if (!u) return "Client UBODROP";
+    const profile = u?.clientProfile;
+    const name = [profile?.firstName, profile?.lastName].filter(Boolean).join(" ").trim();
+    return name || u?.email?.split("@")[0] || "Client UBODROP";
+  }
+
   function renderBookings() {
     const card = document.querySelector("#screen-rdv .list-card");
     if (!card) return;
@@ -2632,22 +2673,26 @@ function syncGoogleUiVisibility(screenId) {
     }
 
     card.innerHTML = state.bookings.map((booking) => {
-      const statusLabels = {PENDING:"En attente",CONFIRMED:"Confirmé",IN_PROGRESS:"En cours",COMPLETED:"Terminé",CANCELLED:"Annulé"};
       const isCompleted = booking?.status === "COMPLETED";
+      const proName = booking?.proProfile?.displayName || booking?.proProfile?.businessName || "Prestataire";
+      const serviceTitle = booking?.service?.title || booking?.service?.name || "Prestation UBODROP";
+      const dateStr = formatBookingDate(booking);
+      const statusFr = formatBookingStatus(booking?.status);
+      const priceFr = euro(booking?.service?.price ?? booking?.service?.priceAmount ?? booking?.priceAmount ?? booking?.totalAmount);
+      const isConfirmed = booking?.status === "CONFIRMED" || booking?.status === "COMPLETED";
+      const isCancelled = booking?.status === "CANCELLED";
+      const statusColor = isConfirmed ? "color:var(--green-ink,#1f8f62);font-weight:700;" : isCancelled ? "color:#e53935;font-weight:700;" : "color:var(--muted);font-weight:600;";
       return `
-      <div class="list-item" style="flex-wrap:wrap;gap:8px;">
-        <img src="${state.selectedPro?.image || 'assets/img/logo-ubodrop-brown.png'}" alt="Réservation">
+      <div class="list-item" style="flex-wrap:wrap;gap:8px;align-items:flex-start;">
         <div style="flex:1;min-width:0;">
-          <strong>${booking?.proProfile?.displayName || booking?.proProfile?.businessName || "Prestataire"}</strong>
-          <p>${booking?.service?.title || booking?.service?.name || "Prestation"} • ${booking?.startsAt || booking?.scheduledAt ? new Date(booking.startsAt || booking.scheduledAt).toLocaleString("fr-FR") : "Date à confirmer"} • ${euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount)}</p>
+          <strong style="font-size:.95rem;">${proName}</strong>
+          <p style="margin-top:3px;">${serviceTitle}</p>
+          <p style="font-size:.82rem;color:var(--muted);">${dateStr} ${priceFr ? "· " + priceFr : ""}</p>
+          <p style="font-size:.82rem;margin-top:4px;${statusColor}">${statusFr}</p>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-          <div class="avail">${statusLabels[booking?.status] || booking?.status || "En attente"}</div>
-          ${isCompleted ? `<button class="tiny-btn" onclick="openSatisfactionModal('${booking.id}', '${(booking?.proProfile?.displayName || "Prestataire").replace(/'/g,"\'")}')">⭐ Laisser un avis</button>` : ""}
-        </div>
+        ${isCompleted ? `<button class="tiny-btn" onclick="openSatisfactionModal('${booking.id}', '${proName.replace(/'/g,"\'")}')">⭐ Avis</button>` : ""}
       </div>`;
     }).join("");
-  }
 
   function renderFavorites() {
     const card = document.querySelector("#screen-favs .list-card");
@@ -2949,14 +2994,26 @@ function syncGoogleUiVisibility(screenId) {
 
     if (rdvCard) {
       rdvCard.innerHTML = state.bookings.length
-        ? state.bookings.slice(0, 5).map((b) => `
-            <div class="agenda-item">
-              <div>
-                <strong>${b?.service?.name || b?.serviceName || "Réservation"}</strong>
-                <p>${b?.status || "Confirmé"} ${b?.startsAt || b?.scheduledAt ? "• " + new Date(b.startsAt || b.scheduledAt).toLocaleDateString("fr-FR") : ""}</p>
+        ? state.bookings.slice(0, 5).map((b) => {
+            const clientName = extractClientName(b);
+            const serviceTitle = b?.service?.title || b?.service?.name || b?.serviceName || "Prestation UBODROP";
+            const dateStr = formatBookingDate(b);
+            const statusFr = formatBookingStatus(b?.status);
+            const priceFr = euro(b?.service?.price ?? b?.priceAmount ?? b?.totalAmount);
+            const isConfirmed = b?.status === "CONFIRMED" || b?.status === "COMPLETED";
+            const isCancelled = b?.status === "CANCELLED";
+            const statusColor = isConfirmed ? "color:var(--green-ink,#1f8f62)" : isCancelled ? "color:#e53935" : "color:var(--muted)";
+            return `<div class="agenda-item" style="align-items:flex-start;">
+              <div style="flex:1;">
+                <strong style="font-size:.9rem;">${statusFr}</strong>
+                <p style="margin-top:4px;font-size:.82rem;">👤 ${clientName}</p>
+                <p style="font-size:.82rem;color:var(--muted);">${serviceTitle}</p>
+                <p style="font-size:.82rem;color:var(--muted);">${dateStr}</p>
+                <p style="font-size:.8rem;margin-top:4px;${statusColor};">${formatPaymentStatus(b?.paymentStatus ?? (isConfirmed ? "SUCCEEDED" : "PENDING"))}</p>
               </div>
-              <strong>${euro(b?.priceAmount ?? b?.totalAmount ?? b?.service?.price)}</strong>
-            </div>`).join("")
+              ${priceFr ? `<strong style="color:var(--violet);font-size:.95rem;white-space:nowrap;">${priceFr}</strong>` : ""}
+            </div>`;
+          }).join("")
         : emptyCard("Aucun RDV", "Les nouvelles réservations apparaîtront ici.");
     }
 

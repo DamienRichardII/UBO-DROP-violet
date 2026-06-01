@@ -350,6 +350,8 @@
 
     /* Search screen */
     #screen-search { padding-bottom: calc(var(--bottom-nav-h) + 8px); }
+    #screen-home { padding-bottom: calc(var(--bottom-nav-h) + 4px); }
+    .home-hero { padding-bottom: 0; }
     .map-stage {
       position: relative;
       margin-top: 14px;
@@ -957,10 +959,10 @@
   <div class="proof-sub">Les premiers prestataires arrivent bientôt sur UBODROP. Aucune donnée fictive n’est affichée en production.</div>
 </div>
 
-<div class="mt-20">
+<div class="stack-12 mt-12">
             <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client">Créer un compte</button>
+            <div class="inline-note" style="text-align:center;">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
           </div>
-          <div class="inline-note mt-16">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
         </div>
       </section>
 
@@ -4386,6 +4388,8 @@ function syncGoogleUiVisibility(screenId) {
     }
   }
 
+}  // fermeture bloc JS
+
 </script>
 
 
@@ -4406,4 +4410,3 @@ function syncGoogleUiVisibility(screenId) {
 
 </body>
 </html>
-                                                

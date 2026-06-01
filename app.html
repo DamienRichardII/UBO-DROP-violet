@@ -950,8 +950,8 @@
           </div>
 
           <div class="stack-12 mt-20">
-            <button class="secondary-btn" data-go="screen-search">Trouver un pro</button>
-            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-pro">Devenir pro</button>
+            <button class="secondary-btn" data-go="screen-search" onclick="goTo('screen-search')">Trouver un pro</button>
+            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-pro" onclick="goTo('screen-register-pro')">Devenir pro</button>
           </div>
 
           <div class="card proof-card">
@@ -960,8 +960,8 @@
 </div>
 
 <div class="stack-12 mt-12">
-            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client">Créer un compte</button>
-            <div class="inline-note" style="text-align:center;">Déjà un compte ? <button class="switch-link" data-go="screen-login">Se connecter</button></div>
+            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client" onclick="goTo('screen-register-client')">Créer un compte</button>
+            <div class="inline-note" style="text-align:center;">Déjà un compte ? <button class="switch-link" data-go="screen-login" onclick="goTo('screen-login')">Se connecter</button></div>
           </div>
         </div>
       </section>
@@ -1058,7 +1058,7 @@
             <button class="secondary-btn" id="loginProBtn">Connexion pro</button>
           </div>
           <div class="inline-note" style="text-align:center;margin-top:4px;"><button class="switch-link" id="forgotPwdLink">Mot de passe oublié ?</button></div>
-          <div class="inline-note">Pas encore de compte ? <button class="switch-link" data-go="screen-register-client">Créer un compte</button></div>
+          <div class="inline-note">Pas encore de compte ? <button class="switch-link" data-go="screen-register-client" onclick="goTo('screen-register-client')">Créer un compte</button></div>
         </div>
       </section>
 
@@ -4389,6 +4389,34 @@ function syncGoogleUiVisibility(screenId) {
   }
 
 }  // fermeture bloc JS
+
+  // ── Fallback navigation : s'assurer que les boutons home fonctionnent toujours ──
+  (function ensureHomeNavigation() {
+    function safeGoTo(screenId) {
+      try {
+        if (typeof goTo === 'function') {
+          goTo(screenId);
+        } else {
+          document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+          const target = document.getElementById(screenId);
+          if (target) { target.classList.add('active'); }
+        }
+      } catch(e) {
+        console.warn('[UBODROP] goTo fallback', screenId, e);
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(screenId);
+        if (target) target.classList.add('active');
+      }
+    }
+    // Rebinder les data-go immédiatement
+    document.querySelectorAll('[data-go]').forEach(btn => {
+      const target = btn.getAttribute('data-go');
+      if (!btn.onclick) {
+        btn.addEventListener('click', () => safeGoTo(target));
+      }
+    });
+    console.log('[UBODROP] Home navigation initialized');
+  })();
 
 </script>
 

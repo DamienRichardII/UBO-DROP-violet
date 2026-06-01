@@ -1783,6 +1783,13 @@
       return this.request(`/payments/bookings/${bookingId}/checkout-session`, { method: "POST" });
     },
 
+    submitFeedback(bookingId, rating, comment) {
+      return this.request(`/bookings/${bookingId}/feedback`, {
+        method: "POST",
+        body: JSON.stringify({ rating, comment }),
+      });
+    },
+
     connectStripeAccount() {
       return this.request("/payments/connect/account", { method: "POST" });
     },
@@ -2498,16 +2505,22 @@ function syncGoogleUiVisibility(screenId) {
       return;
     }
 
-    card.innerHTML = state.bookings.map((booking) => `
-      <div class="list-item">
-        <img src="${state.selectedPro?.image || 'assets/img/ubo-drop-logo.png'}" alt="Réservation">
-        <div style="flex:1;">
+    card.innerHTML = state.bookings.map((booking) => {
+      const statusLabels = {PENDING:"En attente",CONFIRMED:"Confirmé",IN_PROGRESS:"En cours",COMPLETED:"Terminé",CANCELLED:"Annulé"};
+      const isCompleted = booking?.status === "COMPLETED";
+      return `
+      <div class="list-item" style="flex-wrap:wrap;gap:8px;">
+        <img src="${state.selectedPro?.image || 'assets/img/logo-ubodrop-brown.png'}" alt="Réservation">
+        <div style="flex:1;min-width:0;">
           <strong>${booking?.proProfile?.displayName || booking?.proProfile?.businessName || "Prestataire"}</strong>
           <p>${booking?.service?.title || booking?.service?.name || "Prestation"} • ${booking?.startsAt || booking?.scheduledAt ? new Date(booking.startsAt || booking.scheduledAt).toLocaleString("fr-FR") : "Date à confirmer"} • ${euro(booking?.priceAmount ?? booking?.totalAmount ?? booking?.service?.priceAmount)}</p>
         </div>
-        <div class="avail">${{PENDING:"En attente",CONFIRMED:"Confirmé",IN_PROGRESS:"En cours",COMPLETED:"Terminé",CANCELLED:"Annulé"}[booking?.status] || booking?.status || "En attente"}</div>
-      </div>
-    `).join("");
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
+          <div class="avail">${statusLabels[booking?.status] || booking?.status || "En attente"}</div>
+          ${isCompleted ? `<button class="tiny-btn" onclick="openSatisfactionModal('${booking.id}', '${(booking?.proProfile?.displayName || "Prestataire").replace(/'/g,"\'")}')">⭐ Laisser un avis</button>` : ""}
+        </div>
+      </div>`;
+    }).join("");
   }
 
   function renderFavorites() {
@@ -3961,7 +3974,82 @@ function syncGoogleUiVisibility(screenId) {
       goTo(state.userMode === "pro" ? "screen-pro-dashboard" : "screen-search");
     }
   })();
+
+  // ── Enquête satisfaction ─────────────────────────────────────────────────
+
+  let _satBookingId = null;
+  let _satRating = 0;
+  const satLabels = ["","Décevant","Passable","Bien","Très bien","Excellent !"];
+
+  function openSatisfactionModal(bookingId, proName) {
+    _satBookingId = bookingId;
+    _satRating = 0;
+    document.getElementById("satProName").textContent = proName;
+    document.getElementById("satComment").value = "";
+    document.getElementById("satSubmitBtn").disabled = false;
+    document.getElementById("satSubmitBtn").textContent = "Envoyer mon avis";
+    renderStars(0);
+    const overlay = document.getElementById("satisfactionOverlay");
+    overlay.style.display = "flex";
+  }
+
+  function closeSatisfactionModal() {
+    document.getElementById("satisfactionOverlay").style.display = "none";
+    _satBookingId = null;
+    _satRating = 0;
+  }
+
+  function renderStars(current) {
+    const row = document.getElementById("starRow");
+    row.innerHTML = "";
+    for (let i = 1; i <= 5; i++) {
+      const star = document.createElement("span");
+      star.textContent = i <= current ? "★" : "☆";
+      star.style.color = i <= current ? "#5C1A18" : "#C8C0B5";
+      star.style.transition = "color .15s";
+      star.onmouseover = () => renderStars(i);
+      star.onmouseleave = () => renderStars(_satRating);
+      star.onclick = () => { _satRating = i; renderStars(i); document.getElementById("starLabel").textContent = satLabels[i] || ""; };
+      row.appendChild(star);
+    }
+    document.getElementById("starLabel").textContent = satLabels[current] || "";
+  }
+
+  async function submitSatisfaction() {
+    if (!_satRating) { notify("Choisis une note avant d'envoyer.", "error"); return; }
+    if (!_satBookingId) return;
+    const comment = document.getElementById("satComment").value.trim();
+    const btn = document.getElementById("satSubmitBtn");
+    btn.disabled = true;
+    btn.textContent = "Envoi en cours…";
+    try {
+      await appApi.submitFeedback(_satBookingId, _satRating, comment || undefined);
+      closeSatisfactionModal();
+      notify("✓ Avis envoyé. Merci !", "ok");
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = "Envoyer mon avis";
+      notify(friendlyApiError(err, "Impossible d'envoyer l'avis pour le moment."), "error");
+    }
+  }
+
 </script>
+
+
+  <!-- ── MODALE SATISFACTION ──────────────────────────────────────────── -->
+  <div id="satisfactionOverlay" style="display:none;position:fixed;inset:0;background:rgba(24,17,15,.55);z-index:3000;align-items:center;justify-content:center;">
+    <div class="card" style="width:min(360px,92%);padding:28px 24px;position:relative;border-radius:24px;">
+      <button onclick="closeSatisfactionModal()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:20px;color:var(--muted);">✕</button>
+      <h3 style="font-size:1.1rem;font-weight:800;margin-bottom:6px;">Comment s'est passée votre prestation ?</h3>
+      <p id="satProName" style="font-size:.9rem;color:var(--muted);margin-bottom:20px;"></p>
+      <!-- Étoiles -->
+      <div id="starRow" style="display:flex;gap:8px;font-size:32px;cursor:pointer;margin-bottom:16px;"></div>
+      <p id="starLabel" style="font-size:.85rem;color:var(--muted);margin-bottom:12px;min-height:20px;"></p>
+      <textarea id="satComment" placeholder="Un commentaire ? (optionnel)" rows="3"
+        style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:12px;font:inherit;font-size:.9rem;resize:none;outline:none;"></textarea>
+      <button id="satSubmitBtn" onclick="submitSatisfaction()" class="primary-btn" style="width:100%;margin-top:14px;">Envoyer mon avis</button>
+    </div>
+  </div>
 
 </body>
 </html>

@@ -2695,6 +2695,7 @@ function syncGoogleUiVisibility(screenId) {
         ${isCompleted ? `<button class="tiny-btn" onclick="openSatisfactionModal('${booking.id}', '${proName.replace(/'/g,"\'")}')">⭐ Avis</button>` : ""}
       </div>`;
     }).join("");
+  }
 
   function renderFavorites() {
     const card = document.querySelector("#screen-favs .list-card");
@@ -4387,8 +4388,6 @@ function syncGoogleUiVisibility(screenId) {
       notify(friendlyApiError(err, "Impossible d'envoyer l'avis pour le moment."), "error");
     }
   }
-
-}  // fermeture bloc JS
 
   // ── Fallback navigation : s'assurer que les boutons home fonctionnent toujours ──
   (function ensureHomeNavigation() {

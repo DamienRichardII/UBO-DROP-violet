@@ -471,9 +471,31 @@
     .service-price { text-align: right; }
     .service-price strong { display: block; font-size: 18px; }
     .sticky-cta {
-      position: absolute; left: 18px; right: 18px; bottom: calc(var(--bottom-nav-h) + 12px);
-      background: rgba(255,255,255,.88); padding: 10px; border-radius: 28px; border: 1px solid rgba(255,255,255,.9); box-shadow: var(--shadow-md); backdrop-filter: blur(18px);
+      position: sticky;
+      bottom: 0;
+      margin: 16px -18px 0;
+      padding: 12px 18px calc(var(--bottom-nav-h) + 14px);
+      background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,.96) 22px);
+      backdrop-filter: blur(14px);
+      z-index: 10;
     }
+    .sticky-cta .primary-btn {
+      width: 100%;
+      box-shadow: 0 8px 28px rgba(92,26,24,0.22);
+    }
+    /* Résumé prestation sélectionnée */
+    .service-selection-recap {
+      display: none;
+      background: rgba(92,26,24,.06);
+      border: 1.5px solid rgba(92,26,24,.15);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: .84rem;
+    }
+    .service-selection-recap.visible { display: block; }
+    .service-selection-recap strong { color: var(--violet); display: block; font-size: .92rem; }
+    .service-selection-recap span { color: var(--muted); }
 
     /* Auth */
     .auth-shell { padding-top: 72px; }
@@ -971,7 +993,11 @@
         </div>
 
         <div class="sticky-cta">
-          <button class="primary-btn" id="detailCta">Se connecter pour réserver</button>
+          <div class="service-selection-recap" id="serviceSelectionRecap">
+            <strong id="recapServiceName">—</strong>
+            <span id="recapServiceMeta">Sélectionne une prestation ci-dessus</span>
+          </div>
+          <button class="primary-btn" id="detailCta">Sélectionne une prestation</button>
         </div>
       </section>
 
@@ -2476,6 +2502,11 @@ function syncGoogleUiVisibility(screenId) {
     state.selectedPro = detailed;
     state.selectedServiceId = null;
     state.selectedServiceName = null;
+    // Reset récap service
+    const recap = document.getElementById("serviceSelectionRecap");
+    if (recap) recap.classList.remove("visible");
+    const cta = document.getElementById("detailCta");
+    if (cta) { cta.textContent = "Sélectionne une prestation"; cta.disabled = false; }
 
     document.getElementById("detailHero").src = detailed.gallery[0] || detailed.image || "assets/img/ubo-drop-logo.png";
     document.getElementById("detailName").textContent = detailed.name;
@@ -3212,14 +3243,56 @@ function syncGoogleUiVisibility(screenId) {
   function selectService(serviceId, serviceName, rowEl) {
     state.selectedServiceId = serviceId;
     state.selectedServiceName = serviceName;
-    document.querySelectorAll("#detailServices .service-row").forEach(r => { r.style.background = ""; r.style.outline = ""; });
+
+    console.log("[UBODROP] service selected", {
+      serviceId,
+      serviceName,
+      proId: state.selectedPro?.id,
+      proName: state.selectedPro?.name,
+    });
+
+    // Highlight visuel de la ligne sélectionnée
+    document.querySelectorAll("#detailServices .service-row").forEach(r => {
+      r.style.background = "";
+      r.style.outline = "";
+      r.style.borderRadius = "";
+    });
     if (rowEl) {
-      rowEl.style.background = "var(--violet-soft)";
-      rowEl.style.outline = "2px solid var(--violet)";
+      rowEl.style.background = "rgba(92,26,24,.07)";
+      rowEl.style.outline = "2px solid rgba(92,26,24,.35)";
       rowEl.style.borderRadius = "var(--radius-sm)";
     }
+
+    // Récap prestation
+    const recap = document.getElementById("serviceSelectionRecap");
+    const recapName = document.getElementById("recapServiceName");
+    const recapMeta = document.getElementById("recapServiceMeta");
+    if (recap && recapName) {
+      recapName.textContent = serviceName;
+      // Trouver la durée + prix depuis state.selectedPro.services
+      const svc = (state.selectedPro?.services || []).find(s => String(s.id) === String(serviceId));
+      if (recapMeta && svc) {
+        recapMeta.textContent = [
+          svc.durationMin ? svc.durationMin + " min" : "",
+          svc.price || svc.priceNum ? "· " + (svc.price || (svc.priceNum + " €")) : "",
+        ].filter(Boolean).join(" ");
+      }
+      recap.classList.add("visible");
+    }
+
+    // Mettre à jour le bouton CTA
     const cta = document.getElementById("detailCta");
-    if (cta && appApi.getToken()) cta.textContent = `Réserver — ${serviceName}`;
+    if (cta) {
+      if (appApi.getToken()) {
+        cta.textContent = `Réserver — ${serviceName}`;
+        cta.disabled = false;
+        cta.style.opacity = "1";
+      } else {
+        cta.textContent = "Se connecter pour réserver";
+      }
+      // Scroll vers le CTA pour que l'utilisateur le voie
+      cta.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
   }
 
   function openBookingOverlay() {
@@ -3276,11 +3349,22 @@ function syncGoogleUiVisibility(screenId) {
   }
 
     async function handleReserveClick() {
+    console.log("[UBODROP] reserve click", {
+      token: !!appApi.getToken(),
+      selectedServiceId: state.selectedServiceId,
+      selectedServiceName: state.selectedServiceName,
+      selectedProId: state.selectedPro?.id,
+      selectedProName: state.selectedPro?.name,
+    });
     if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); goTo("screen-login"); return; }
     if (!state.selectedPro) { notify("Aucun professionnel disponible pour le moment."); return; }
     const proHasServices = state.selectedPro.services && state.selectedPro.services.length > 0;
     if (!proHasServices) { notify("Ce professionnel n'a pas encore publié de prestation."); return; }
-    if (!state.selectedServiceId) { notify("Sélectionne une prestation dans la liste pour continuer."); return; }
+    if (!state.selectedServiceId) {
+      notify("Sélectionne une prestation dans la liste ci-dessus pour continuer.", "error");
+      document.getElementById("detailServices")?.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
     openBookingOverlay();
   }
 

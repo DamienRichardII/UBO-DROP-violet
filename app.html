@@ -1275,19 +1275,19 @@
         <div id="proSpecialtyChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-top:6px;"></div>
       </div>
       <div class="field">
-        <label>Photo de profil</label>
-        <div style="display:flex; align-items:center; gap:14px; margin-top:6px;">
-          <img id="proAvatarPreview" src="assets/img/ubo-drop-logo.png" alt="Aperçu"
-               style="width:72px; height:72px; border-radius:50%; object-fit:cover; border:2px solid var(--line); flex-shrink:0;">
-          <div style="flex:1;">
-            <label class="btn btn-outline" style="display:inline-block; cursor:pointer; font-size:13px; padding:10px 16px;">
-              📷 Choisir une photo
-              <input type="file" id="proAvatarFile" accept="image/*" style="display:none">
-            </label>
-            <div class="muted" style="font-size:11px; margin-top:4px;">JPG, PNG — max 2 Mo · compressé auto</div>
-          </div>
+        <label style="font-weight:700;">📸 Photo de fiche prestataire</label>
+        <div class="muted" style="font-size:.82rem; margin-bottom:10px;">Cette photo est affichée en grand sur votre fiche prestataire.</div>
+        <div style="position:relative; border-radius:16px; overflow:hidden; background:var(--surface-soft); border:1.5px solid var(--line-2); margin-bottom:12px; aspect-ratio:16/7;">
+          <img id="proAvatarPreview" src="assets/img/service-coiffeuse.jpg" alt="Photo fiche"
+               style="width:100%; height:100%; object-fit:cover; display:block;">
+          <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.3) 0%,transparent 60%);"></div>
+          <div style="position:absolute;bottom:10px;left:12px;color:#fff;font-size:.78rem;font-weight:600;opacity:.85;">Aperçu fiche prestataire</div>
         </div>
-        <!-- URL de secours (data URI ou lien externe) — lu par handleSaveProProfile() -->
+        <label class="primary-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;margin-bottom:6px;">
+          📷 Choisir depuis la galerie
+          <input type="file" id="proAvatarFile" accept="image/*" style="display:none">
+        </label>
+        <div class="muted" style="font-size:.78rem;text-align:center;">JPG, PNG · max 15 Mo · compressé auto (max 1200 px)</div>
         <input type="hidden" id="proEditAvatarUrl">
       </div>
       <div class="field">

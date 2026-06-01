@@ -2495,6 +2495,14 @@ function syncGoogleUiVisibility(screenId) {
       ctaEl.disabled = false;
       ctaEl.style.opacity = "";
     }
+    // Auto-sélection si une seule prestation (meilleure UX)
+    if (hasServices && detailed.services.length === 1) {
+      state.selectedServiceId   = detailed.services[0].id;
+      state.selectedServiceName = detailed.services[0].name;
+      if (ctaEl && appApi.getToken()) {
+        ctaEl.textContent = `Réserver — ${detailed.services[0].name}`;
+      }
+    }
     document.getElementById("detailMeta").innerHTML = [
       detailed.rating ? `<span>⭐ ${detailed.rating}${detailed.reviews ? ` (${detailed.reviews})` : ""}</span>` : "",
       detailed.distance ? `<span>• ${detailed.distance}</span>` : "",
@@ -3242,15 +3250,27 @@ function syncGoogleUiVisibility(screenId) {
     if (!serviceId) { notify("Aucune prestation sélectionnée.", "error"); return; }
     const startsAt = new Date(`${date}T${time}`).toISOString();
     const btn = document.getElementById("confirmBookingBtn");
-    if (btn) { btn.disabled = true; btn.textContent = "Création de la réservation…"; }
+    if (btn) { btn.disabled = true; btn.textContent = "Vérification…"; }
     try {
+      // Étape 1 — Créer la réservation
+      if (btn) btn.textContent = "Création de la réservation…";
       const booking = await appApi.createBooking(serviceId, startsAt, notes);
+      console.log("[UBODROP] booking créé", booking.id, "status=", booking.status);
+
+      // Étape 2 — Lancer le checkout Stripe
       if (btn) btn.textContent = "Redirection vers le paiement…";
       const { checkoutUrl } = await appApi.createCheckoutSession(booking.id);
+      console.log("[UBODROP] checkout URL obtenu, redirection...");
       closeBookingOverlay();
       window.location.href = checkoutUrl;
     } catch (error) {
-      notify(friendlyApiError(error, "La réservation n'a pas pu être confirmée. Veuillez réessayer."), "error");
+      const msg = error?.message || "";
+      if (msg.includes("Stripe") || msg.includes("paiements")) {
+        notify("⚠ Ce professionnel n'a pas encore activé les paiements. Réservation annulée.", "error");
+      } else {
+        notify(friendlyApiError(error, "La réservation n'a pas pu être confirmée. Veuillez réessayer."), "error");
+      }
+      console.error("[UBODROP] confirmBooking error", error);
       if (btn) { btn.disabled = false; btn.textContent = "Envoyer la demande"; }
     }
   }

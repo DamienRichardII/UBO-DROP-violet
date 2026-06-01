@@ -3930,10 +3930,15 @@ function syncGoogleUiVisibility(screenId) {
       notify("Paiement annulé. Tu peux recommencer à tout moment.", "error");
     } else if (hash === "#stripe-return") {
       window.location.hash = "";
-      notify("✅ Compte Stripe connecté ! Retourne dans l'onglet Bancaire pour vérifier ton statut.", "ok");
+      notify("✅ Retour Stripe — vérification du statut en cours…", "ok");
+      // Auto-refresh statut Stripe après onboarding Connect
+      setTimeout(async () => {
+        try { await loadStripeConnectStatus(); } catch (_) {}
+        notify("✅ Statut Stripe mis à jour. Vérifie l'onglet Bancaire pour confirmer.", "ok");
+      }, 1800);
     } else if (hash === "#stripe-refresh") {
       window.location.hash = "";
-      notify("Le lien Stripe a expiré. Clique à nouveau sur “Connecter mon compte Stripe”.", "error");
+      notify("Le lien Stripe a expiré. Clique à nouveau sur \"Connecter mon compte Stripe\".", "error");
     }
   })();
 

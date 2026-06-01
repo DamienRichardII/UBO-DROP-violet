@@ -5,40 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>UBO DROP</title>
     <meta name="description" content="UBO DROP : réservez un barber, coiffeuse, manucure ou prestataire beauté à domicile ou en salon. Service style Uber pour la beauté.">
-    <link rel="icon" type="image/jpeg" href="/assets/logo-ubodrop.jpeg">
-    <link rel="apple-touch-icon" href="/assets/logo-ubodrop.jpeg">
+    <link rel="icon" type="image/png" href="/assets/brand/logo-ubodrop-icon-brown.png">
+    <link rel="apple-touch-icon" href="/assets/brand/logo-ubodrop-icon-brown.png">
 
     <meta property="og:title" content="UBO DROP">
     <meta property="og:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://ubo-drop-violet.vercel.app/">
-    <meta property="og:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
+    <meta property="og:image" content="https://www.ubodrop.com/assets/brand/logo-ubodrop-brown.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="UBO DROP">
     <meta name="twitter:description" content="Réserve un professionnel beauté & barber à domicile en quelques minutes.">
-    <meta name="twitter:image" content="https://ubo-drop-violet.vercel.app/assets/logo-ubodrop.jpeg">
+    <meta name="twitter:image" content="https://www.ubodrop.com/assets/brand/logo-ubodrop-brown.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --violet-deep: #6C3FA0;
-            --violet-neon: #A855F7;
-            --violet-light: #D4B8E8;
-            --violet-medium: #B48ED0;
-            --violet-soft: #EDE4F3;
-            --violet-pale: #F3ECF8;
-            --noir: #111111;
-            --noir-soft: #1A1A2E;
-            --blanc-casse: #F5F0EB;
-            --blanc: #FFFFFF;
-            --gold: #D4AF37;
-            --glass-bg: rgba(212, 184, 232, 0.15);
-            --glass-border: rgba(212, 184, 232, 0.25);
-            --shadow-sm: 0 2px 8px rgba(17, 17, 17, 0.06);
-            --shadow-md: 0 4px 20px rgba(17, 17, 17, 0.08);
-            --shadow-lg: 0 8px 40px rgba(17, 17, 17, 0.12);
-            --shadow-glow: 0 0 30px rgba(168, 85, 247, 0.3);
+            /* ── UBODROP DA Cream / Bordeaux · Logos Sofiane ── */
+            --violet-deep:   #5C1A18;
+            --violet-neon:   #7A2420;
+            --violet-light:  #C8C0B5;
+            --violet-medium: #9B3B37;
+            --violet-soft:   #EAE4D8;
+            --violet-pale:   #F3EEE6;
+            --noir:          #18110F;
+            --noir-soft:     #3A0F0C;
+            --blanc-casse:   #F3EEE6;
+            --blanc:         #FFFFFF;
+            --gold:          #D4AF37;
+            --glass-bg:      rgba(92, 26, 24, 0.08);
+            --glass-border:  rgba(92, 26, 24, 0.14);
+            --shadow-sm:     0 2px 8px rgba(58, 15, 12, 0.06);
+            --shadow-md:     0 4px 20px rgba(58, 15, 12, 0.08);
+            --shadow-lg:     0 8px 40px rgba(58, 15, 12, 0.12);
+            --shadow-glow:   0 0 30px rgba(92, 26, 24, 0.20);
             --radius-sm: 10px;
             --radius-md: 16px;
             --radius-lg: 24px;
@@ -48,7 +49,7 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
         body {
-            font-family: 'DM Sans', -apple-system, sans-serif;
+            font-family: 'Space Grotesk', 'DM Sans', -apple-system, sans-serif;
             background: var(--violet-pale);
             color: var(--noir);
             line-height: 1.6;
@@ -61,7 +62,7 @@
         /* ===== HEADER ===== */
         .header {
             position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-            background: rgba(243, 236, 248, 0.88);
+            background: rgba(243, 238, 230, 0.92);
             backdrop-filter: blur(24px) saturate(180%);
             -webkit-backdrop-filter: blur(24px) saturate(180%);
             border-bottom: 1px solid var(--glass-border);
@@ -85,7 +86,7 @@
             isolation: isolate;
             overflow: hidden;
             display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-            background: linear-gradient(135deg, #eadcf5 0%, #dcc4ee 45%, #cfafe8 100%);
+            background: linear-gradient(135deg, #EAE4D8 0%, #DDD6C8 45%, #C8C0B5 100%);
             color: var(--noir);
             border: 1px solid rgba(108, 63, 160, 0.12);
             box-shadow: 0 10px 24px rgba(108, 63, 160, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
@@ -121,7 +122,7 @@
         }
         .btn-open-app:hover,
         .hero-cta:hover {
-            background: linear-gradient(135deg, var(--violet-medium) 0%, var(--violet-neon) 55%, var(--violet-deep) 100%);
+            background: linear-gradient(135deg, #9B3B37 0%, #7A2420 55%, #5C1A18 100%);
             color: var(--blanc);
             transform: translateY(-1px);
             box-shadow: 0 14px 32px rgba(108, 63, 160, 0.24), 0 0 28px rgba(168, 85, 247, 0.22);
@@ -140,8 +141,8 @@
             background: rgba(255, 255, 255, 0.62);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border-top: 1px solid rgba(180, 142, 208, 0.16);
-            border-bottom: 1px solid rgba(180, 142, 208, 0.22);
+            border-top: 1px solid rgba(92, 26, 24, 0.10);
+            border-bottom: 1px solid rgba(92, 26, 24, 0.14);
             overflow: hidden;
             padding: 14px 0;
         }
@@ -162,10 +163,10 @@
             cursor: pointer;
             letter-spacing: 0.01em;
         }
-        .banner-item:hover { color: var(--violet-deep); opacity: 1; }
+        .banner-item:hover { color: #5C1A18; opacity: 1; }
         .banner-item .b-icon {
             width: 16px; height: 16px; display: inline-flex; align-items: center; justify-content: center;
-            color: var(--violet-deep);
+            color: #5C1A18;
             opacity: 0.9;
         }
         .banner-item .b-icon svg { width: 16px; height: 16px; stroke: currentColor; }
@@ -201,10 +202,10 @@
         .hero-band::after {
             content: ''; position: absolute; inset: 0;
             background: linear-gradient(180deg,
-                rgba(212,184,232,0.2) 0%,
-                rgba(212,184,232,0.1) 40%,
-                rgba(212,184,232,0.4) 80%,
-                rgba(243,236,248,0.95) 100%);
+                rgba(220,212,200,0.15) 0%,
+                rgba(220,212,200,0.08) 40%,
+                rgba(220,212,200,0.35) 80%,
+                rgba(243,238,230,0.96) 100%);
         }
         .hero-band:nth-child(1) { background-image: url('assets/img/hero-nails.jpeg'); }
         .hero-band:nth-child(2) { background-image: url('assets/img/hero-barber.jpeg'); }
@@ -215,10 +216,10 @@
         .hero-overlay {
             position: absolute; inset: 0;
             background: linear-gradient(180deg,
-                rgba(243,236,248,0.3) 0%,
-                rgba(243,236,248,0.0) 30%,
-                rgba(243,236,248,0.5) 70%,
-                rgba(243,236,248,1) 100%);
+                rgba(243,238,230,0.3) 0%,
+                rgba(243,238,230,0.0) 30%,
+                rgba(243,238,230,0.5) 70%,
+                rgba(243,238,230,1) 100%);
             z-index: 2;
         }
         .hero-content {
@@ -261,7 +262,7 @@
             font-size: 0.75rem; font-weight: 600;
             letter-spacing: 1.5px; text-transform: uppercase;
             margin-bottom: 16px;
-            border: 1px solid rgba(180, 142, 208, 0.4);
+            border: 1px solid rgba(92, 26, 24, 0.22);
         }
         .section-title {
             font-family: 'Playfair Display', serif;
@@ -309,8 +310,8 @@
         }
         .concept-features li .feat-icon {
             width: 36px; height: 36px; min-width: 36px;
-            background: rgba(168, 85, 247, 0.1);
-            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: rgba(92, 26, 24, 0.08);
+            border: 1px solid rgba(92, 26, 24, 0.15);
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             color: var(--noir);
@@ -330,8 +331,8 @@
             width: 240px;
             border-radius: 32px;
             overflow: hidden;
-            box-shadow: 0 20px 60px rgba(108,63,160,0.25), 0 0 40px rgba(168,85,247,0.1);
-            border: 3px solid rgba(180,142,208,0.3);
+            box-shadow: 0 20px 60px rgba(92,26,24,0.22), 0 0 40px rgba(92,26,24,0.08);
+            border: 3px solid rgba(92,26,24,0.18);
             position: relative;
             transition: transform 0.5s ease;
             background: var(--blanc);
@@ -354,7 +355,7 @@
         .phone-glow {
             position: absolute;
             width: 300px; height: 300px;
-            background: radial-gradient(circle, rgba(168,85,247,0.25) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(92,26,24,0.18) 0%, transparent 70%);
             border-radius: 50%;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
@@ -362,8 +363,8 @@
             animation: pulseGlow 3s ease-in-out infinite;
         }
         @keyframes pulseGlow {
-            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 1; transform: translate(-50%, -50%) scale(1.15); }
+            0%, 100% { opacity: 0.4; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.12); }
         }
 
         /* ===== NOS SERVICES CAROUSEL ===== */
@@ -407,7 +408,7 @@
         }
         .service-card:hover .service-card-overlay {
             background: linear-gradient(180deg,
-                transparent 20%, rgba(108,63,160,0.2) 50%, rgba(17,17,17,0.9) 100%);
+                transparent 20%, rgba(92,26,24,0.25) 50%, rgba(17,17,17,0.9) 100%);
         }
         .service-card-label {
             font-family: 'Playfair Display', serif;
@@ -435,18 +436,18 @@
             background: var(--blanc);
             border-radius: var(--radius-lg);
             padding: 32px 28px;
-            border: 1px solid rgba(212,184,232,0.3);
+            border: 1px solid rgba(92,26,24,0.10);
             transition: all 0.3s ease;
         }
         .step-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 8px 30px rgba(168,85,247,0.12);
+            box-shadow: 0 8px 30px rgba(92,26,24,0.12);
             border-color: var(--violet-medium);
         }
         .step-num {
             display: inline-flex; align-items: center; justify-content: center;
             width: 44px; height: 44px;
-            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
+            background: linear-gradient(135deg, #7A2420, #5C1A18);
             color: var(--blanc); border-radius: 14px;
             font-family: 'Playfair Display', serif;
             font-weight: 800; font-size: 1.1rem; margin-bottom: 18px;
@@ -465,7 +466,7 @@
             border-radius: var(--radius-lg);
             padding: 36px 28px;
             color: var(--noir);
-            border: 1px solid rgba(212,184,232,0.3);
+            border: 1px solid rgba(92,26,24,0.10);
             transition: all 0.3s ease;
         }
         .advantage-card:hover {
@@ -474,7 +475,7 @@
         }
         .advantage-card .adv-icon {
             width: 50px; height: 50px;
-            background: linear-gradient(135deg, var(--violet-neon), var(--violet-deep));
+            background: linear-gradient(135deg, #7A2420, #5C1A18);
             border-radius: 14px; display: flex;
             align-items: center; justify-content: center; margin-bottom: 20px;
         }
@@ -488,7 +489,7 @@
         /* ===== CTA ===== */
         .cta-section { text-align: center; padding: 80px 20px 100px; }
         .cta-box {
-            background: linear-gradient(135deg, var(--violet-deep) 0%, var(--violet-neon) 50%, var(--violet-deep) 100%);
+            background: linear-gradient(135deg, #5C1A18 0%, #7A2420 50%, #5C1A18 100%);
             background-size: 200% 200%;
             animation: gradientShift 6s ease infinite;
             border-radius: var(--radius-xl); padding: 60px 32px;
@@ -530,7 +531,7 @@
         /* ===== FOOTER ===== */
         .footer {
             background: var(--noir-soft);
-            border-top: 1px solid rgba(180,142,208,0.2);
+            border-top: 1px solid rgba(92,26,24,0.25);
             color: var(--blanc-casse);
             padding: 48px 20px 40px; text-align: center;
         }
@@ -612,8 +613,8 @@
     <header class="header">
         <div class="header-top">
             <a href="index.html" class="header-logo">
-                <img src="assets/img/ubo-drop-logo.png" alt="UBO DROP">
-                <span>UBO DROP</span>
+                <img src="assets/brand/logo-ubodrop-brown.png" alt="UBODROP" style="height:32px;width:auto;display:block;">
+                <span style="display:none;">UBODROP</span>
             </a>
             <a href="./app.html" class="btn-open-app">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>
@@ -897,7 +898,9 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <div class="footer-logo">UBO DROP</div>
+        <div class="footer-logo" style="display:flex;align-items:center;justify-content:center;">
+            <img src="assets/brand/logo-ubodrop-white.png" alt="UBODROP" style="height:28px;width:auto;filter:brightness(1.1);">
+        </div>
         <p>&copy; 2026 UBO DROP. Tous droits réservés.</p>
         <div class="footer-links">
             <a href="#">Mentions légales</a>

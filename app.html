@@ -470,6 +470,48 @@
     .service-row p { font-size: 12px; color: #6d6577; margin-top: 4px; }
     .service-price { text-align: right; }
     .service-price strong { display: block; font-size: 18px; }
+    /* ── Créneaux réservation Uber-style ── */
+    .quick-booking-slots {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 2px 0 4px;
+    }
+    .quick-booking-slot {
+      border: 1.5px solid rgba(92,26,24,.16);
+      background: var(--surface-soft, #f8f4f9);
+      color: var(--ink);
+      border-radius: 16px;
+      padding: 12px 14px;
+      font-weight: 700;
+      font-size: .88rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      text-align: left;
+      font-family: inherit;
+    }
+    .quick-booking-slot small {
+      display: block;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: .76rem;
+      margin-top: 3px;
+    }
+    .quick-booking-slot:hover {
+      border-color: rgba(92,26,24,.35);
+      background: rgba(92,26,24,.04);
+    }
+    .quick-booking-slot.active {
+      background: var(--violet, #5C1A18);
+      color: #EAE4D8;
+      border-color: var(--violet, #5C1A18);
+      box-shadow: 0 10px 28px rgba(92,26,24,.24);
+    }
+    .quick-booking-slot.active small { color: rgba(234,228,216,.82); }
+    @media (max-width: 420px) {
+      .quick-booking-slots { grid-template-columns: 1fr; }
+    }
+    /* ── */
     .sticky-cta {
       position: sticky;
       bottom: 0;
@@ -1410,25 +1452,34 @@
     <div class="overlay-panel">
       <div class="sheet-handle"></div>
       <div class="row-between mt-12">
-        <div class="section-title">Confirmer la réservation</div>
+        <div class="section-title">Réserver</div>
         <button class="icon-btn" id="closeBookingOverlayBtn">✕</button>
       </div>
-      <div id="bookingServiceLabel" style="font-size:14px;font-weight:600;color:var(--violet);margin:8px 0 4px;"></div>
-      <div class="field" style="margin-top:14px">
-        <label>Date</label>
-        <input type="date" id="bookingDate" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+
+      <!-- Récap prestation -->
+      <div id="bookingServiceLabel" style="font-size:13px;font-weight:700;color:var(--violet);margin:10px 0 2px;letter-spacing:.02em;text-transform:uppercase;"></div>
+      <div id="bookingServiceMeta" style="font-size:.84rem;color:var(--muted);margin-bottom:14px;"></div>
+      <div style="font-size:.78rem;color:var(--muted);margin-bottom:14px;padding:8px 12px;background:rgba(92,26,24,.05);border-radius:10px;">
+        ⚡ UBODROP fonctionne comme Uber : réservation dans les 3 prochaines heures.
       </div>
-      <div class="field">
-        <label>Heure</label>
-        <input type="time" id="bookingTime" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+
+      <!-- Créneaux rapides -->
+      <div style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">Quand souhaites-tu réserver ?</div>
+      <div class="quick-booking-slots" id="quickBookingSlots">
+        <!-- Généré dynamiquement par buildRollingBookingSlots() -->
       </div>
-      <div class="field">
+
+      <!-- Notes -->
+      <div class="field" style="margin-top:16px;">
         <label>Notes <span class="muted">(optionnel)</span></label>
         <input type="text" id="bookingNotes" placeholder="Ex. : coupe dégradé haut, allergie au latex…" maxlength="200"
           style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
       </div>
+
       <div class="stack-12 mt-20">
-        <button class="primary-btn" id="confirmBookingBtn">Envoyer la demande</button>
+        <button class="primary-btn" id="confirmBookingBtn" disabled style="opacity:.5;">
+          Confirmer et payer
+        </button>
         <button class="secondary-btn" id="cancelBookingOverlayBtn">Annuler</button>
       </div>
     </div>
@@ -1543,6 +1594,7 @@
     pricingData: {},
     selectedServiceId: null,
     selectedServiceName: null,
+    selectedBookingStartsAt: null,
     loginMode: "any",
     returnToScreen: null
   };
@@ -3295,19 +3347,83 @@ function syncGoogleUiVisibility(screenId) {
     }
   }
 
+  function buildRollingBookingSlots() {
+    const now = new Date();
+    const options = [
+      { label: "Dès que possible", minutes: 15 },
+      { label: "Dans 30 min",      minutes: 30 },
+      { label: "Dans 1h",          minutes: 60 },
+      { label: "Dans 1h30",        minutes: 90 },
+      { label: "Dans 2h",          minutes: 120 },
+      { label: "Dans 2h30",        minutes: 150 },
+      { label: "Dans 3h",          minutes: 180 },
+    ];
+    return options.map((opt) => {
+      const date = new Date(now.getTime() + opt.minutes * 60 * 1000);
+      return {
+        label: opt.label,
+        value: date.toISOString(),
+        displayTime: date.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }),
+      };
+    });
+  }
+
   function openBookingOverlay() {
     const overlay = document.getElementById("bookingOverlay");
     if (!overlay) return;
-    const today = new Date().toISOString().slice(0, 10);
-    const dateInput = document.getElementById("bookingDate");
-    const timeInput = document.getElementById("bookingTime");
-    if (dateInput) { dateInput.min = today; dateInput.value = ""; }
-    if (timeInput) timeInput.value = "";
+
+    // Reset état créneau
+    state.selectedBookingStartsAt = null;
     const notesInput = document.getElementById("bookingNotes");
     if (notesInput) notesInput.value = "";
+
+    // Récap prestation
+    const svc = (state.selectedPro?.services || []).find(s => String(s.id) === String(state.selectedServiceId));
     const label = document.getElementById("bookingServiceLabel");
-    if (label) label.textContent = state.selectedServiceName ? `Prestation : ${state.selectedServiceName}` : "";
+    const meta  = document.getElementById("bookingServiceMeta");
+    if (label) label.textContent = state.selectedServiceName || "Prestation";
+    if (meta && svc) {
+      meta.textContent = [
+        svc.durationMin ? svc.durationMin + " min" : "",
+        svc.price ? "· " + svc.price : (svc.priceNum ? "· " + svc.priceNum.toFixed(2) + " €" : ""),
+      ].filter(Boolean).join(" ");
+    }
+
+    // Générer les créneaux
+    const slotsContainer = document.getElementById("quickBookingSlots");
+    if (slotsContainer) {
+      const slots = buildRollingBookingSlots();
+      slotsContainer.innerHTML = slots.map((slot, idx) => `
+        <button class="quick-booking-slot" data-value="${slot.value}" onclick="selectBookingSlot(this, '${slot.value}')">
+          ${slot.label}
+          <small>${slot.displayTime}</small>
+        </button>
+      `).join("");
+    }
+
+    // Bouton confirm désactivé jusqu'à sélection d'un créneau
+    const confirmBtn = document.getElementById("confirmBookingBtn");
+    if (confirmBtn) {
+      confirmBtn.disabled = true;
+      confirmBtn.style.opacity = "0.5";
+      confirmBtn.textContent = "Confirmer et payer";
+    }
+
     overlay.classList.add("open");
+  }
+
+  function selectBookingSlot(el, isoValue) {
+    state.selectedBookingStartsAt = isoValue;
+    // Highlight
+    document.querySelectorAll(".quick-booking-slot").forEach(b => b.classList.remove("active"));
+    el.classList.add("active");
+    // Activer bouton confirm
+    const confirmBtn = document.getElementById("confirmBookingBtn");
+    if (confirmBtn) {
+      confirmBtn.disabled = false;
+      confirmBtn.style.opacity = "1";
+    }
+    console.log("[UBODROP] slot selected", isoValue, new Date(isoValue).toLocaleTimeString("fr-FR"));
   }
 
   function closeBookingOverlay() {
@@ -3315,15 +3431,35 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   async function confirmBooking() {
-    const date  = document.getElementById("bookingDate")?.value;
-    const time  = document.getElementById("bookingTime")?.value;
+    const startsAt = state.selectedBookingStartsAt;
     const notes = document.getElementById("bookingNotes")?.value.trim() || undefined;
-    if (!date || !time) { notify("Choisis une date et une heure pour continuer.", "error"); return; }
     const serviceId = state.selectedServiceId;
+
+    if (!startsAt) { notify("Choisis un créneau pour continuer.", "error"); return; }
     if (!serviceId) { notify("Aucune prestation sélectionnée.", "error"); return; }
-    const startsAt = new Date(`${date}T${time}`).toISOString();
+
+    // Vérification fenêtre 3h côté client (double sécurité)
+    const slotDate = new Date(startsAt);
+    const now = new Date();
+    const max3h = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+    if (slotDate < new Date(now.getTime() - 2 * 60 * 1000)) {
+      notify("Ce créneau n'est plus disponible. Rouvre l'overlay pour un créneau à jour.", "error");
+      return;
+    }
+    if (slotDate > max3h) {
+      notify("Les réservations UBODROP sont disponibles uniquement dans les 3 prochaines heures.", "error");
+      return;
+    }
+
     const btn = document.getElementById("confirmBookingBtn");
     if (btn) { btn.disabled = true; btn.textContent = "Vérification…"; }
+
+    console.log("[UBODROP] create booking payload", {
+      serviceId,
+      startsAt,
+      proId: state.selectedPro?.id,
+    });
+
     try {
       // Étape 1 — Créer la réservation
       if (btn) btn.textContent = "Création de la réservation…";
@@ -3338,13 +3474,15 @@ function syncGoogleUiVisibility(screenId) {
       window.location.href = checkoutUrl;
     } catch (error) {
       const msg = error?.message || "";
-      if (msg.includes("Stripe") || msg.includes("paiements")) {
+      if (msg.includes("3 prochaines heures")) {
+        notify("⚠ " + msg, "error");
+      } else if (msg.includes("Stripe") || msg.includes("paiements")) {
         notify("⚠ Ce professionnel n'a pas encore activé les paiements. Réservation annulée.", "error");
       } else {
         notify(friendlyApiError(error, "La réservation n'a pas pu être confirmée. Veuillez réessayer."), "error");
       }
       console.error("[UBODROP] confirmBooking error", error);
-      if (btn) { btn.disabled = false; btn.textContent = "Envoyer la demande"; }
+      if (btn) { btn.disabled = false; btn.style.opacity = "1"; btn.textContent = "Confirmer et payer"; }
     }
   }
 

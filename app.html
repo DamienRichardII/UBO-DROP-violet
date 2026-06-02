@@ -2364,19 +2364,52 @@ function syncGoogleUiVisibility(screenId) {
     };
   }
 
+  // Cache géocodage ville -> coordonnées (les pros n'ont pas tous lat/lng en base)
+  const _cityGeocodeCache = {};
+  function geocodeCity(city) {
+    if (!city || !window.google?.maps?.Geocoder) return Promise.resolve(null);
+    if (Object.prototype.hasOwnProperty.call(_cityGeocodeCache, city)) {
+      return Promise.resolve(_cityGeocodeCache[city]);
+    }
+    return new Promise((resolve) => {
+      try {
+        new google.maps.Geocoder().geocode({ address: `${city}, France` }, (res, status) => {
+          if (status === "OK" && res && res[0]) {
+            const loc = res[0].geometry.location;
+            const pos = { lat: loc.lat(), lng: loc.lng() };
+            _cityGeocodeCache[city] = pos;
+            resolve(pos);
+          } else {
+            _cityGeocodeCache[city] = null;
+            resolve(null);
+          }
+        });
+      } catch (e) { resolve(null); }
+    });
+  }
+
+  function placeProMarker(pro, position) {
+    if (!state.map || !window.google?.maps) return;
+    const marker = new google.maps.Marker({
+      position,
+      map: state.map,
+      title: pro.name,
+      icon: proMarkerIcon(pro.category)
+    });
+    marker.addListener("click", () => openPro(pro.id));
+    state.mapMarkers.push(marker);
+  }
+
   function renderMapMarkers() {
     if (!state.map || !window.google?.maps) return;
     clearMapMarkers();
     getVisiblePros().forEach((pro) => {
-      if (!Number.isFinite(pro.lat) || !Number.isFinite(pro.lng)) return;
-      const marker = new google.maps.Marker({
-        position: { lat: pro.lat, lng: pro.lng },
-        map: state.map,
-        title: pro.name,
-        icon: proMarkerIcon(pro.category)
-      });
-      marker.addListener("click", () => openPro(pro.id));
-      state.mapMarkers.push(marker);
+      if (Number.isFinite(pro.lat) && Number.isFinite(pro.lng)) {
+        placeProMarker(pro, { lat: pro.lat, lng: pro.lng });
+      } else if (pro.location) {
+        // Pas de coordonnées en base -> géocodage de la ville (marker approximatif)
+        geocodeCity(pro.location).then((pos) => { if (pos) placeProMarker(pro, pos); });
+      }
     });
   }
 

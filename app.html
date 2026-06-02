@@ -510,6 +510,24 @@
       box-shadow: 0 10px 28px rgba(92,26,24,.24);
     }
     .quick-booking-slot.active small { color: rgba(234,228,216,.82); }
+    .booking-mode-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .booking-mode-btn {
+      border: 1.5px solid rgba(92,26,24,.16);
+      background: var(--surface-soft, #f8f4f9);
+      color: var(--ink);
+      border-radius: 14px;
+      padding: 11px 12px;
+      font-weight: 700;
+      font-size: .86rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      font-family: inherit;
+    }
+    .booking-mode-btn.active {
+      background: var(--violet, #5C1A18);
+      color: #EAE4D8;
+      border-color: var(--violet, #5C1A18);
+    }
     @media (max-width: 420px) {
       .quick-booking-slots { grid-template-columns: 1fr; }
     }
@@ -1463,10 +1481,27 @@
       <div id="bookingServiceMeta" style="font-size:.84rem;color:var(--muted);margin-bottom:14px;"></div>
 
 
-      <!-- Créneaux rapides -->
+      <!-- Quand -->
       <div style="font-size:.82rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">Quand souhaites-tu réserver ?</div>
+      <div class="booking-mode-row" id="bookingModeRow">
+        <button type="button" class="booking-mode-btn active" id="bookingModeAsap" onclick="setBookingMode('ASAP')">Dès que possible</button>
+        <button type="button" class="booking-mode-btn" id="bookingModeScheduled" onclick="setBookingMode('SCHEDULED')">Planifier une date</button>
+      </div>
+
+      <!-- Mode ASAP : créneaux rapides -->
       <div class="quick-booking-slots" id="quickBookingSlots">
         <!-- Généré dynamiquement par buildRollingBookingSlots() -->
+      </div>
+
+      <!-- Mode SCHEDULED : date + heure -->
+      <div id="scheduledBookingFields" style="display:none;">
+        <div class="field"><label>Date</label>
+          <input type="date" id="scheduledDate" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+        </div>
+        <div class="field" style="margin-top:10px;"><label>Heure</label>
+          <input type="time" id="scheduledTime" style="width:100%;padding:12px 14px;border:1px solid var(--line-2);border-radius:var(--radius-sm);font-size:14px;background:var(--surface-soft);">
+        </div>
+        <div id="scheduledError" style="display:none;color:#e53935;font-size:13px;margin-top:6px;"></div>
       </div>
 
       <!-- Notes -->
@@ -1595,6 +1630,7 @@
     selectedServiceId: null,
     selectedServiceName: null,
     selectedBookingStartsAt: null,
+    bookingMode: "ASAP",
     loginMode: "any",
     returnToScreen: null
   };
@@ -1620,7 +1656,7 @@
     { id: "screen-pro-dashboard", label: "Espace pro", icon: navIcons.dashboard },
     { id: "screen-pro-messages", label: "Messages", icon: navIcons.messages },
     { id: "screen-search", label: "Carte", icon: navIcons.map },
-    { id: "screen-home", label: "Accueil", icon: navIcons.home }
+    { id: "screen-account", label: "Compte", icon: navIcons.user }
   ];
 
   const appApi = {
@@ -1820,9 +1856,10 @@
       });
     },
 
-    createBooking(serviceId, startsAt, notes) {
+    createBooking(serviceId, startsAt, notes, bookingMode) {
       const body = { serviceId, startsAt };
       if (notes) body.notes = notes;
+      if (bookingMode) body.bookingMode = bookingMode;
       return this.request("/bookings", {
         method: "POST",
         body: JSON.stringify(body)
@@ -2782,7 +2819,20 @@ function syncGoogleUiVisibility(screenId) {
     const clientProfile = state.authUser?.clientProfile;
 
     if (blocks[0]) {
-      blocks[0].innerHTML = `
+      const isProAccount = state.userMode === "pro" || (authUser.roles || []).some((r) => String(r).toUpperCase() === "PROFESSIONAL");
+      if (isProAccount) {
+        blocks[0].innerHTML = `
+        <h4>Informations du compte</h4>
+        <div class="setting-list">
+          <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span></div>
+          <div class="setting-row"><span><strong>Type de compte</strong><br>Professionnel</span><span class="muted">Vérifié</span></div>
+        </div>
+        <div class="inline-note" style="margin-top:12px;">Gère ton profil, tes prestations et tes coordonnées bancaires dans l'onglet « Espace pro ».</div>
+        <button class="secondary-btn" style="margin-top:12px;" data-go="screen-pro-dashboard">Aller à l'espace pro</button>
+        `;
+        blocks[0].querySelectorAll("[data-go]").forEach((btn) => btn.onclick = () => goTo(btn.dataset.go));
+      } else {
+        blocks[0].innerHTML = `
         <h4>Informations personnelles</h4>
         <div class="setting-list">
           <div class="setting-row"><span><strong>Email</strong><br>${authUser.email}</span></div>
@@ -2793,8 +2843,9 @@ function syncGoogleUiVisibility(screenId) {
         <div class="field"><label>Téléphone</label><input type="tel" id="clientPhone" placeholder="+33 6 00 00 00 00" value="${clientProfile?.phone || ""}"></div>
         <div class="field"><label>Ville</label><input type="text" id="clientCity" placeholder="Paris" value="${clientProfile?.city || ""}"></div>
         <button class="primary-btn" style="margin-top:4px;" id="saveClientProfileBtn">Enregistrer</button>
-      `;
-      document.getElementById("saveClientProfileBtn")?.addEventListener("click", handleSaveClientProfile);
+        `;
+        document.getElementById("saveClientProfileBtn")?.addEventListener("click", handleSaveClientProfile);
+      }
     }
     if (blocks[1]) {
       blocks[1].innerHTML = `
@@ -3492,7 +3543,35 @@ function syncGoogleUiVisibility(screenId) {
       `).join("");
     }
 
-    // Bouton confirm désactivé jusqu'à sélection d'un créneau
+    // Réinitialiser les champs date/heure planifiés
+    const dateInput = document.getElementById("scheduledDate");
+    const timeInput = document.getElementById("scheduledTime");
+    if (dateInput) dateInput.value = "";
+    if (timeInput) timeInput.value = "";
+    const schedErr = document.getElementById("scheduledError");
+    if (schedErr) schedErr.style.display = "none";
+
+    // Mode par défaut : Dès que possible (comportement actuel conservé)
+    setBookingMode("ASAP");
+
+    overlay.classList.add("open");
+  }
+
+  // Bascule entre les deux modes de réservation (ASAP / SCHEDULED)
+  function setBookingMode(mode) {
+    state.bookingMode = mode === "SCHEDULED" ? "SCHEDULED" : "ASAP";
+    state.selectedBookingStartsAt = null;
+    document.querySelectorAll(".quick-booking-slot").forEach((b) => b.classList.remove("active"));
+
+    const asapBtn  = document.getElementById("bookingModeAsap");
+    const schedBtn = document.getElementById("bookingModeScheduled");
+    const quick    = document.getElementById("quickBookingSlots");
+    const sched    = document.getElementById("scheduledBookingFields");
+    if (asapBtn)  asapBtn.classList.toggle("active", state.bookingMode === "ASAP");
+    if (schedBtn) schedBtn.classList.toggle("active", state.bookingMode === "SCHEDULED");
+    if (quick)    quick.style.display = state.bookingMode === "ASAP" ? "" : "none";
+    if (sched)    sched.style.display = state.bookingMode === "SCHEDULED" ? "" : "none";
+
     const confirmBtn = document.getElementById("confirmBookingBtn");
     if (confirmBtn) {
       confirmBtn.disabled = true;
@@ -3500,7 +3579,42 @@ function syncGoogleUiVisibility(screenId) {
       confirmBtn.textContent = "Confirmer et payer";
     }
 
-    overlay.classList.add("open");
+    if (state.bookingMode === "SCHEDULED") {
+      const dateInput = document.getElementById("scheduledDate");
+      const timeInput = document.getElementById("scheduledTime");
+      if (dateInput) {
+        const today = new Date();
+        const max = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+        dateInput.min = today.toISOString().slice(0, 10);
+        dateInput.max = max.toISOString().slice(0, 10);
+        dateInput.onchange = validateScheduledBooking;
+      }
+      if (timeInput) timeInput.onchange = validateScheduledBooking;
+    }
+  }
+
+  // Valide la date/heure planifiée et active le bouton confirmer si OK
+  function validateScheduledBooking() {
+    const dateInput = document.getElementById("scheduledDate");
+    const timeInput = document.getElementById("scheduledTime");
+    const err = document.getElementById("scheduledError");
+    const confirmBtn = document.getElementById("confirmBookingBtn");
+    const fail = (msg) => {
+      if (err) { err.style.display = "block"; err.textContent = msg; }
+      state.selectedBookingStartsAt = null;
+      if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; }
+    };
+    if (err) err.style.display = "none";
+    const d = dateInput?.value, t = timeInput?.value;
+    if (!d || !t) { if (confirmBtn) { confirmBtn.disabled = true; confirmBtn.style.opacity = "0.5"; } return; }
+    const dt = new Date(`${d}T${t}`);
+    if (Number.isNaN(dt.getTime())) { fail("Choisis une date et une heure valides."); return; }
+    const now = new Date();
+    if (dt < now) { fail("Choisis une date et une heure valides (pas dans le passé)."); return; }
+    const max = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+    if (dt > max) { fail("Tu peux réserver jusqu'à 30 jours à l'avance."); return; }
+    state.selectedBookingStartsAt = dt.toISOString();
+    if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = "1"; }
   }
 
   function selectBookingSlot(el, isoValue) {
@@ -3529,17 +3643,26 @@ function syncGoogleUiVisibility(screenId) {
     if (!startsAt) { notify("Choisis un créneau pour continuer.", "error"); return; }
     if (!serviceId) { notify("Aucune prestation sélectionnée.", "error"); return; }
 
-    // Vérification fenêtre 3h côté client (double sécurité)
+    // Vérification côté client (double sécurité) — selon le mode choisi
+    const mode = state.bookingMode === "SCHEDULED" ? "SCHEDULED" : "ASAP";
     const slotDate = new Date(startsAt);
     const now = new Date();
-    const max3h = new Date(now.getTime() + 3 * 60 * 60 * 1000);
     if (slotDate < new Date(now.getTime() - 2 * 60 * 1000)) {
-      notify("Ce créneau n'est plus disponible. Rouvre l'overlay pour un créneau à jour.", "error");
+      notify("Ce créneau n'est plus disponible. Choisis une date et une heure valides.", "error");
       return;
     }
-    if (slotDate > max3h) {
-      notify("Les réservations UBODROP sont disponibles uniquement dans les 3 prochaines heures.", "error");
-      return;
+    if (mode === "ASAP") {
+      const max3h = new Date(now.getTime() + 3 * 60 * 60 * 1000);
+      if (slotDate > max3h) {
+        notify("En mode « Dès que possible », choisis un créneau dans les 3 prochaines heures.", "error");
+        return;
+      }
+    } else {
+      const max30d = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+      if (slotDate > max30d) {
+        notify("Tu peux planifier une réservation jusqu'à 30 jours à l'avance.", "error");
+        return;
+      }
     }
 
     const btn = document.getElementById("confirmBookingBtn");
@@ -3554,7 +3677,7 @@ function syncGoogleUiVisibility(screenId) {
     try {
       // Étape 1 — Créer la réservation
       if (btn) btn.textContent = "Création de la réservation…";
-      const booking = await appApi.createBooking(serviceId, startsAt, notes);
+      const booking = await appApi.createBooking(serviceId, startsAt, notes, mode);
       console.log("[UBODROP] booking créé", booking.id, "status=", booking.status);
 
       // Étape 2 — Lancer le checkout Stripe

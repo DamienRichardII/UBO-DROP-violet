@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>Renouvellement lien Stripe — UBODROP</title>
+  <style>
+    :root {
+      --cream: #EAE4D8;
+      --bordeaux: #5C1A18;
+      --bordeaux-dark: #3A0F0C;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Space Grotesk', Arial, sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,.08);
+    }
+    .logo { height: 36px; margin-bottom: 28px; }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid #eee;
+      border-top-color: var(--bordeaux);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    h2 { font-size: 1.2rem; color: var(--bordeaux-dark); margin-bottom: 10px; }
+    p  { font-size: .9rem; color: #666; line-height: 1.6; margin-bottom: 20px; }
+    a.btn {
+      display: inline-block;
+      padding: 12px 28px;
+      background: var(--bordeaux);
+      color: var(--cream);
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .95rem;
+    }
+    .error-msg {
+      background: rgba(200,30,30,.08);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: #8a0000;
+      font-size: .87rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="card">
+    <img class="logo" src="/assets/img/logo-ubodrop-brown.png" alt="UBODROP" />
+    <div class="spinner" id="spinner"></div>
+    <h2 id="title">Renouvellement du lien Stripe…</h2>
+    <p id="message">Le lien Stripe a expiré. Nous en générons un nouveau automatiquement.</p>
+    <div class="error-msg" id="error-msg"></div>
+    <a class="btn" href="/app.html" id="fallback-btn" style="display:none;">Retour à mon espace pro</a>
+  </div>
+
+  <script>
+    const API_BASE = '';  // Vercel proxy → Railway
+
+    function getToken() {
+      try {
+        const raw = localStorage.getItem('ubodrop_app_session');
+        if (!raw) return null;
+        return JSON.parse(raw)?.accessToken ?? null;
+      } catch { return null; }
+    }
+
+    function showError(msg) {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('title').textContent = '⚠️ Lien Stripe expiré';
+      document.getElementById('message').textContent = 'Impossible de générer automatiquement un nouveau lien. Reviens à ton espace pro et clique à nouveau sur "Connecter mon compte Stripe".';
+      const errEl = document.getElementById('error-msg');
+      errEl.textContent = msg;
+      errEl.style.display = 'block';
+      document.getElementById('fallback-btn').style.display = 'inline-block';
+    }
+
+    async function refreshOnboardingLink() {
+      const token = getToken();
+      if (!token) {
+        showError('Tu n\'es pas connecté. Connecte-toi à ton espace pro.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API_BASE}/api/v1/payments/connect/onboarding-link`, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err?.message ?? `HTTP ${res.status}`);
+        }
+
+        const data = await res.json();
+        const url = data?.url ?? data?.data?.url;
+
+        if (url) {
+          // Redirection immédiate vers le nouvel Account Link Stripe
+          window.location.href = url;
+        } else {
+          showError('URL Stripe manquante dans la réponse du serveur.');
+        }
+      } catch (err) {
+        showError(`Erreur : ${String(err)}`);
+      }
+    }
+
+    refreshOnboardingLink();
+  </script>
+</body>
+</html>

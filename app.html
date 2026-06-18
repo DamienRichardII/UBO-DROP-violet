@@ -1381,16 +1381,63 @@
 
     <!-- Stripe Connect -->
     <div class="card list-card mt-16" id="stripeConnectCard">
-      <h4 style="font-size:1rem; font-weight:800; margin-bottom:4px;">💳 Paiements en ligne (Stripe)</h4>
-      <div class="section-sub" style="margin-bottom:12px; font-size:.86rem;">
+      <h4 style="font-size:1rem; font-weight:800; margin-bottom:8px;">💳 Paiements en ligne (Stripe)</h4>
+      <div class="section-sub" style="margin-bottom:14px; font-size:.86rem;">
         Connecte ton compte Stripe pour recevoir les paiements UBODROP directement sur ton compte bancaire. UBODROP prélève une commission de 10 %.
       </div>
-      <div id="stripeConnectStatus" style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:12px; background:rgba(0,0,0,.05);">
-        Vérification…
+
+      <!-- État : non connecté -->
+      <div id="stripe-state-not_connected" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(255,160,0,.12); color:#7a4d00;">
+          ⏳ Compte Stripe non connecté
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Connecte ton compte Stripe pour recevoir tes paiements clients.</p>
+        <button class="primary-btn" id="stripeConnectBtn">Connecter mon compte Stripe</button>
       </div>
-      <button class="primary-btn" id="stripeConnectBtn" style="display:none;">Connecter mon compte Stripe</button>
-      <button class="secondary-btn" id="stripeResumeBtn" style="display:none; margin-top:8px;">Reprendre l'inscription Stripe</button>
-      <div class="section-sub" style="margin-top:10px; font-size:.78rem;">🔒 Stripe gère l'ensemble des paiements en toute sécurité. Tes données bancaires ne transitent jamais par UBODROP.</div>
+
+      <!-- État : en attente / vérification -->
+      <div id="stripe-state-pending" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(80,80,200,.1); color:#2a2a8a;">
+          ⏳ Vérification Stripe en cours
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Ton compte Stripe est en cours de vérification. Cela peut prendre quelques heures. Aucune action requise.</p>
+        <button class="secondary-btn" id="stripeResumeBtn">Continuer la configuration Stripe</button>
+      </div>
+
+      <!-- État : action requise par Stripe -->
+      <div id="stripe-state-action_required" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(255,140,0,.15); color:#7a3d00;">
+          ⚠️ Action requise par Stripe
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Stripe a besoin d'informations complémentaires pour activer ton compte.</p>
+        <button class="primary-btn" id="stripeActionBtn">Mettre à jour mes informations Stripe</button>
+      </div>
+
+      <!-- État : connecté et actif -->
+      <div id="stripe-state-connected" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(0,180,90,.1); color:#0a6e3a;">
+          ✅ Stripe connecté — Tu peux recevoir des paiements
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Ton compte Stripe est actif. Les paiements clients seront virés sur ton compte bancaire automatiquement.</p>
+        <button class="secondary-btn" id="stripeRefreshStatusBtn" style="font-size:.82rem;">↻ Actualiser le statut</button>
+      </div>
+
+      <!-- État : désactivé -->
+      <div id="stripe-state-disabled" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(200,30,30,.1); color:#8a0000;">
+          🚫 Compte Stripe désactivé
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;" id="stripeDisabledMsg">Ton compte Stripe est désactivé. Accède à ton dashboard Stripe ou contacte le support UBODROP.</p>
+      </div>
+
+      <!-- État : chargement -->
+      <div id="stripe-state-loading" class="stripe-state-panel">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(0,0,0,.05); color:#888;">
+          Vérification du statut Stripe…
+        </div>
+      </div>
+
+      <div class="section-sub" style="margin-top:12px; font-size:.78rem;">🔒 Stripe gère l'ensemble des paiements en toute sécurité. Tes données bancaires ne transitent jamais par UBODROP.</div>
     </div>
 
     <!-- IBAN / BIC (optionnel) -->
@@ -4274,8 +4321,16 @@ function syncGoogleUiVisibility(screenId) {
     });
     document.getElementById("addPortfolioBtn")?.addEventListener("click", handleAddPortfolioPhoto);
     document.getElementById("saveBankingBtn")?.addEventListener("click", handleSaveBankingInfo);
-  document.getElementById("stripeConnectBtn")?.addEventListener("click", handleStripeConnect);
-  document.getElementById("stripeResumeBtn")?.addEventListener("click", handleStripeConnect);
+  // ── Boutons Stripe Connect ───────────────────────────────────────────────
+  document.getElementById("stripeConnectBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
+  document.getElementById("stripeResumeBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
+  document.getElementById("stripeActionBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
+  document.getElementById("stripeRefreshStatusBtn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("stripeRefreshStatusBtn");
+    if (btn) { btn.disabled = true; btn.textContent = "Actualisation…"; }
+    await loadStripeConnectStatus();
+    if (btn) { btn.disabled = false; btn.textContent = "↻ Actualiser le statut"; }
+  });
 
   // Charger statut Stripe quand l'onglet bancaire est ouvert
   const _bancaireTrigger = document.querySelector('[data-tab="tab-bancaire"]');
@@ -4385,6 +4440,8 @@ function syncGoogleUiVisibility(screenId) {
   })();
 
   // ── Détection retour Stripe (payment-success, payment-cancel, stripe-return, stripe-refresh) ──
+  // Note : les URLs /pro/stripe/return.html et /pro/stripe/refresh.html gèrent le retour principal.
+  // Les hashes #stripe-return / #stripe-refresh restent en fallback pour compatibilité.
   (async function detectPaymentReturn() {
     const hash = window.location.hash;
     if (hash.startsWith("#payment-success=")) {
@@ -4398,63 +4455,84 @@ function syncGoogleUiVisibility(screenId) {
       window.location.hash = "";
       notify("Paiement annulé. Tu peux recommencer à tout moment.", "error");
     } else if (hash === "#stripe-return") {
+      // Fallback hash (utilisé si env vars non configurées côté serveur)
       window.location.hash = "";
       notify("✅ Retour Stripe — vérification du statut en cours…", "ok");
-      // Auto-refresh statut Stripe après onboarding Connect
       setTimeout(async () => {
-        try { await loadStripeConnectStatus(); } catch (_) {}
-        notify("✅ Statut Stripe mis à jour. Vérifie l'onglet Bancaire pour confirmer.", "ok");
-      }, 1800);
+        try {
+          await loadStripeConnectStatus();
+          notify("✅ Statut Stripe mis à jour. Vérifie l'onglet Bancaire.", "ok");
+        } catch (_) {}
+      }, 1200);
+      // Naviguer vers l'onglet Bancaire du dashboard pro
+      if (state.userMode === "pro") {
+        goTo("screen-pro-dashboard");
+        setTimeout(() => {
+          const bancaireTab = document.querySelector('[data-tab="tab-bancaire"]');
+          if (bancaireTab) bancaireTab.click();
+        }, 400);
+      }
     } else if (hash === "#stripe-refresh") {
+      // Lien Stripe expiré — l'app redirect.html gère normalement ce cas
       window.location.hash = "";
       notify("Le lien Stripe a expiré. Clique à nouveau sur \"Connecter mon compte Stripe\".", "error");
+      if (state.userMode === "pro") {
+        goTo("screen-pro-dashboard");
+        setTimeout(() => {
+          const bancaireTab = document.querySelector('[data-tab="tab-bancaire"]');
+          if (bancaireTab) bancaireTab.click();
+        }, 400);
+      }
     }
   })();
+  // ── Stripe Connect : statut + UI ─────────────────────────────────────────
+  // Gère les 5 états : not_connected / pending / connected / action_required / disabled
 
-  // ── Stripe Connect : fonctions ──
+  function showStripePanel(status) {
+    const panels = ['not_connected', 'pending', 'action_required', 'connected', 'disabled', 'loading'];
+    panels.forEach(s => {
+      const el = document.getElementById('stripe-state-' + s);
+      if (el) el.style.display = (s === status) ? 'block' : 'none';
+    });
+  }
+
   async function loadStripeConnectStatus() {
-    if (!appApi.getToken() || state.userMode !== "pro") return;
-    const statusEl = document.getElementById("stripeConnectStatus");
-    const connectBtn = document.getElementById("stripeConnectBtn");
-    const resumeBtn = document.getElementById("stripeResumeBtn");
-    if (!statusEl) return;
+    if (!appApi.getToken() || state.userMode !== 'pro') return;
+    showStripePanel('loading');
     try {
-      const s = await appApi.getStripeConnectStatus();
-      if (!s.connected) {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⏳ Compte Stripe non connecté";
-        if (connectBtn) connectBtn.style.display = "block";
-        if (resumeBtn) resumeBtn.style.display = "none";
-      } else if (!s.stripeOnboardingComplete) {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⚠️ Inscription Stripe en cours — clique sur 'Reprendre' pour terminer";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "block";
-      } else if (s.stripeChargesEnabled) {
-        statusEl.style.background = "rgba(0,200,100,.12)";
-        statusEl.innerHTML = "✅ Stripe actif — tu peux recevoir des paiements";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "none";
-      } else {
-        statusEl.style.background = "rgba(255,160,0,.12)";
-        statusEl.innerHTML = "⏳ Stripe connecté — paiements en attente d'activation par Stripe";
-        if (connectBtn) connectBtn.style.display = "none";
-        if (resumeBtn) resumeBtn.style.display = "block";
+      const raw = await appApi.getStripeConnectStatus();
+      // L'intercepteur response.interceptor wrapping → { data: {...} } ou directement l'objet
+      const s = raw?.data ?? raw;
+      const status = s?.status ?? (s?.connected ? 'connected' : 'not_connected');
+
+      showStripePanel(status);
+
+      if (status === 'disabled' && s?.stripeDisabledReason) {
+        const msgEl = document.getElementById('stripeDisabledMsg');
+        if (msgEl) msgEl.textContent = 'Compte désactivé — raison : ' + s.stripeDisabledReason;
       }
     } catch (err) {
-      statusEl.innerHTML = "Impossible de vérifier le statut Stripe.";
+      showStripePanel('not_connected');
+      console.warn('[Stripe] loadStripeConnectStatus error', err);
     }
   }
 
-  async function handleStripeConnect() {
-    const btn = document.getElementById("stripeConnectBtn") || document.getElementById("stripeResumeBtn");
+  // Déclenche l'onboarding Stripe Connect (crée ou reprend le lien)
+  async function handleStripeConnect(btnEl) {
+    const btn = btnEl
+      || document.getElementById("stripeConnectBtn")
+      || document.getElementById("stripeResumeBtn")
+      || document.getElementById("stripeActionBtn");
+    const origText = btn ? btn.textContent : '';
     if (btn) { btn.disabled = true; btn.textContent = "Connexion…"; }
     try {
-      const { url } = await appApi.getStripeOnboardingLink();
-      window.location.href = url;
+      const raw = await appApi.getStripeOnboardingLink();
+      const url = raw?.url ?? raw?.data?.url;
+      if (url) window.location.href = url;
+      else throw new Error('URL Stripe manquante');
     } catch (err) {
       notify(friendlyApiError(err, "Impossible de créer le lien Stripe. Réessaie."), "error");
-      if (btn) { btn.disabled = false; btn.textContent = btn.id === "stripeConnectBtn" ? "Connecter mon compte Stripe" : "Reprendre l'inscription Stripe"; }
+      if (btn) { btn.disabled = false; btn.textContent = origText; }
     }
   }
 

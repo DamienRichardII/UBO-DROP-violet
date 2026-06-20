@@ -1422,12 +1422,22 @@
         <button class="secondary-btn" id="stripeRefreshStatusBtn" style="font-size:.82rem;">↻ Actualiser le statut</button>
       </div>
 
-      <!-- État : désactivé -->
+      <!-- État : désactivé (blocage définitif Stripe) -->
       <div id="stripe-state-disabled" class="stripe-state-panel" style="display:none;">
         <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(200,30,30,.1); color:#8a0000;">
           🚫 Compte Stripe désactivé
         </div>
         <p style="font-size:.84rem;color:#555;margin-bottom:12px;" id="stripeDisabledMsg">Ton compte Stripe est désactivé. Accède à ton dashboard Stripe ou contacte le support UBODROP.</p>
+        <button class="secondary-btn" id="stripeDisabledResumeBtn" style="font-size:.84rem;">Contacter le support Stripe →</button>
+      </div>
+
+      <!-- État : à compléter (requirements.past_due) -->
+      <div id="stripe-state-past_due" class="stripe-state-panel" style="display:none;">
+        <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(255,140,0,.15); color:#7a3d00;">
+          ⚠️ Compte Stripe à compléter
+        </div>
+        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Stripe demande encore des informations obligatoires pour activer les paiements et les virements.</p>
+        <button class="primary-btn" id="stripePastDueBtn">Continuer la configuration Stripe</button>
       </div>
 
       <!-- État : chargement -->
@@ -4325,6 +4335,10 @@ function syncGoogleUiVisibility(screenId) {
   document.getElementById("stripeConnectBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
   document.getElementById("stripeResumeBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
   document.getElementById("stripeActionBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
+  document.getElementById("stripePastDueBtn")?.addEventListener("click", (e) => handleStripeConnect(e.currentTarget));
+  document.getElementById("stripeDisabledResumeBtn")?.addEventListener("click", () => {
+    window.open('https://dashboard.stripe.com/', '_blank');
+  });
   document.getElementById("stripeRefreshStatusBtn")?.addEventListener("click", async () => {
     const btn = document.getElementById("stripeRefreshStatusBtn");
     if (btn) { btn.disabled = true; btn.textContent = "Actualisation…"; }
@@ -4489,7 +4503,7 @@ function syncGoogleUiVisibility(screenId) {
   // Gère les 5 états : not_connected / pending / connected / action_required / disabled
 
   function showStripePanel(status) {
-    const panels = ['not_connected', 'pending', 'action_required', 'connected', 'disabled', 'loading'];
+    const panels = ['not_connected', 'pending', 'action_required', 'connected', 'disabled', 'past_due', 'loading'];
     panels.forEach(s => {
       const el = document.getElementById('stripe-state-' + s);
       if (el) el.style.display = (s === status) ? 'block' : 'none';
@@ -4505,9 +4519,13 @@ function syncGoogleUiVisibility(screenId) {
       const s = raw?.data ?? raw;
       const status = s?.status ?? (s?.connected ? 'connected' : 'not_connected');
 
-      showStripePanel(status);
+      // Si disabled_reason = requirements.past_due → panel dédié avec bouton
+      const isPastDue = s?.stripeDisabledReason === 'requirements.past_due'
+        || (s?.pastDue && s.pastDue.length > 0 && status === 'disabled');
 
-      if (status === 'disabled' && s?.stripeDisabledReason) {
+      showStripePanel(isPastDue ? 'past_due' : status);
+
+      if (status === 'disabled' && s?.stripeDisabledReason && !isPastDue) {
         const msgEl = document.getElementById('stripeDisabledMsg');
         if (msgEl) msgEl.textContent = 'Compte désactivé — raison : ' + s.stripeDisabledReason;
       }

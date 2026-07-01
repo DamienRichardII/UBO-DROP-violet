@@ -4456,18 +4456,160 @@ function syncGoogleUiVisibility(screenId) {
   // ── Détection retour Stripe (payment-success, payment-cancel, stripe-return, stripe-refresh) ──
   // Note : les URLs /pro/stripe/return.html et /pro/stripe/refresh.html gèrent le retour principal.
   // Les hashes #stripe-return / #stripe-refresh restent en fallback pour compatibilité.
+  // ── Gestion retour paiement ──────────────────────────────────────────────
+  let _pendingRetryBookingId = null; // bookingId en attente pour "Réessayer le paiement"
+
+  function showPaymentOverlay(type, bookingId) {
+    // Cacher tous les overlays paiement
+    ['paymentSuccessOverlay','paymentCancelOverlay','paymentFailedOverlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    if (type === 'success') {
+      const overlay = document.getElementById('paymentSuccessOverlay');
+      if (overlay) overlay.style.display = 'flex';
+      // Remplir le récap
+      const recap = document.getElementById('paySuccessRecap');
+      if (recap && bookingId) {
+        // Chercher la réservation dans state.bookings (déjà rechargé)
+        const booking = (state.bookings || []).find(b => b.id === bookingId);
+        if (booking) {
+          const dateStr = booking.startsAt
+            ? new Date(booking.startsAt).toLocaleString('fr-FR', { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' })
+            : '';
+          const title = booking.service?.title || 'Prestation';
+          const proName = booking.proProfile?.displayName || booking.proProfile?.businessName || 'Professionnel';
+          recap.innerHTML = `<strong>${title}</strong> avec <strong>${proName}</strong><br>${dateStr}`;
+        } else {
+          recap.innerHTML = 'Récapitulatif disponible dans ton onglet RDV.';
+        }
+      }
+      // Stocker bookingId pour la facture
+      const btn = document.getElementById('downloadInvoiceBtn');
+      if (btn) btn.dataset.bookingId = bookingId || '';
+    } else if (type === 'cancel' || type === 'failed') {
+      const overlay = document.getElementById(type === 'cancel' ? 'paymentCancelOverlay' : 'paymentFailedOverlay');
+      if (overlay) overlay.style.display = 'flex';
+    }
+  }
+
+  function closePaymentResult(type) {
+    ['paymentSuccessOverlay','paymentCancelOverlay','paymentFailedOverlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    if (type === 'success') {
+      goTo('screen-rdv');
+    } else {
+      // Retour à l'écran principal (accueil carte)
+      goTo('screen-home');
+    }
+  }
+
+  async function retryPayment() {
+    // Fermer les overlays
+    ['paymentCancelOverlay','paymentFailedOverlay'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    // Trouver la réservation PENDING et relancer le checkout
+    if (!_pendingRetryBookingId) {
+      notify("Aucune réservation en attente trouvée.", "error");
+      goTo('screen-home');
+      return;
+    }
+    try {
+      notify("Relancement du paiement…", "ok");
+      const token = appApi.getToken();
+      const res = await fetch(`/api/v1/payments/bookings/${_pendingRetryBookingId}/checkout-session`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      });
+      if (!res.ok) throw new Error('Erreur serveur');
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error('URL Stripe manquante');
+      }
+    } catch (e) {
+      console.error('[Stripe] Erreur relance paiement', e);
+      notify("Impossible de relancer le paiement. Réessaie depuis l'onglet RDV.", "error");
+      goTo('screen-rdv');
+    }
+  }
+
+  async function downloadInvoice() {
+    const btn = document.getElementById('downloadInvoiceBtn');
+    const bookingId = btn?.dataset?.bookingId;
+    if (!bookingId) { notify("Réservation introuvable pour la facture.", "error"); return; }
+    try {
+      const token = appApi.getToken();
+      const res = await fetch(`/api/v1/bookings/${bookingId}/invoice`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const inv = await res.json();
+      // Générer un HTML facture imprimable dans un nouvel onglet
+      const html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Facture ${inv.invoiceNumber}</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:640px;margin:40px auto;padding:20px;color:#222;}
+.logo{font-weight:900;font-size:1.5rem;color:#5C1A18;margin-bottom:4px;}
+.subtitle{color:#888;font-size:.85rem;margin-bottom:32px;}
+h1{font-size:1.1rem;font-weight:800;margin:0 0 4px;}
+.inv-num{color:#888;font-size:.85rem;margin-bottom:28px;}
+table{width:100%;border-collapse:collapse;margin-bottom:24px;}
+td{padding:10px 12px;font-size:.9rem;}
+tr:nth-child(odd) td{background:#FAF7F3;}
+.label{color:#888;font-size:.82rem;text-transform:uppercase;letter-spacing:.04em;}
+.total{font-size:1.1rem;font-weight:800;color:#5C1A18;}
+.footer{margin-top:36px;font-size:.78rem;color:#aaa;border-top:1px solid #eee;padding-top:16px;}
+@media print{body{margin:0;}}
+</style></head><body>
+<div class="logo">UBODROP</div>
+<div class="subtitle">La beauté à domicile · ubodrop.com</div>
+<h1>Facture</h1>
+<div class="inv-num">N° ${inv.invoiceNumber} · Émise le ${inv.payment?.paidAtFormatted || ''}</div>
+<table>
+<tr><td class="label">Prestation</td><td>${inv.service?.title || ''}</td></tr>
+<tr><td class="label">Durée</td><td>${inv.service?.durationMin || ''} min</td></tr>
+<tr><td class="label">Date de la prestation</td><td>${inv.booking?.prestationDate || ''} à ${inv.booking?.prestationTime || ''}</td></tr>
+<tr><td class="label">Professionnel</td><td>${inv.pro?.name || ''}${inv.pro?.city ? ' · ' + inv.pro.city : ''}</td></tr>
+<tr><td class="label">Client</td><td>${inv.client?.name || ''}</td></tr>
+<tr><td class="label">Référence paiement</td><td>${inv.payment?.reference || ''}</td></tr>
+<tr><td class="label">Montant réglé</td><td class="total">${inv.payment?.amountFormatted || ''}</td></tr>
+</table>
+<div class="footer">${inv.platform?.legalNote || ''}<br>UBODROP · ${inv.platform?.email || ''} · ${inv.platform?.website || ''}</div>
+<script>window.onload = function(){ window.print(); }<\/script>
+</body></html>`;
+      const w = window.open('', '_blank');
+      if (w) { w.document.write(html); w.document.close(); }
+    } catch (e) {
+      console.error('[Invoice] Erreur', e);
+      notify("Facture temporairement indisponible. Réessaie depuis l'onglet RDV.", "error");
+    }
+  }
+
   (async function detectPaymentReturn() {
     const hash = window.location.hash;
     if (hash.startsWith("#payment-success=")) {
       const bookingId = hash.replace("#payment-success=", "");
+      _pendingRetryBookingId = null;
       window.location.hash = "";
       await loadBookings();
-      goTo("screen-rdv");
-      notify("🎉 Réservation confirmée ! Retrouve ton rendez-vous dans l'onglet RDV.", "ok");
+      showPaymentOverlay('success', bookingId);
       console.log("[Stripe] Paiement réussi — bookingId=" + bookingId);
     } else if (hash.startsWith("#payment-cancel=")) {
+      const bookingId = hash.replace("#payment-cancel=", "");
+      _pendingRetryBookingId = bookingId || null;
       window.location.hash = "";
-      notify("Paiement annulé. Tu peux recommencer à tout moment.", "error");
+      showPaymentOverlay('cancel', bookingId);
+    } else if (hash.startsWith("#payment-failed=")) {
+      const bookingId = hash.replace("#payment-failed=", "");
+      _pendingRetryBookingId = bookingId || null;
+      window.location.hash = "";
+      showPaymentOverlay('failed', bookingId);
     } else if (hash === "#stripe-return") {
       // Fallback hash (utilisé si env vars non configurées côté serveur)
       window.location.hash = "";
@@ -4715,6 +4857,48 @@ function syncGoogleUiVisibility(screenId) {
       <textarea id="satComment" placeholder="Un commentaire ? (optionnel)" rows="3"
         style="width:100%;padding:10px 12px;border:1.5px solid var(--line-2);border-radius:12px;font:inherit;font-size:.9rem;resize:none;outline:none;"></textarea>
       <button id="satSubmitBtn" onclick="submitSatisfaction()" class="primary-btn" style="width:100%;margin-top:14px;">Envoyer mon avis</button>
+    </div>
+  </div>
+
+  <!-- ── ÉCRAN PAIEMENT ACCEPTÉ ────────────────────────────────────────── -->
+  <div id="paymentSuccessOverlay" style="display:none;position:fixed;inset:0;background:rgba(24,17,15,.7);z-index:3100;align-items:center;justify-content:center;">
+    <div class="card" style="width:min(380px,94%);padding:32px 24px;position:relative;border-radius:24px;text-align:center;">
+      <div style="font-size:52px;line-height:1;margin-bottom:12px;">✅</div>
+      <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement confirmé !</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin:0 0 20px;">Ta réservation est confirmée. Un email de confirmation t'a été envoyé.</p>
+      <!-- Récap réservation (rempli dynamiquement) -->
+      <div id="paySuccessRecap" style="background:var(--surface-soft);border-radius:14px;padding:14px 16px;text-align:left;margin-bottom:20px;font-size:.88rem;line-height:1.7;color:var(--ink);"></div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="primary-btn" onclick="closePaymentResult('success')">Voir mes rendez-vous</button>
+        <button class="secondary-btn" id="downloadInvoiceBtn" onclick="downloadInvoice()">Télécharger la facture</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ÉCRAN PAIEMENT ANNULÉ ─────────────────────────────────────────── -->
+  <div id="paymentCancelOverlay" style="display:none;position:fixed;inset:0;background:rgba(24,17,15,.7);z-index:3100;align-items:center;justify-content:center;">
+    <div class="card" style="width:min(380px,94%);padding:32px 24px;position:relative;border-radius:24px;text-align:center;">
+      <div style="font-size:52px;line-height:1;margin-bottom:12px;">⏸️</div>
+      <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement annulé</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin:0 0 24px;">Tu as quitté la page de paiement. Ta réservation est toujours en attente — tu peux relancer le paiement à tout moment.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="primary-btn" onclick="retryPayment()">Relancer le paiement</button>
+        <button class="secondary-btn" onclick="closePaymentResult('cancel')">Retour à l'accueil</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ÉCRAN PAIEMENT REFUSÉ ─────────────────────────────────────────── -->
+  <div id="paymentFailedOverlay" style="display:none;position:fixed;inset:0;background:rgba(24,17,15,.7);z-index:3100;align-items:center;justify-content:center;">
+    <div class="card" style="width:min(380px,94%);padding:32px 24px;position:relative;border-radius:24px;text-align:center;">
+      <div style="font-size:52px;line-height:1;margin-bottom:12px;">❌</div>
+      <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement refusé</h2>
+      <p style="font-size:.9rem;color:var(--muted);margin:0 0 8px;">Ton paiement n'a pas pu être traité.</p>
+      <p style="font-size:.83rem;color:var(--muted);margin:0 0 24px;">Vérifie les informations de ta carte ou essaie avec un autre moyen de paiement.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="primary-btn" onclick="retryPayment()">Réessayer le paiement</button>
+        <button class="secondary-btn" onclick="closePaymentResult('failed')">Retour à l'accueil</button>
+      </div>
     </div>
   </div>
 

@@ -2132,20 +2132,26 @@
 
   function normalizePros(data) {
     return extractArray(data).map((item, index) => {
-      // Déduire la catégorie depuis les spécialités d'abord (pros sans services),
-      // puis depuis les services, puis fallback sur COIFFEUSE.
+      // Déduire la catégorie depuis TOUTES les spécialités (ordre d'importance),
+      // puis depuis les services, puis null si inconnu.
+      // On ne met PAS de fallback COIFFEUSE car un pro retourné par le backend
+      // filtré par catégorie doit passer getVisiblePros() même sans catégorie détectable.
+      const allSpecialtyCats = (Array.isArray(item?.specialties) ? item.specialties : [])
+        .map(s => s?.category?.name).filter(Boolean);
+      const allServiceCats = (Array.isArray(item?.services) ? item.services : [])
+        .map(s => s?.category?.name).filter(Boolean);
       const categorySource =
         item?.category?.name ||
         item?.primaryCategory?.name ||
         item?.specialty ||
         item?.serviceCategory ||
         item?.profession ||
-        item?.specialties?.[0]?.category?.name ||
-        item?.services?.[0]?.category?.name ||
+        allSpecialtyCats[0] ||
+        allServiceCats[0] ||
         item?.services?.[0]?.name ||
-        "COIFFEUSE";
+        null; // null = inconnu (pas de fallback COIFFEUSE)
 
-      const key = categoryKeyFromText(categorySource);
+      const key = categorySource ? categoryKeyFromText(categorySource) : null;
       const name =
         item?.displayName ||
         item?.businessName ||
@@ -2358,7 +2364,15 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   function getVisiblePros() {
-    return state.pros.filter((pro) => pro.category === state.category || !state.category);
+    // Si pas de filtre catégorie → tous les pros
+    // Si catégorie filtrée → pros dont la catégorie correspond OU dont la catégorie est null
+    // (un pro retourné par le backend avec filtre catégorie mais sans catégorie détectable
+    //  côté frontend ne doit PAS être exclu ici — le backend a déjà fait la vérification)
+    return state.pros.filter((pro) =>
+      !state.category ||
+      pro.category === state.category ||
+      pro.category == null
+    );
   }
 
   function renderMapEmptyMessage() {
@@ -3349,8 +3363,11 @@ function syncGoogleUiVisibility(screenId) {
         mode: params.mode
       });
 
-      state.pros = normalizePros(await appApi.searchProfessionals(params));
-      console.log("[UBODROP][Search] pros loaded", { count: state.pros.length });
+      const rawPros = await appApi.searchProfessionals(params);
+      console.log("[UBODROP][Search] API raw pros", { total: rawPros?.total, count: rawPros?.items?.length ?? (Array.isArray(rawPros) ? rawPros.length : 0) });
+      state.pros = normalizePros(rawPros);
+      console.log("[UBODROP][Search] pros normalisés", state.pros.map(p => ({ id: p.id, name: p.name, category: p.category, city: p.location })));
+      console.log("[UBODROP][Search] pros loaded", { count: state.pros.length, visibles: getVisiblePros().length });
     } catch (err) {
       console.warn("[UBODROP][Search] loadPros error", err);
       state.pros = [];

@@ -2535,14 +2535,27 @@ function syncGoogleUiVisibility(screenId) {
         state.autocomplete.addListener("place_changed", () => {
           const place = state.autocomplete.getPlace();
           const location = place?.geometry?.location;
-          if (!location || !state.map) return;
+          if (!location) return;
+          // Nom court (ex: "Paris") pour le filtre backend, label complet pour l'affichage
+          const shortName = place.name || (place.formatted_address || input.value).split(',')[0]?.trim();
           state.searchLocation = {
             lat: location.lat(),
             lng: location.lng(),
-            label: place.formatted_address || place.name || input.value
+            label: place.formatted_address || place.name || input.value,
+            cityName: shortName
           };
-          state.map.panTo({ lat: state.searchLocation.lat, lng: state.searchLocation.lng });
-          state.map.setZoom(13);
+          if (state.map) {
+            state.map.panTo({ lat: state.searchLocation.lat, lng: state.searchLocation.lng });
+            state.map.setZoom(13);
+          }
+          console.log("[UBODROP][Search] city changed via autocomplete", {
+            city: state.searchLocation.cityName,
+            lat: state.searchLocation.lat,
+            lng: state.searchLocation.lng,
+            radiusKm: state.radius
+          });
+          // Recharger les pros pour la nouvelle ville (vide liste + markers avant)
+          loadPros();
         });
       }
 
@@ -3306,19 +3319,40 @@ function syncGoogleUiVisibility(screenId) {
   async function loadPros() {
     try {
       const params = {};
-      if (state.category)  params.category = state.category;
-      const city = state.searchLocation?.label;
-      if (city && city !== "Paris") params.city = city;
+      if (state.category) params.category = state.category;
+
       if (state.searchLocation?.lat && state.searchLocation?.lng) {
+        // Géo-recherche : coordonnées + rayon
         params.lat    = state.searchLocation.lat;
         params.lng    = state.searchLocation.lng;
         params.radius = state.radius || 15;
+        // Nom court de la ville (ex: "Paris") pour le fallback backend (pros sans coords)
+        const shortCity = state.searchLocation.cityName
+          || (state.searchLocation.label || '').split(',')[0]?.trim();
+        if (shortCity) params.city = shortCity;
+      } else if (state.searchLocation?.label) {
+        // Recherche par nom de ville uniquement (pas de coords)
+        params.city = (state.searchLocation.label).split(',')[0]?.trim()
+          || state.searchLocation.label;
       }
+
       const mode = PLACE_TO_MODE[state.place];
       if (mode) params.mode = mode;
       if (state.budget) params.maxPrice = state.budget;
+
+      console.log("[UBODROP][Search] loading pros", {
+        city: params.city,
+        lat: params.lat,
+        lng: params.lng,
+        radius: params.radius,
+        category: params.category,
+        mode: params.mode
+      });
+
       state.pros = normalizePros(await appApi.searchProfessionals(params));
-    } catch (_) {
+      console.log("[UBODROP][Search] pros loaded", { count: state.pros.length });
+    } catch (err) {
+      console.warn("[UBODROP][Search] loadPros error", err);
       state.pros = [];
     }
     if (!state.pros.length) state.selectedPro = null;
@@ -4419,6 +4453,75 @@ function syncGoogleUiVisibility(screenId) {
       };
       container.appendChild(chip);
     });
+  })();
+
+  // ── Recherche par ville : Enter + clic flèche ───────────────────────────────
+  (function initCitySearch() {
+    const cityInput = document.getElementById("citySearchInput");
+    if (!cityInput) return;
+
+    async function triggerCitySearch() {
+      const val = cityInput.value.trim();
+      if (!val) return;
+      // Si Google Maps est chargé, géocoder la saisie manuelle
+      if (window.google?.maps?.Geocoder) {
+        try {
+          const result = await new Promise((resolve, reject) =>
+            new google.maps.Geocoder().geocode({ address: val + ", France" }, (res, status) =>
+              status === "OK" && res[0] ? resolve(res[0]) : reject(status)
+            )
+          );
+          const loc = result.geometry.location;
+          const shortName = result.address_components
+            ?.find(c => c.types.includes("locality")
+                     || c.types.includes("administrative_area_level_2")
+                     || c.types.includes("administrative_area_level_1"))
+            ?.long_name || val;
+          state.searchLocation = {
+            lat: loc.lat(),
+            lng: loc.lng(),
+            label: result.formatted_address || val,
+            cityName: shortName
+          };
+          if (state.map) {
+            state.map.panTo({ lat: state.searchLocation.lat, lng: state.searchLocation.lng });
+            state.map.setZoom(13);
+          }
+        } catch (_) {
+          // Géocodage échoué : utiliser le texte saisi tel quel comme nom de ville
+          state.searchLocation = {
+            ...(state.searchLocation || { lat: 48.8566, lng: 2.3522 }),
+            label: val,
+            cityName: val
+          };
+        }
+      } else {
+        state.searchLocation = {
+          ...(state.searchLocation || { lat: 48.8566, lng: 2.3522 }),
+          label: val,
+          cityName: val
+        };
+      }
+      console.log("[UBODROP][Search] city changed via input", {
+        city: state.searchLocation.cityName,
+        lat: state.searchLocation.lat,
+        lng: state.searchLocation.lng,
+        radiusKm: state.radius
+      });
+      loadPros();
+    }
+
+    // Enter key
+    cityInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); triggerCitySearch(); }
+    });
+
+    // Clic sur la flèche › (dernier span du .searchbar.compact)
+    const searchbarArrow = cityInput.parentElement?.querySelector("span:last-child");
+    if (searchbarArrow) {
+      searchbarArrow.style.cursor = "pointer";
+      searchbarArrow.addEventListener("click", () => triggerCitySearch());
+    }
   })();
 
   document.getElementById("filterOverlay").addEventListener("click", (e) => {

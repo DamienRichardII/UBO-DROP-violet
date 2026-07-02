@@ -1496,6 +1496,19 @@
   <div class="card list-card"></div>
 </section>
 
+      <!-- ── ÉCRAN PRO : MES DÉPLACEMENTS ──────────────────────────────── -->
+      <section class="screen" id="screen-pro-map">
+        <div class="screen-head">
+          <button class="icon-btn" data-go="screen-pro-dashboard">‹</button>
+          <div class="title-wrap">
+            <h2>Mes déplacements</h2>
+            <p>Demandes clients et interventions à venir.</p>
+          </div>
+          <button class="icon-btn" onclick="renderProMap()" title="Actualiser">↻</button>
+        </div>
+        <div id="proMapList" style="padding:16px;display:flex;flex-direction:column;gap:12px;"></div>
+      </section>
+
       <section class="screen chat-shell" id="screen-chat">
   <div class="chat-head">
     <button class="icon-btn" data-go="screen-pro-messages">‹</button>
@@ -1734,7 +1747,7 @@
   const screenToNavPro = [
     { id: "screen-pro-dashboard", label: "Espace pro", icon: navIcons.dashboard },
     { id: "screen-pro-messages", label: "Messages", icon: navIcons.messages },
-    { id: "screen-search", label: "Carte", icon: navIcons.map },
+    { id: "screen-pro-map", label: "Carte", icon: navIcons.map },
     { id: "screen-account", label: "Compte", icon: navIcons.user }
   ];
 
@@ -2264,6 +2277,7 @@ function syncGoogleUiVisibility(screenId) {
     "screen-account",
     "screen-pro-dashboard",
     "screen-pro-messages",
+    "screen-pro-map",
     "screen-chat",
   ]);
 
@@ -2282,6 +2296,8 @@ function syncGoogleUiVisibility(screenId) {
     document.getElementById(screenId)?.classList.add("active");
     renderNav(screenId);
     syncGoogleUiVisibility(screenId);
+    // Hooks écrans pro
+    if (screenId === "screen-pro-map") { renderProMap(); }
   }
 
   function toggleFilter(open) {
@@ -3369,6 +3385,101 @@ function syncGoogleUiVisibility(screenId) {
     });
   }
 
+  // ── ÉCRAN PRO : MES DÉPLACEMENTS ──────────────────────────────────────
+  const BOOKING_STATUS_LABELS = {
+    PENDING:          "Demande reçue",
+    AWAITING_PAYMENT: "En attente de paiement",
+    CONFIRMED:        "Réservation confirmée",
+    FAILED:           "Paiement refusé",
+    CANCELLED:        "Annulée",
+    COMPLETED:        "Terminée",
+  };
+
+  const BOOKING_STATUS_COLORS = {
+    PENDING:          "#f59e0b",
+    AWAITING_PAYMENT: "#3b82f6",
+    CONFIRMED:        "#10b981",
+    FAILED:           "#ef4444",
+    CANCELLED:        "#6b7280",
+    COMPLETED:        "#8b5cf6",
+  };
+
+  function buildProClientDirectionsUrl(proCity, clientCity) {
+    if (!clientCity) return null;
+    const dest = encodeURIComponent(clientCity);
+    if (proCity) {
+      return "https://www.google.com/maps/dir/?api=1&origin=" + encodeURIComponent(proCity) + "&destination=" + dest;
+    }
+    return "https://www.google.com/maps/dir/?api=1&destination=" + dest;
+  }
+
+  async function renderProMap() {
+    const container = document.getElementById("proMapList");
+    if (!container) return;
+    if (!appApi.getToken()) {
+      container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:48px 16px;">Connecte-toi pour voir tes demandes.</div>';
+      return;
+    }
+    container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:32px;">Chargement...</div>';
+    try {
+      const raw = await appApi.myBookings();
+      const allBookings = Array.isArray(raw) ? raw : (raw?.items ?? []);
+      // Filtrer les réservations où l'utilisateur courant est le PRO (pas le client)
+      const myUserId = state.authUser?.id;
+      const myProId  = state.authUser?.proProfile?.id;
+      const proBookings = allBookings.filter(function(b) {
+        // Exclure les bookings où l'utilisateur est le client
+        if (b.clientUserId && b.clientUserId === myUserId) return false;
+        // Inclure si le proProfile correspond
+        if (myProId && (b.proProfileId === myProId || b.proProfile?.id === myProId)) return true;
+        // Sinon inclure si pas client (fallback)
+        return !b.clientUserId || b.clientUserId !== myUserId;
+      });
+
+      if (!proBookings.length) {
+        container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:48px 16px;"><div style="font-size:2.5rem;margin-bottom:12px;">📋</div><div style="font-weight:700;margin-bottom:8px;">Aucune demande pour le moment</div><div style="font-size:.9rem;">Les demandes clients apparaîtront ici dès qu\'un client te réserve une prestation.</div></div>';
+        return;
+      }
+
+      const proCity = state.authUser?.proProfile?.city || state.authUser?.city || "";
+      container.innerHTML = proBookings.map(function(b) {
+        var client = b.clientUser && b.clientUser.clientProfile ? b.clientUser.clientProfile : null;
+        var clientName = (client && (client.firstName || client.lastName))
+          ? [client.firstName, client.lastName].filter(Boolean).join(" ")
+          : (b.clientUser && b.clientUser.email ? b.clientUser.email : "Client");
+        var serviceName = (b.service && b.service.title) ? b.service.title : "Prestation";
+        var status = BOOKING_STATUS_LABELS[b.status] || b.status || "Inconnu";
+        var statusColor = BOOKING_STATUS_COLORS[b.status] || "var(--muted)";
+        var date = b.startsAt
+          ? new Date(b.startsAt).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })
+          : "Date à définir";
+        var clientCity = (client && client.city) ? client.city : "";
+        var mapsUrl = buildProClientDirectionsUrl(proCity, clientCity);
+        var durationStr = (b.service && b.service.durationMin) ? b.service.durationMin + " min" : "";
+        return '<div class="card" style="padding:16px;">'
+          + '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">'
+          + '<div>'
+          + '<div style="font-weight:700;font-size:1rem;">' + clientName + '</div>'
+          + '<div style="font-size:.85rem;color:var(--muted);">' + serviceName + (durationStr ? " · " + durationStr : "") + '</div>'
+          + '</div>'
+          + '<span style="font-size:.78rem;font-weight:600;background:' + statusColor + '22;color:' + statusColor + ';padding:4px 10px;border-radius:20px;white-space:nowrap;">' + status + '</span>'
+          + '</div>'
+          + '<div style="font-size:.85rem;color:var(--muted);display:flex;flex-direction:column;gap:4px;margin-bottom:12px;">'
+          + '<div>🕐 ' + date + '</div>'
+          + (clientCity ? '<div>📍 ' + clientCity + '</div>' : '<div style="font-style:italic;">Adresse client non renseignée</div>')
+          + '</div>'
+          + (mapsUrl
+            ? '<a href="' + mapsUrl + '" target="_blank" rel="noopener" class="primary-btn" style="display:block;text-align:center;text-decoration:none;font-size:.9rem;">🚗 Itinéraire</a>'
+            : '<div style="font-size:.85rem;color:var(--muted);font-style:italic;">Itinéraire indisponible (ville client manquante)</div>')
+          + '</div>';
+      }).join("");
+    } catch (err) {
+      container.innerHTML = '<div style="text-align:center;color:#e53935;padding:32px;">Impossible de charger les demandes. Réessaie plus tard.</div>';
+      console.warn("[UBODROP] renderProMap error", err);
+    }
+  }
+  // ── FIN ÉCRAN PRO : MES DÉPLACEMENTS ───────────────────────────────────
+
   async function hydrateSession() {
     state.session = appApi.getSession();
     if (!state.session?.accessToken) return;
@@ -3506,7 +3617,7 @@ function syncGoogleUiVisibility(screenId) {
     const returnTo = state.returnToScreen;
     state.returnToScreen = null;
     const defaultScreen = state.userMode === "pro" ? "screen-pro-dashboard" : "screen-account";
-    const proScreens = new Set(["screen-pro-dashboard", "screen-pro-messages"]);
+    const proScreens = new Set(["screen-pro-dashboard", "screen-pro-messages", "screen-pro-map"]);
     const clientScreens = new Set(["screen-account", "screen-rdv", "screen-favs", "screen-chat"]);
     let destination = defaultScreen;
     if (returnTo) {
@@ -4361,9 +4472,12 @@ function syncGoogleUiVisibility(screenId) {
       if (statusEl) { statusEl.textContent = "Remplis le métier, le titre, le prix et la durée."; statusEl.style.display = "block"; }
       return;
     }
-    // Guard : categoryId doit être un UUID (contient des tirets) — pas une clé fallback
-    if (!categoryId.includes('-')) {
-      if (statusEl) { statusEl.textContent = "Sélectionne un métier valide dans la liste (rechargez l'onglet si la liste est vide)."; statusEl.style.display = "block"; statusEl.style.color = "#e53935"; }
+    // Guard : categoryId ne doit pas être une clé fallback (enum string comme "BARBER")
+    // Les vrais IDs en base sont des CUIDs (≥10 chars, générés par Prisma @default(cuid()))
+    // et ne correspondent PAS aux clés d'enum uppercase
+    const FALLBACK_KEYS = ["BARBER","COIFFEUSE","MANUCURE","MAQUILLAGE","HENNE","ESTHETICIENNE","TATOUEUR","MASSAGE","MICRO_PIGMENTATION"];
+    if (!categoryId || categoryId.length < 8 || FALLBACK_KEYS.includes(categoryId.toUpperCase())) {
+      if (statusEl) { statusEl.textContent = "Métier non chargé — rechargez l'onglet Prestations et réessayez."; statusEl.style.display = "block"; statusEl.style.color = "#e53935"; }
       return;
     }
     const price = parseFloat(priceRaw);
@@ -5119,4 +5233,13 @@ tr:nth-child(odd) td{background:#FAF7F3;}
       <div style="font-size:52px;line-height:1;margin-bottom:12px;">❌</div>
       <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement refusé</h2>
       <p style="font-size:.9rem;color:var(--muted);margin:0 0 8px;">Ton paiement n'a pas pu être traité.</p>
-      <p style="font-size:.83rem;color:var(--muted);margin:0 0 24px;
+      <p style="font-size:.83rem;color:var(--muted);margin:0 0 24px;">Vérifie les informations de ta carte ou essaie avec un autre moyen de paiement.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <button class="primary-btn" onclick="retryPayment()">Réessayer le paiement</button>
+        <button class="secondary-btn" onclick="closePaymentResult('failed')">Retour à l'accueil</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1591,7 +1591,7 @@
       <div class="filter-grid">
         <div class="filter-group">
           <h4>Lieu de la prestation</h4>
-          <div class="seg-grid seg-grid--3" id="filterPlaceGrid"></div>
+          <div class="seg-grid seg-grid--2" id="filterPlaceGrid"></div>
         </div>
         <div class="filter-group">
           <h4>Catégories</h4>
@@ -1630,7 +1630,7 @@
     { key: "MANUCURE",           label: "Manucure" }
   ];
 
-  const placeOptions = ["À domicile", "Chez le pro", "En salon"];
+  const placeOptions = ["En déplacement", "En salon"];
 
   const emptyState = {
     pros: {
@@ -3324,9 +3324,11 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   // Mapping place UI → enum backend
+  // Mapping filtres UI → mode backend
+  // "En déplacement" = le pro se déplace chez le client (offersAtHome / mode HOME)
+  // "En salon"       = le client se rend au pro (offersAtSalon / mode SALON)
   const PLACE_TO_MODE = {
-    "À domicile": "HOME",
-    "Chez le pro": "PRO_PLACE",
+    "En déplacement": "HOME",
     "En salon": "SALON",
   };
 

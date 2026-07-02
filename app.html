@@ -1420,10 +1420,14 @@
       <!-- État : en attente / vérification -->
       <div id="stripe-state-pending" class="stripe-state-panel" style="display:none;">
         <div style="padding:10px 14px; border-radius:10px; font-size:.86rem; font-weight:600; margin-bottom:10px; background:rgba(80,80,200,.1); color:#2a2a8a;">
-          ⏳ Vérification Stripe en cours
+          🕐 Compte Stripe en cours de vérification
         </div>
-        <p style="font-size:.84rem;color:#555;margin-bottom:12px;">Ton compte Stripe est en cours de vérification. Cela peut prendre quelques heures. Aucune action requise.</p>
-        <button class="secondary-btn" id="stripeResumeBtn">Continuer la configuration Stripe</button>
+        <p style="font-size:.84rem;color:#555;margin-bottom:4px;">Stripe vérifie actuellement vos informations. Vous pourrez recevoir des paiements dès que la vérification sera terminée.</p>
+        <p style="font-size:.82rem;color:#888;margin-bottom:12px;">Cette vérification peut prendre quelques minutes à quelques heures.</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="secondary-btn" id="stripeRefreshStatusPendingBtn" style="font-size:.84rem;">↻ Actualiser le statut</button>
+          <button class="secondary-btn" id="stripeResumeBtn" style="font-size:.84rem;">Continuer la vérification Stripe</button>
+        </div>
       </div>
 
       <!-- État : action requise par Stripe -->
@@ -4615,6 +4619,13 @@ function syncGoogleUiVisibility(screenId) {
     await loadStripeConnectStatus();
     if (btn) { btn.disabled = false; btn.textContent = "↻ Actualiser le statut"; }
   });
+  // Bouton Actualiser dans le panel "pending" (vérification en cours)
+  document.getElementById("stripeRefreshStatusPendingBtn")?.addEventListener("click", async () => {
+    const btn = document.getElementById("stripeRefreshStatusPendingBtn");
+    if (btn) { btn.disabled = true; btn.textContent = "Actualisation…"; }
+    await loadStripeConnectStatus();
+    if (btn) { btn.disabled = false; btn.textContent = "↻ Actualiser le statut"; }
+  });
 
   // Charger statut Stripe quand l'onglet bancaire est ouvert
   const _bancaireTrigger = document.querySelector('[data-tab="tab-bancaire"]');
@@ -4991,6 +5002,19 @@ tr:nth-child(odd) td{background:#FAF7F3;}
     });
   }
 
+  // Traduction des raisons Stripe en messages lisibles pour le pro
+  const STRIPE_REASON_LABELS = {
+    'requirements.pending_verification': 'Stripe vérifie actuellement vos informations. Aucune action requise pour le moment.',
+    'requirements.past_due':             'Des informations sont manquantes sur votre compte Stripe. Cliquez pour compléter.',
+    'listed':                            'Votre compte est en attente de validation par Stripe.',
+    'under_review':                      'Votre compte est en cours de révision par Stripe.',
+    'other':                             'Votre compte nécessite une vérification. Contactez le support Stripe.',
+    'rejected.fraud':                    'Votre compte a été refusé (suspicion de fraude). Contactez le support Stripe.',
+    'rejected.terms_of_service':         'Votre compte a été refusé (conditions d\'utilisation). Contactez le support Stripe.',
+    'rejected.listed':                   'Votre compte a été refusé. Contactez le support Stripe.',
+    'rejected.other':                    'Votre compte a été refusé. Contactez le support Stripe.',
+  };
+
   async function loadStripeConnectStatus() {
     if (!appApi.getToken() || state.userMode !== 'pro') return;
     showStripePanel('loading');
@@ -4999,16 +5023,31 @@ tr:nth-child(odd) td{background:#FAF7F3;}
       // L'intercepteur response.interceptor wrapping → { data: {...} } ou directement l'objet
       const s = raw?.data ?? raw;
       const status = s?.status ?? (s?.connected ? 'connected' : 'not_connected');
+      const disabledReason = s?.stripeDisabledReason ?? null;
 
-      // Si disabled_reason = requirements.past_due → panel dédié avec bouton
-      const isPastDue = s?.stripeDisabledReason === 'requirements.past_due'
+      // requirements.pending_verification → afficher le panel "pending" (pas "disabled")
+      const isPendingVerification = disabledReason === 'requirements.pending_verification'
+        || (s?.pendingVerification && s.pendingVerification.length > 0);
+
+      // requirements.past_due → panel dédié avec bouton de complétion
+      const isPastDue = disabledReason === 'requirements.past_due'
         || (s?.pastDue && s.pastDue.length > 0 && status === 'disabled');
 
-      showStripePanel(isPastDue ? 'past_due' : status);
+      if (isPendingVerification) {
+        showStripePanel('pending');
+      } else if (isPastDue) {
+        showStripePanel('past_due');
+      } else {
+        showStripePanel(status);
+      }
 
-      if (status === 'disabled' && s?.stripeDisabledReason && !isPastDue) {
+      // Message humain pour le panel "disabled" (blocage réel)
+      if (status === 'disabled' && disabledReason && !isPastDue && !isPendingVerification) {
         const msgEl = document.getElementById('stripeDisabledMsg');
-        if (msgEl) msgEl.textContent = 'Compte désactivé — raison : ' + s.stripeDisabledReason;
+        if (msgEl) {
+          msgEl.textContent = STRIPE_REASON_LABELS[disabledReason]
+            || 'Votre compte Stripe nécessite une attention. Contactez le support Stripe ou UBODROP.';
+        }
       }
     } catch (err) {
       showStripePanel('not_connected');
@@ -5206,7 +5245,6 @@ tr:nth-child(odd) td{background:#FAF7F3;}
       <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement confirmé !</h2>
       <p style="font-size:.9rem;color:var(--muted);margin:0 0 20px;">Ta réservation est confirmée. Un email de confirmation t'a été envoyé.</p>
       <!-- Récap réservation (rempli dynamiquement) -->
-      <div id="paySuccessRecap" style="background:var(--surface-soft);border-radius:14px;padding:14px 16px;text-align:left;margin-bottom:20px;font-size:.88rem;line-height:1.7;color:var(--ink);"></div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button class="primary-btn" onclick="closePaymentResult('success')">Voir mes rendez-vous</button>
         <button class="secondary-btn" id="downloadInvoiceBtn" onclick="downloadInvoice()">Télécharger la facture</button>

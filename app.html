@@ -1052,6 +1052,26 @@
           </div>
 
           <div class="stack-12 mt-14" id="detailServices"></div>
+
+          <!-- A4 : localisation pro + A5 : bouton itinéraire Google Maps -->
+          <div id="detailLocationSection" style="display:none; margin-top:20px; padding-top:16px; border-top:1px solid var(--line-2);">
+            <div style="font-weight:700; font-size:.9rem; margin-bottom:10px; color:var(--ink);">📍 Localisation</div>
+            <img id="detailStaticMap" src="" alt="Carte du prestataire"
+                 style="width:100%; border-radius:12px; display:none; margin-bottom:10px; object-fit:cover; height:140px; background:var(--surface-soft);">
+            <div id="detailLocationLabel" style="font-size:.84rem; color:var(--muted); margin-bottom:10px;"></div>
+            <div style="display:flex; gap:8px;">
+              <a id="detailMapsBtn" href="#" target="_blank" rel="noopener noreferrer"
+                 class="secondary-btn"
+                 style="flex:1; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; font-size:.85rem; padding:11px 10px;">
+                🗺 Voir sur Maps
+              </a>
+              <a id="detailDirectionsBtn" href="#" target="_blank" rel="noopener noreferrer"
+                 class="primary-btn"
+                 style="flex:1; text-align:center; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:6px; font-size:.85rem; padding:11px 10px;">
+                🚗 Itinéraire
+              </a>
+            </div>
+          </div>
         </div>
 
         <div class="sticky-cta">
@@ -1279,16 +1299,18 @@
       <div class="field"><label>SIRET <span class="muted">(optionnel)</span></label><input type="text" id="proEditSiret" placeholder="000 000 000 00000" maxlength="17"></div>
       <div class="field"><label>Rayon d’intervention (km)</label><input type="number" id="proEditRadius" placeholder="10" min="1" max="200"></div>
       <div class="field">
-        <label>Modes de prestation</label>
-        <!-- hidden checkboxes — backward compat avec handleSaveProProfile() -->
+        <label>Lieu de travail</label>
+        <div class="section-sub" style="font-size:.8rem; margin-bottom:8px;">Où proposes-tu tes services ? Sélectionne tout ce qui s'applique.</div>
+        <!-- hidden checkboxes — lus par handleSaveProProfile() → offersAtHome / offersAtProLocation / offersAtSalon -->
         <input type="checkbox" id="proModeHome"   style="display:none">
         <input type="checkbox" id="proModeProLoc" style="display:none">
         <input type="checkbox" id="proModeSalon"  style="display:none">
-        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:8px;">
-          <button type="button" class="mode-chip" id="chipModeHome"   data-for="proModeHome">🏠 À domicile</button>
-          <button type="button" class="mode-chip" id="chipModeProLoc" data-for="proModeProLoc">💼 Chez le pro</button>
-          <button type="button" class="mode-chip" id="chipModeSalon"  data-for="proModeSalon">✂️ En salon</button>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:4px;">
+          <button type="button" class="mode-chip" id="chipModeHome"   data-for="proModeHome">🏠 Domicile</button>
+          <button type="button" class="mode-chip" id="chipModeProLoc" data-for="proModeProLoc">🚗 Déplacement</button>
+          <button type="button" class="mode-chip" id="chipModeSalon"  data-for="proModeSalon">✂️ Salon</button>
         </div>
+        <div class="section-sub" style="font-size:.74rem; margin-top:6px;">🏠 Domicile = tu te rends chez le client · 🚗 Déplacement = le client vient à toi · ✂️ Salon = tu travailles en salon</div>
       </div>
       <div class="field">
         <label>Métier(s)</label>
@@ -1590,8 +1612,8 @@
 
       <div class="filter-grid">
         <div class="filter-group">
-          <h4>Lieu de la prestation</h4>
-          <div class="seg-grid seg-grid--2" id="filterPlaceGrid"></div>
+          <h4>Lieu de travail</h4>
+          <div class="seg-grid seg-grid--3" id="filterPlaceGrid"></div>
         </div>
         <div class="filter-group">
           <h4>Catégories</h4>
@@ -1630,7 +1652,7 @@
     { key: "MANUCURE",           label: "Manucure" }
   ];
 
-  const placeOptions = ["En déplacement", "En salon"];
+  const placeOptions = ["Domicile", "Déplacement", "Salon"];
 
   const emptyState = {
     pros: {
@@ -2736,9 +2758,66 @@ function syncGoogleUiVisibility(screenId) {
       return;
     }
 
+  // A4+A5 — Carte mini + bouton itinéraire dans la fiche pro
+  function renderDetailLocation(pro) {
+    const section = document.getElementById("detailLocationSection");
+    if (!section) return;
+
+    const hasCoords = Number.isFinite(pro.lat) && Number.isFinite(pro.lng)
+                      && !(pro.lat === 0 && pro.lng === 0);
+    const hasCity   = !!pro.location;
+
+    if (!hasCoords && !hasCity) {
+      section.style.display = "none";
+      return;
+    }
+    section.style.display = "block";
+
+    // Label textuel
+    const labelEl = document.getElementById("detailLocationLabel");
+    if (labelEl) {
+      const offersAtHome = pro.raw?.offersAtHome;
+      if (offersAtHome && !pro.raw?.offersAtSalon && !pro.raw?.offersAtProLocation) {
+        labelEl.textContent = "Ce professionnel se déplace chez vous — l\'itinéraire est indicatif.";
+      } else {
+        labelEl.textContent = pro.location ? "Secteur : " + pro.location : "";
+      }
+    }
+
+    // Static map (uniquement si lat+lng disponibles)
+    const mapImg = document.getElementById("detailStaticMap");
+    if (mapImg && hasCoords && typeof GOOGLE_MAPS_API_KEY !== "undefined" && GOOGLE_MAPS_API_KEY) {
+      const lat = pro.lat.toFixed(6);
+      const lng = pro.lng.toFixed(6);
+      mapImg.src = "https://maps.googleapis.com/maps/api/staticmap"
+        + "?center=" + lat + "," + lng
+        + "&zoom=14&size=400x140&scale=2"
+        + "&markers=color:0x6c3bcc%7C" + lat + "," + lng
+        + "&key=" + GOOGLE_MAPS_API_KEY;
+      mapImg.style.display = "block";
+      mapImg.onerror = () => { mapImg.style.display = "none"; };
+    } else if (mapImg) {
+      mapImg.style.display = "none";
+    }
+
+    // Boutons Maps + Itinéraire
+    const mapsBtn = document.getElementById("detailMapsBtn");
+    const dirBtn  = document.getElementById("detailDirectionsBtn");
+    if (hasCoords) {
+      const dest   = pro.lat.toFixed(6) + "," + pro.lng.toFixed(6);
+      if (mapsBtn) mapsBtn.href = "https://www.google.com/maps/search/?api=1&query=" + dest;
+      if (dirBtn)  dirBtn.href  = "https://www.google.com/maps/dir/?api=1&destination=" + dest;
+    } else {
+      const q = encodeURIComponent((pro.name || "") + " " + (pro.location || ""));
+      if (mapsBtn) mapsBtn.href = "https://www.google.com/maps/search/?api=1&query=" + q;
+      if (dirBtn)  dirBtn.href  = "https://www.google.com/maps/search/?api=1&query=" + q;
+    }
+  }
+
     state.selectedPro = detailed;
     state.selectedServiceId = null;
     state.selectedServiceName = null;
+    renderDetailLocation(detailed); // A4+A5 — mini-carte + itinéraire
     // Reset récap service
     const recap = document.getElementById("serviceSelectionRecap");
     if (recap) recap.classList.remove("visible");
@@ -3325,11 +3404,13 @@ function syncGoogleUiVisibility(screenId) {
 
   // Mapping place UI → enum backend
   // Mapping filtres UI → mode backend
-  // "En déplacement" = le pro se déplace chez le client (offersAtHome / mode HOME)
-  // "En salon"       = le client se rend au pro (offersAtSalon / mode SALON)
+  // Domicile    = pro vient chez le client              (offersAtHome / mode HOME)
+  // Déplacement = pro se déplace (ProLocation repurpose) (offersAtProLocation / mode PRO_PLACE)
+  // Salon       = client se rend au pro                  (offersAtSalon / mode SALON)
   const PLACE_TO_MODE = {
-    "En déplacement": "HOME",
-    "En salon": "SALON",
+    "Domicile":    "HOME",
+    "Déplacement": "PRO_PLACE",
+    "Salon":       "SALON",
   };
 
   async function loadPros() {
@@ -4168,7 +4249,8 @@ function syncGoogleUiVisibility(screenId) {
     if (!state.session?.accessToken) return;
     try {
       const raw = await appApi.myServices();
-      _myServices = Array.isArray(raw) ? raw : (raw?.items ?? []);
+      const _allServices = Array.isArray(raw) ? raw : (raw?.items ?? []);
+      _myServices = _allServices.filter(s => s.status !== 'INACTIVE'); // soft-delete: masquer les supprimés
     } catch (_) { _myServices = []; }
     renderServicesTab();
   }
@@ -4185,9 +4267,20 @@ function syncGoogleUiVisibility(screenId) {
   function populateServiceCategorySelect() {
     const sel = document.getElementById("svcCategory");
     if (!sel) return;
-    sel.innerHTML = _backendCategories.length
-      ? _backendCategories.map(c => `<option value="${c.id}">${c.label || c.name}</option>`).join("")
-      : categoriesFallback.map(c => `<option value="${c.key}">${c.label}</option>`).join("");
+    if (_backendCategories.length) {
+      sel.innerHTML = _backendCategories.map(c => `<option value="${c.id}">${c.label || c.name}</option>`).join("");
+      const statusEl = document.getElementById("serviceFormStatus");
+      if (statusEl) statusEl.style.display = "none";
+    } else {
+      // Fallback : catégories non chargées depuis le backend
+      sel.innerHTML = '<option value="">⚠ Catégories indisponibles — rechargez l\'onglet</option>';
+      const statusEl = document.getElementById("serviceFormStatus");
+      if (statusEl) {
+        statusEl.textContent = "Impossible de charger les métiers. Revenez sur cet onglet pour réessayer.";
+        statusEl.style.display = "block";
+        statusEl.style.color = "#e53935";
+      }
+    }
   }
 
   function renderServicesTab() {
@@ -4266,6 +4359,11 @@ function syncGoogleUiVisibility(screenId) {
     const statusEl    = document.getElementById("serviceFormStatus");
     if (!title || !priceRaw || !durationRaw || !categoryId) {
       if (statusEl) { statusEl.textContent = "Remplis le métier, le titre, le prix et la durée."; statusEl.style.display = "block"; }
+      return;
+    }
+    // Guard : categoryId doit être un UUID (contient des tirets) — pas une clé fallback
+    if (!categoryId.includes('-')) {
+      if (statusEl) { statusEl.textContent = "Sélectionne un métier valide dans la liste (rechargez l'onglet si la liste est vide)."; statusEl.style.display = "block"; statusEl.style.color = "#e53935"; }
       return;
     }
     const price = parseFloat(priceRaw);
@@ -4356,9 +4454,14 @@ function syncGoogleUiVisibility(screenId) {
         btn.classList.add("active");
         const target = document.getElementById(btn.dataset.tab);
         if (target) target.style.display = "block";
-        if (btn.dataset.tab === "tab-prestations" && !btn.dataset.loaded) {
-          btn.dataset.loaded = "1";
-          initServicesTab();
+        if (btn.dataset.tab === "tab-prestations") {
+          if (!btn.dataset.loaded) {
+            btn.dataset.loaded = "1";
+            initServicesTab();
+          } else {
+            // Rafraîchir la liste à chaque retour sur l'onglet
+            loadMyServices();
+          }
         }
       });
     });
@@ -5016,13 +5119,4 @@ tr:nth-child(odd) td{background:#FAF7F3;}
       <div style="font-size:52px;line-height:1;margin-bottom:12px;">❌</div>
       <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement refusé</h2>
       <p style="font-size:.9rem;color:var(--muted);margin:0 0 8px;">Ton paiement n'a pas pu être traité.</p>
-      <p style="font-size:.83rem;color:var(--muted);margin:0 0 24px;">Vérifie les informations de ta carte ou essaie avec un autre moyen de paiement.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;">
-        <button class="primary-btn" onclick="retryPayment()">Réessayer le paiement</button>
-        <button class="secondary-btn" onclick="closePaymentResult('failed')">Retour à l'accueil</button>
-      </div>
-    </div>
-  </div>
-
-</body>
-</html>
+      <p style="font-size:.83rem;color:var(--muted);margin:0 0 24px;

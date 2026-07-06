@@ -404,11 +404,14 @@
     }
     .map-user-dot { position: absolute; width: 18px; height: 18px; border-radius: 50%; background: #4ba4ff; border: 4px solid rgba(255,255,255,.88); box-shadow: 0 0 0 8px rgba(75,164,255,.15); left: 46%; top: 42%; z-index: 2; }
     .map-position-btn {
-      position: absolute; right: 16px; bottom: 112px; z-index: 2;
-      padding: 12px 14px; border-radius: 16px; background: rgba(255,255,255,.9); border: 1px solid var(--line);
-      font-size: 12px; font-weight: 700; box-shadow: var(--shadow-xs);
-      backdrop-filter: blur(10px);
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      width: 100%; padding: 10px 16px; border-radius: 20px;
+      background: #fff; border: 1.5px solid var(--violet);
+      color: var(--violet); font-size: 13px; font-weight: 700;
+      box-shadow: 0 2px 10px rgba(92,26,24,.10);
+      margin-bottom: 2px;
     }
+    .map-position-btn:active { opacity: .8; }
     .bottom-sheet {
       position: absolute; left: 10px; right: 10px; bottom: 10px; z-index: 3;
       border-radius: 30px; background: rgba(255,255,255,.94); border: 1px solid rgba(255,255,255,.92);
@@ -438,7 +441,7 @@
       display: grid; grid-template-columns: 64px 1fr auto; gap: 12px; align-items: center;
       padding: 12px; border-radius: 22px; background: var(--surface-soft); border: 1px solid var(--line); margin-bottom: 10px;
     }
-    .pro-avatar { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; }
+    .pro-avatar { width: 64px; height: 64px; border-radius: 18px; object-fit: cover; border: 2px solid rgba(92,26,24,.16); box-shadow: 0 6px 18px rgba(92,26,24,.10); background: #F3EEE6; }
     .pro-main { min-width: 0; }
     .pro-name { font-size: 15px; font-weight: 800; }
     .pro-meta, .pro-secondary { font-size: 12px; color: #6b6274; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -588,7 +591,7 @@
     /* Pro dashboard */
     .pro-header-card { padding: 20px; }
     .pro-header-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .pro-avatar-lg { width: 60px; height: 60px; border-radius: 22px; object-fit: cover; }
+    .pro-avatar-lg { width: 68px; height: 68px; border-radius: 22px; object-fit: cover; border: 2px solid rgba(92,26,24,.18); box-shadow: 0 12px 28px rgba(92,26,24,.12); background: #F3EEE6; }
     .online-chip { background: var(--green); color: var(--green-ink); padding: 8px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; }
     .online-toggle-btn { padding: 8px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; transition: .22s ease; border: 0; }
     .online-toggle-btn.is-online { background: var(--green); color: var(--green-ink); }
@@ -1003,15 +1006,17 @@
                 <span style="color:#bbb2c2;">›</span>
               </div>
             </div>
+            <div style="padding:0 4px 2px;">
+              <button class="map-position-btn" id="mapPositionBtn">📍 Me localiser</button>
+            </div>
             <div class="place-row" id="placeRow"></div>
           </div>
-          <button class="map-position-btn" id="mapPositionBtn">📍 Ma position</button>
 
           <div class="bottom-sheet sheet-state-1" id="bottomSheet">
             <button class="sheet-handle" id="sheetHandle" aria-label="Déplier"></button>
             <div class="sheet-header">
               <div>
-                <h3>Pros disponibles</h3>
+                <h3>Professionnels disponibles</h3>
                 <p class="section-sub">Sélection premium proche de toi</p>
               </div>
               <button class="sheet-link" id="sheetCycle">Voir tout</button>
@@ -1044,14 +1049,15 @@
             <div class="badge" id="detailPrice">à partir de 35€</div>
           </div>
 
-          <div class="tabs">
-            <button class="tab active">Prestations</button>
-            <button class="tab">Infos</button>
-            <button class="tab">Avis</button>
-            <button class="tab">Portfolio</button>
+          <div class="tabs" id="detailTabs">
+            <button class="tab active" data-detail-tab="prestations">Prestations</button>
+            <button class="tab" data-detail-tab="infos">Infos</button>
+            <button class="tab" data-detail-tab="avis">Avis</button>
+            <button class="tab" data-detail-tab="portfolio">Portfolio</button>
           </div>
 
           <div class="stack-12 mt-14" id="detailServices"></div>
+          <div id="detailPortfolio" style="display:none;"></div>
 
           <!-- A4 : localisation pro + A5 : bouton itinéraire Google Maps -->
           <div id="detailLocationSection" style="display:none; margin-top:20px; padding-top:16px; border-top:1px solid var(--line-2);">
@@ -1189,7 +1195,7 @@
 
   <div class="card list-card">
     <div class="account-header">
-      <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Invité">
+      <img class="account-avatar" src="assets/img/logo-ubodrop-icon-brown.png" alt="Invité">
       <div style="flex:1;">
         <div class="account-name">Compte invité</div>
         <div class="account-role">Connecte-toi pour afficher tes données réelles.</div>
@@ -1216,7 +1222,7 @@
   <div class="card pro-header-card">
     <div class="pro-header-top" id="proDashHeader">
       <div style="display:flex; gap:12px; align-items:center;">
-        <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Espace pro">
+        <img class="pro-avatar-lg" src="assets/img/logo-ubodrop-icon-brown.png" alt="Espace pro">
         <div>
           <strong style="font-size:1.15rem;">Espace pro</strong>
           <div class="section-sub">Connecte-toi pour accéder à ton espace.</div>
@@ -1240,7 +1246,7 @@
 
   <!-- Onglets -->
   <div class="pro-tabs" id="proTabs" style="display:flex; gap:6px; margin:16px 0 0; overflow-x:auto; scrollbar-width:none;">
-    <button class="pro-tab active" data-tab="tab-rdv">📅 RDV</button>
+    <button class="pro-tab active" data-tab="tab-rdv">📅 Rendez-vous</button>
     <button class="pro-tab" data-tab="tab-prestations">✂️ Prestations</button>
     <button class="pro-tab" data-tab="tab-profil">👤 Profil</button>
     <button class="pro-tab" data-tab="tab-portfolio">🖼 Portfolio</button>
@@ -1743,7 +1749,7 @@
 
   const screenToNavClient = [
     { id: "screen-search", label: "Carte", icon: navIcons.map },
-    { id: "screen-rdv", label: "RDV", icon: navIcons.calendar },
+    { id: "screen-rdv", label: "Rendez-vous", icon: navIcons.calendar },
     { id: "screen-chat", label: "Chat", icon: navIcons.chat },
     { id: "screen-account", label: "Compte", icon: navIcons.user }
   ];
@@ -2219,6 +2225,7 @@
         description: item?.bio || item?.description || "",
         services,
         gallery: [item?.avatarUrl, item?.imageUrl, item?.coverImage].filter(Boolean),
+        portfolioPhotos: Array.isArray(item?.portfolioPhotos) ? item.portfolioPhotos : [],
         lat: Number(item?.latitude ?? item?.lat),
         lng: Number(item?.longitude ?? item?.lng),
         raw: item
@@ -2316,7 +2323,7 @@ function syncGoogleUiVisibility(screenId) {
     sheet.classList.add(`sheet-state-${state.sheetState}`);
     const cycleLabel = document.getElementById("sheetCycle");
     if (cycleLabel) {
-      cycleLabel.textContent = ["Ouvrir", "Monter", "Développer", "Réduire"][state.sheetState];
+      cycleLabel.textContent = ["Ouvrir", "Voir plus", "Développer", "Réduire"][state.sheetState];
     }
   }
 
@@ -2329,13 +2336,13 @@ function syncGoogleUiVisibility(screenId) {
       const chip = document.createElement("button");
       chip.className = "place-chip" + (state.place === place ? " active" : "");
       chip.textContent = place;
-      chip.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); };
+      chip.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); loadPros(); };
       row.appendChild(chip);
 
       const seg = document.createElement("button");
       seg.className = "seg" + (state.place === place ? " active" : "");
       seg.textContent = place;
-      seg.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); };
+      seg.onclick = () => { state.place = state.place === place ? null : place; renderPlaceChips(); loadPros(); };
       filterGrid.appendChild(seg);
     });
   }
@@ -2406,15 +2413,17 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   function getVisiblePros() {
-    // Si pas de filtre catégorie → tous les pros
-    // Si catégorie filtrée → pros dont la catégorie correspond OU dont la catégorie est null
-    // (un pro retourné par le backend avec filtre catégorie mais sans catégorie détectable
-    //  côté frontend ne doit PAS être exclu ici — le backend a déjà fait la vérification)
-    return state.pros.filter((pro) =>
-      !state.category ||
-      pro.category === state.category ||
-      pro.category == null
-    );
+    // Double défense : le backend filtre déjà via modeFilter, mais on re-filtre côté
+    // frontend pour éviter qu'un refresh partiel n'affiche un pro non éligible.
+    return state.pros.filter((pro) => {
+      // Filtre catégorie (inchangé : null = inconnu → autorisé)
+      if (state.category && pro.category !== state.category && pro.category != null) return false;
+      // Filtre lieu de travail (backend + frontend cohérents)
+      if (state.place === "Domicile"    && pro.raw?.offersAtHome !== true)        return false;
+      if (state.place === "Déplacement" && pro.raw?.offersAtProLocation !== true) return false;
+      if (state.place === "Salon"       && pro.raw?.offersAtSalon !== true)       return false;
+      return true;
+    });
   }
 
   function renderMapEmptyMessage() {
@@ -2844,7 +2853,7 @@ function syncGoogleUiVisibility(screenId) {
     const cta = document.getElementById("detailCta");
     if (cta) { cta.textContent = "Sélectionne une prestation"; cta.disabled = false; }
 
-    document.getElementById("detailHero").src = detailed.gallery[0] || detailed.image || "assets/img/ubo-drop-logo.png";
+    document.getElementById("detailHero").src = detailed.gallery[0] || detailed.image || "assets/img/logo-ubodrop-icon-brown.png";
     document.getElementById("detailName").textContent = detailed.name;
     document.getElementById("detailDesc").textContent = detailed.description || "Professionnel vérifié sur UBODROP.";
     document.getElementById("detailPrice").textContent = detailed.fromPrice ? `à partir de ${detailed.fromPrice}` : "Tarif sur demande";
@@ -2896,9 +2905,62 @@ function syncGoogleUiVisibility(screenId) {
       `).join("");
     }
 
+    // ── Tab switching dans la fiche prestataire ──────────────────────────────
+    document.querySelectorAll("#detailTabs .tab").forEach((tab) => {
+      tab.onclick = () => {
+        document.querySelectorAll("#detailTabs .tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const tabName = tab.getAttribute("data-detail-tab");
+        const svcEl  = document.getElementById("detailServices");
+        const portEl = document.getElementById("detailPortfolio");
+        if (tabName === "portfolio") {
+          if (svcEl)  svcEl.style.display  = "none";
+          if (portEl) { portEl.style.display = ""; renderDetailPortfolio(state.selectedPro); }
+        } else {
+          if (svcEl)  svcEl.style.display  = "";
+          if (portEl) portEl.style.display = "none";
+        }
+      };
+    });
+    // Reset : montrer onglet Prestations à chaque ouverture
+    document.querySelectorAll("#detailTabs .tab").forEach(t => t.classList.remove("active"));
+    const firstTab = document.querySelector("#detailTabs .tab[data-detail-tab='prestations']");
+    if (firstTab) firstTab.classList.add("active");
+    const portEl0 = document.getElementById("detailPortfolio");
+    const svcEl0  = document.getElementById("detailServices");
+    if (svcEl0)  svcEl0.style.display  = "";
+    if (portEl0) portEl0.style.display = "none";
+
     goTo("screen-detail");
   }
 
+  // ── Rendu portfolio dans la fiche client ─────────────────────────────────
+  function renderDetailPortfolio(pro) {
+    const el = document.getElementById("detailPortfolio");
+    if (!el || !pro) return;
+    const photos = pro.portfolioPhotos && pro.portfolioPhotos.length
+      ? pro.portfolioPhotos
+      : (pro.raw?.portfolioPhotos || []);
+    if (!photos.length) {
+      el.innerHTML = `
+        <div class="soft-card" style="padding:24px 18px; text-align:center; margin-top:14px;">
+          <div style="font-size:2rem; margin-bottom:8px;">📷</div>
+          <div class="section-title" style="font-size:.95rem;">Aucune photo pour le moment</div>
+          <div class="section-sub" style="margin-top:6px;">Ce professionnel n'a pas encore ajouté de photo.</div>
+        </div>`;
+      return;
+    }
+    el.innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px;">
+        ${photos.map(p => `
+          <div style="border-radius:12px; overflow:hidden; aspect-ratio:1; background:var(--surface-soft);">
+            <img src="${p.url}" alt="${(p.caption || 'Photo portfolio').replace(/"/g,'&quot;')}"
+                 style="width:100%; height:100%; object-fit:cover;" loading="lazy"
+                 onerror="this.parentElement.style.display='none'">
+          </div>
+        `).join("")}
+      </div>`;
+  }
 
   // ── Traduction statuts booking / paiement ──────────────────────────────────
 
@@ -2996,7 +3058,7 @@ function syncGoogleUiVisibility(screenId) {
     if (!appApi.getToken()) {
       if (accountHeader) {
         accountHeader.innerHTML = `
-          <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Invité">
+          <img class="account-avatar" src="assets/img/logo-ubodrop-icon-brown.png" alt="Invité">
           <div style="flex:1;">
             <div class="account-name">${emptyState.accountGuest.title}</div>
             <div class="account-role">${emptyState.accountGuest.text}</div>
@@ -3015,7 +3077,7 @@ function syncGoogleUiVisibility(screenId) {
 
     if (accountHeader) {
       accountHeader.innerHTML = `
-        <img class="account-avatar" src="assets/img/ubo-drop-logo.png" alt="Profil utilisateur">
+        <img class="account-avatar" src="assets/img/logo-ubodrop-icon-brown.png" alt="Profil utilisateur">
         <div style="flex:1;">
           <div class="account-name">${authUser.displayName}</div>
           <div class="account-role">${authUser.roleLabel} • ${authUser.email}</div>
@@ -3172,7 +3234,7 @@ function syncGoogleUiVisibility(screenId) {
 
     card.innerHTML = state.conversations.map((conv) => `
       <div class="list-item" data-conversation-id="${conv.id}">
-        <img src="assets/img/ubo-drop-logo.png" alt="${conversationTitle(conv)}">
+        <img src="assets/img/logo-ubodrop-icon-brown.png" alt="${conversationTitle(conv)}">
         <div style="flex:1;">
           <strong>${conversationTitle(conv)}</strong>
           <p>${truncate(conv.lastMessage || "Ouvrir la conversation", 54)}</p>
@@ -3246,7 +3308,7 @@ function syncGoogleUiVisibility(screenId) {
     if (state.userMode !== "pro" || !appApi.getToken()) {
       if (header) header.innerHTML = `
         <div style="display:flex; gap:12px; align-items:center;">
-          <img class="pro-avatar-lg" src="assets/img/ubo-drop-logo.png" alt="Pro">
+          <img class="pro-avatar-lg" src="assets/img/logo-ubodrop-icon-brown.png" alt="Pro">
           <div>
             <strong style="font-size:1.15rem;">${emptyState.proDashboard.title}</strong>
             <div class="section-sub">${emptyState.proDashboard.text}</div>
@@ -3267,7 +3329,7 @@ function syncGoogleUiVisibility(screenId) {
     const proProfile = state.authUser?.proProfile;
 
     if (header) {
-      const avatarSrc = proProfile?.avatarUrl || "assets/img/ubo-drop-logo.png";
+      const avatarSrc = proProfile?.avatarUrl || "assets/img/logo-ubodrop-icon-brown.png";
       header.innerHTML = `
         <div style="display:flex; gap:12px; align-items:center;">
           <img class="pro-avatar-lg" src="${avatarSrc}" alt="Pro" style="object-fit:cover;">
@@ -5245,6 +5307,7 @@ tr:nth-child(odd) td{background:#FAF7F3;}
       <h2 style="font-size:1.25rem;font-weight:900;color:var(--ink);margin:0 0 6px;">Paiement confirmé !</h2>
       <p style="font-size:.9rem;color:var(--muted);margin:0 0 20px;">Ta réservation est confirmée. Un email de confirmation t'a été envoyé.</p>
       <!-- Récap réservation (rempli dynamiquement) -->
+      <div id="paySuccessRecap" style="background:var(--surface-soft);border-radius:14px;padding:14px 16px;text-align:left;margin-bottom:20px;font-size:.88rem;line-height:1.7;color:var(--ink);"></div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <button class="primary-btn" onclick="closePaymentResult('success')">Voir mes rendez-vous</button>
         <button class="secondary-btn" id="downloadInvoiceBtn" onclick="downloadInvoice()">Télécharger la facture</button>

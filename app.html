@@ -2487,6 +2487,7 @@ function syncGoogleUiVisibility(screenId) {
   }
 
   // Cache géocodage ville -> coordonnées (les pros n'ont pas tous lat/lng en base)
+  // Note : on ne cache PAS les résultats null pour permettre les retentatives
   const _cityGeocodeCache = {};
   function geocodeCity(city) {
     if (!city || !window.google?.maps?.Geocoder) return Promise.resolve(null);
@@ -2495,18 +2496,26 @@ function syncGoogleUiVisibility(screenId) {
     }
     return new Promise((resolve) => {
       try {
-        new google.maps.Geocoder().geocode({ address: `${city}, France` }, (res, status) => {
+        // Biais géographique vers la zone de recherche actuelle (évite le mauvais "Aulnay")
+        const opts = { address: `${city}, France` };
+        if (state.map?.getBounds()) opts.bounds = state.map.getBounds();
+        new google.maps.Geocoder().geocode(opts, (res, status) => {
           if (status === "OK" && res && res[0]) {
             const loc = res[0].geometry.location;
             const pos = { lat: loc.lat(), lng: loc.lng() };
             _cityGeocodeCache[city] = pos;
+            console.log(`[UBODROP][Geocode] "${city}" → lat=${pos.lat.toFixed(4)}, lng=${pos.lng.toFixed(4)}`);
             resolve(pos);
           } else {
-            _cityGeocodeCache[city] = null;
+            // Pas de mise en cache des échecs → retentative possible au prochain appel
+            console.warn(`[UBODROP][Geocode] "${city}" échec : status=${status}`);
             resolve(null);
           }
         });
-      } catch (e) { resolve(null); }
+      } catch (e) {
+        console.warn(`[UBODROP][Geocode] exception pour "${city}":`, e);
+        resolve(null);
+      }
     });
   }
 
@@ -2525,16 +2534,31 @@ function syncGoogleUiVisibility(screenId) {
   function renderMapMarkers() {
     if (!state.map || !window.google?.maps) return;
     clearMapMarkers();
+    const searchFallback = (state.searchLocation?.lat && state.searchLocation?.lng)
+      ? { lat: state.searchLocation.lat, lng: state.searchLocation.lng }
+      : null;
     getVisiblePros().forEach((pro) => {
       // Coordonnées valides = non-null, finies, et pas (0,0) [Number(null)=0 était le bug]
       const hasValidCoords = pro.lat != null && pro.lng != null &&
                              Number.isFinite(pro.lat) && Number.isFinite(pro.lng) &&
                              !(pro.lat === 0 && pro.lng === 0);
+      console.log(`[UBODROP][Marker] ${pro.name} lat=${pro.lat} lng=${pro.lng} location="${pro.location}" hasValidCoords=${hasValidCoords}`);
       if (hasValidCoords) {
         placeProMarker(pro, { lat: pro.lat, lng: pro.lng });
       } else if (pro.location) {
-        // Pas de coordonnées en base → géocodage de la ville (marker approximatif)
-        geocodeCity(pro.location).then((pos) => { if (pos) placeProMarker(pro, pos); });
+        // Pas de coordonnées en base → géocodage biaisé vers la zone de recherche
+        geocodeCity(pro.location).then((pos) => {
+          if (pos) {
+            placeProMarker(pro, pos);
+          } else if (searchFallback) {
+            // Fallback : zone de recherche (marker approximatif visible)
+            console.log(`[UBODROP][Marker] fallback searchLocation pour ${pro.name}`);
+            placeProMarker(pro, searchFallback);
+          }
+        });
+      } else if (searchFallback) {
+        // Pas de ville connue → zone de recherche
+        placeProMarker(pro, searchFallback);
       }
     });
   }

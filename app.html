@@ -2226,8 +2226,8 @@
         services,
         gallery: [item?.avatarUrl, item?.imageUrl, item?.coverImage].filter(Boolean),
         portfolioPhotos: Array.isArray(item?.portfolioPhotos) ? item.portfolioPhotos : [],
-        lat: Number(item?.latitude ?? item?.lat),
-        lng: Number(item?.longitude ?? item?.lng),
+        lat: (item?.latitude != null) ? Number(item.latitude) : ((item?.lat != null) ? Number(item.lat) : null),
+        lng: (item?.longitude != null) ? Number(item.longitude) : ((item?.lng != null) ? Number(item.lng) : null),
         raw: item
       };
     });
@@ -2526,10 +2526,14 @@ function syncGoogleUiVisibility(screenId) {
     if (!state.map || !window.google?.maps) return;
     clearMapMarkers();
     getVisiblePros().forEach((pro) => {
-      if (Number.isFinite(pro.lat) && Number.isFinite(pro.lng)) {
+      // Coordonnées valides = non-null, finies, et pas (0,0) [Number(null)=0 était le bug]
+      const hasValidCoords = pro.lat != null && pro.lng != null &&
+                             Number.isFinite(pro.lat) && Number.isFinite(pro.lng) &&
+                             !(pro.lat === 0 && pro.lng === 0);
+      if (hasValidCoords) {
         placeProMarker(pro, { lat: pro.lat, lng: pro.lng });
       } else if (pro.location) {
-        // Pas de coordonnées en base -> géocodage de la ville (marker approximatif)
+        // Pas de coordonnées en base → géocodage de la ville (marker approximatif)
         geocodeCity(pro.location).then((pos) => { if (pos) placeProMarker(pro, pos); });
       }
     });

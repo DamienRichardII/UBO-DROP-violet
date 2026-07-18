@@ -304,7 +304,7 @@
       width: clamp(200px, 54vw, 300px);
       max-width: 78%;
       height: auto;
-      margin: 0 auto clamp(6px, 1.2svh, 14px);
+      margin: 0 auto clamp(30px, 5.5svh, 56px);
       display: block;
       object-fit: contain;
       filter: drop-shadow(0 4px 12px rgba(92, 26, 24, .12));
@@ -335,19 +335,23 @@
     .proof-line { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
     .proof-sub { margin-top: 8px; font-size: 14px; color: #595261; }
 
-    /* ── Home : distribution verticale équilibrée ── */
+    /* ── Home : hiérarchie visuelle par groupes fonctionnels ── */
     .home-content-under-logo {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       padding-bottom: clamp(4px, 0.8svh, 10px);
     }
-    /* Supprimer les marges internes — le flex gap gère l'espacement */
+    /* Annuler les marges utilitaires et intrinsèques des enfants */
     .home-content-under-logo .steps-card,
     .home-content-under-logo .proof-card { margin-top: 0; }
     .home-content-under-logo > .mt-20,
     .home-content-under-logo > .mt-12 { margin-top: 0; }
+    /* Espacements différenciés — déclarés APRÈS les zéros pour primer */
+    .home-content-under-logo > :nth-child(1) { margin-top: 0; }
+    .home-content-under-logo > :nth-child(2) { margin-top: clamp(14px, 2.5svh, 22px); }
+    .home-content-under-logo > :nth-child(3) { margin-top: clamp(10px, 1.8svh, 18px); }
+    .home-content-under-logo > :nth-child(4) { margin-top: clamp(5px, 0.9svh, 9px); }
 
     /* ── Nav en haut pour l'espace pro ── */
     .bottom-nav.nav-top {

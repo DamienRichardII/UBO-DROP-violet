@@ -1754,7 +1754,8 @@
     selectedBookingStartsAt: null,
     bookingMode: "ASAP",
     loginMode: "any",
-    returnToScreen: null
+    returnToScreen: null,
+    hasAutoLocated: false
   };
 
   const navIcons = {
@@ -2350,6 +2351,11 @@ function syncGoogleUiVisibility(screenId) {
     syncGoogleUiVisibility(screenId);
     // Hooks écrans pro
     if (screenId === "screen-pro-map") { renderProMap(); }
+    // Auto-géolocalisation au premier affichage de la carte client
+    if (screenId === "screen-search" && !state.hasAutoLocated) {
+      state.hasAutoLocated = true;
+      setTimeout(centerOnUser, 900);
+    }
   }
 
   function toggleFilter(open) {
@@ -4129,8 +4135,16 @@ function syncGoogleUiVisibility(screenId) {
     const schedErr = document.getElementById("scheduledError");
     if (schedErr) schedErr.style.display = "none";
 
-    // Mode par défaut : Dès que possible (comportement actuel conservé)
+    // Mode par défaut : Dès que possible
     setBookingMode("ASAP");
+
+    // Auto-sélection du 1er créneau pour éviter le blocage du bouton Confirmer
+    setTimeout(() => {
+      const firstSlot = document.querySelector(".quick-booking-slot");
+      if (firstSlot && !state.selectedBookingStartsAt) {
+        firstSlot.click();
+      }
+    }, 50);
 
     overlay.classList.add("open");
   }
@@ -4407,8 +4421,10 @@ function syncGoogleUiVisibility(screenId) {
       const savedAvatar = updated?.avatarUrl || dto.avatarUrl;
       if (savedAvatar) {
         document.querySelectorAll(".pro-avatar-lg").forEach(el => { el.src = savedAvatar; });
+        document.querySelectorAll(".account-avatar").forEach(el => { el.src = savedAvatar; });
         const preview = document.getElementById("proAvatarPreview");
         if (preview) preview.src = savedAvatar;
+        if (state.authUser?.proProfile) state.authUser.proProfile.avatarUrl = savedAvatar;
         _pendingAvatarDataUrl = null;
       }
     } catch (error) {
@@ -4513,6 +4529,7 @@ function syncGoogleUiVisibility(screenId) {
       if (!appApi.getToken()) { notify("Connecte-toi pour continuer."); return; }
       const caption = document.getElementById("portfolioCaptionUpload")?.value.trim() || undefined;
       confirmBtn.disabled = true; confirmBtn.textContent = "Envoi…";
+      if (galleryBtn) galleryBtn.disabled = true;
       statusEl.textContent = "Envoi en cours…";
       try {
         const photo = await appApi.addPortfolioPhoto(_pendingUploadDataUrl, caption);
@@ -4529,6 +4546,7 @@ function syncGoogleUiVisibility(screenId) {
         notify(friendlyApiError(error, "L'upload a échoué. Réessaie."), "error");
       } finally {
         confirmBtn.disabled = false; confirmBtn.textContent = "Envoyer";
+        if (galleryBtn) galleryBtn.disabled = false;
       }
     };
     cancelBtn.onclick = () => {
@@ -4545,6 +4563,8 @@ function syncGoogleUiVisibility(screenId) {
     const url     = document.getElementById("portfolioUrl")?.value.trim() || "";
     const caption = document.getElementById("portfolioCaption")?.value.trim() || "";
     if (!url) { notify("Renseigne l'URL de la photo."); return; }
+    const addBtn = document.getElementById("addPortfolioPhotoBtn");
+    if (addBtn) { addBtn.disabled = true; addBtn.textContent = "Envoi…"; }
     try {
       const photo = await appApi.addPortfolioPhoto(url, caption || undefined);
       if (state.authUser?.proProfile) {
@@ -4555,6 +4575,8 @@ function syncGoogleUiVisibility(screenId) {
       document.getElementById("portfolioCaption").value = "";
     } catch (error) {
       notify(friendlyApiError(error, "L'ajout a échoué. Réessaie dans quelques instants."), "error");
+    } finally {
+      if (addBtn) { addBtn.disabled = false; addBtn.textContent = "Ajouter"; }
     }
   }
 
@@ -5322,10 +5344,27 @@ tr:nth-child(odd) td{background:#FAF7F3;}
   });
 
   // Mode chips (Modes de prestation espace pro)
+  // Règle : Salon est exclusif (travail en salon ≠ domicile/déplacement)
   document.querySelectorAll(".mode-chip[data-for]").forEach(chip => {
     chip.addEventListener("click", () => {
       const chk = document.getElementById(chip.dataset.for);
-      if (chk) { chk.checked = !chk.checked; chip.classList.toggle("active", chk.checked); }
+      if (!chk) return;
+      chk.checked = !chk.checked;
+      chip.classList.toggle("active", chk.checked);
+      // Si Salon activé → désélectionner Domicile + Déplacement
+      if (chip.id === "chipModeSalon" && chk.checked) {
+        ["proModeHome", "proModeProLoc"].forEach(id => {
+          const c = document.getElementById(id); if (c) c.checked = false;
+        });
+        ["chipModeHome", "chipModeProLoc"].forEach(id => {
+          document.getElementById(id)?.classList.remove("active");
+        });
+      }
+      // Si Domicile ou Déplacement activé → désélectionner Salon
+      if ((chip.id === "chipModeHome" || chip.id === "chipModeProLoc") && chk.checked) {
+        const chkSalon = document.getElementById("proModeSalon"); if (chkSalon) chkSalon.checked = false;
+        document.getElementById("chipModeSalon")?.classList.remove("active");
+      }
     });
   });
 

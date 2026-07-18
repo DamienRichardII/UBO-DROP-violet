@@ -331,6 +331,19 @@
     .proof-card { margin-top: 16px; padding: 16px 18px; text-align: center; }
     .proof-line { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
     .proof-sub { margin-top: 8px; font-size: 14px; color: #595261; }
+
+    /* ── Home : contenu sous logo légèrement plus bas ── */
+    .home-content-under-logo { margin-top: clamp(24px, 5vh, 56px); }
+
+    /* ── Nav en haut pour l'espace pro ── */
+    .bottom-nav.nav-top {
+      top: calc(12px + env(safe-area-inset-top, 0px));
+      bottom: auto !important;
+    }
+    .app.pro-nav-top .screen.active {
+      padding-top: calc(var(--bottom-nav-h) + env(safe-area-inset-top, 0px) + 20px);
+      padding-bottom: 20px;
+    }
     .mini-avatars { display: flex; justify-content: center; margin-top: 10px; }
     .mini-avatars img {
       width: 42px; height: 42px; border-radius: 14px; object-fit: cover; border: 2px solid white; margin-left: -8px; box-shadow: var(--shadow-xs);
@@ -807,6 +820,11 @@
         right: 10px;
         bottom: calc(8px + env(safe-area-inset-bottom));
       }
+      .bottom-nav.nav-top {
+        top: calc(10px + env(safe-area-inset-top, 0px));
+        bottom: auto !important;
+        left: 10px; right: 10px;
+      }
     }
 
     /* ── Mode chips (modes de prestation espace pro) ─────────────── */
@@ -896,6 +914,16 @@
         width: 100%;
         padding-bottom: 8px;
       }
+      .bottom-nav.nav-top {
+        position: fixed;
+        top: 0; bottom: auto !important;
+        left: 0; right: 0;
+        border-radius: 0;
+      }
+      .app.pro-nav-top .screen.active {
+        padding-top: calc(var(--bottom-nav-h) + 20px);
+        padding-bottom: 24px;
+      }
       /* Pro dashboard desktop */
       .pro-tabs { max-width: 800px; }
       #screen-pro-dashboard .card { max-width: 900px; }
@@ -965,36 +993,37 @@
 
                     
 
-          <div class="card steps-card">
-            <div class="steps-grid">
-              <div class="step-item">
-                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><circle cx="12" cy="10" r="2.3"/></svg></div>
-                <span>Choisis ton service</span>
-              </div>
-              <div class="step-item">
-                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="3"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div>
-                <span>Réserve</span>
-              </div>
-              <div class="step-item">
-                <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 14l1.7-4.2A2 2 0 0 1 8.56 8.5h6.88a2 2 0 0 1 1.86 1.3L19 14"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1M5 18H4a1 1 0 0 1-1-1v-3"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg></div>
-                <span>Le pro arrive</span>
+          <div class="home-content-under-logo">
+            <div class="card steps-card">
+              <div class="steps-grid">
+                <div class="step-item">
+                  <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s6-5.2 6-10a6 6 0 1 0-12 0c0 4.8 6 10 6 10Z"/><circle cx="12" cy="10" r="2.3"/></svg></div>
+                  <span>Choisis ton service</span>
+                </div>
+                <div class="step-item">
+                  <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="6" width="16" height="14" rx="3"/><path d="M8 4v4M16 4v4M4 10h16"/></svg></div>
+                  <span>Réserve</span>
+                </div>
+                <div class="step-item">
+                  <div class="step-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 14l1.7-4.2A2 2 0 0 1 8.56 8.5h6.88a2 2 0 0 1 1.86 1.3L19 14"/><path d="M4 14h16v3a1 1 0 0 1-1 1h-1M5 18H4a1 1 0 0 1-1-1v-3"/><circle cx="7.5" cy="18" r="1.5"/><circle cx="16.5" cy="18" r="1.5"/></svg></div>
+                  <span>Le pro arrive</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="stack-12 mt-20">
-            <button class="secondary-btn" data-go="screen-search" onclick="goTo('screen-search')">Trouver un pro</button>
-            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-pro" onclick="goTo('screen-register-pro')">Devenir pro</button>
-          </div>
+            <div class="stack-12 mt-20">
+              <button class="secondary-btn" data-go="screen-register-client" onclick="goTo('screen-register-client')">Créer un compte client</button>
+              <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-pro" onclick="goTo('screen-register-pro')">Créer un compte pro</button>
+            </div>
 
-          <div class="card proof-card">
-  <div class="proof-line">✨ <span>Ouverture progressive</span></div>
-  <div class="proof-sub">Les premiers prestataires arrivent bientôt sur UBODROP. Aucune donnée fictive n’est affichée en production.</div>
-</div>
+            <div class="card proof-card">
+              <div class="proof-line">✨ <span>Ouverture progressive</span></div>
+              <div class="proof-sub">Les premiers prestataires arrivent bientôt sur UBODROP. Aucune donnée fictive n’est affichée en production.</div>
+            </div>
 
-<div class="stack-12 mt-12">
-            <button class="primary-btn home-cta-match home-cta-match-light" data-go="screen-register-client" onclick="goTo('screen-register-client')">Créer un compte</button>
-            <div class="inline-note" style="text-align:center;">Déjà un compte ? <button class="switch-link" data-go="screen-login" onclick="goTo('screen-login')">Se connecter</button></div>
+            <div class="stack-12 mt-12">
+              <div class="inline-note" style="text-align:center;">Déjà un compte ? <button class="switch-link" data-go="screen-login" onclick="goTo('screen-login')">Se connecter</button></div>
+            </div>
           </div>
         </div>
       </section>
@@ -2319,13 +2348,20 @@ function syncGoogleUiVisibility(screenId) {
   function renderNav(screenId) {
     const nav = document.getElementById("bottomNav");
     const grid = document.getElementById("navGrid");
+    const appEl = document.querySelector(".app");
     const authScreens = ["screen-home","screen-login","screen-register-client","screen-register-pro","screen-forgot-password","screen-reset-password"];
     if (authScreens.includes(screenId)) {
       nav.classList.remove("show");
+      nav.classList.remove("nav-top");
+      if (appEl) appEl.classList.remove("pro-nav-top");
       return;
     }
     nav.classList.add("show");
-    const items = state.userMode === "pro" ? screenToNavPro : screenToNavClient;
+    // Espace pro → nav en haut ; espace client → nav en bas
+    const isPro = state.userMode === "pro";
+    nav.classList.toggle("nav-top", isPro);
+    if (appEl) appEl.classList.toggle("pro-nav-top", isPro);
+    const items = isPro ? screenToNavPro : screenToNavClient;
     grid.innerHTML = items.map(item => `
       <button class="nav-item ${item.id === screenId ? "active" : ""}" data-go="${item.id}">
         <span class="nav-icon">${item.icon}</span>

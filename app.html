@@ -294,14 +294,17 @@
     .primary-btn:active, .secondary-btn:active, .icon-btn:active { transform: scale(.985); }
 
     .home-hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
       text-align: center;
-      padding-top: 12px;
+      padding-top: 0;
     }
     .home-logo {
-      width: clamp(220px, 58vw, 320px);
-      max-width: 80%;
+      width: clamp(200px, 54vw, 300px);
+      max-width: 78%;
       height: auto;
-      margin: 0 auto 28px;
+      margin: 0 auto clamp(6px, 1.2svh, 14px);
       display: block;
       object-fit: contain;
       filter: drop-shadow(0 4px 12px rgba(92, 26, 24, .12));
@@ -332,8 +335,19 @@
     .proof-line { display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 15px; font-weight: 700; }
     .proof-sub { margin-top: 8px; font-size: 14px; color: #595261; }
 
-    /* ── Home : contenu sous logo légèrement plus bas ── */
-    .home-content-under-logo { margin-top: clamp(24px, 5vh, 56px); }
+    /* ── Home : distribution verticale équilibrée ── */
+    .home-content-under-logo {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: clamp(4px, 0.8svh, 10px);
+    }
+    /* Supprimer les marges internes — le flex gap gère l'espacement */
+    .home-content-under-logo .steps-card,
+    .home-content-under-logo .proof-card { margin-top: 0; }
+    .home-content-under-logo > .mt-20,
+    .home-content-under-logo > .mt-12 { margin-top: 0; }
 
     /* ── Nav en haut pour l'espace pro ── */
     .bottom-nav.nav-top {
@@ -363,7 +377,11 @@
 
     /* Search screen */
     #screen-search { padding-bottom: calc(var(--bottom-nav-h) + 8px); }
-    #screen-home { padding-bottom: calc(var(--bottom-nav-h) + 4px); }
+    #screen-home {
+      padding-bottom: calc(clamp(20px, 4svh, 40px) + env(safe-area-inset-bottom, 0px));
+      display: flex;
+      flex-direction: column;
+    }
     .home-hero { padding-bottom: 0; }
     .map-stage {
       position: relative;
